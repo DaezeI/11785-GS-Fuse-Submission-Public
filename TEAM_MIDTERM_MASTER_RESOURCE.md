@@ -118,25 +118,7 @@
     * **Learned Gate Openness:** Text **`51.07%`** | TS **`48.93%`** (nearly matches paper's reported 51.55%).
     * **Granger Causal Text Lift:** Full multimodal achieves **`+1.13%` error reduction** over TS-only ($0.000679 \to 0.000666$), proving incremental news signal.
 
----
 
-## 4. Master Experimental Results Table
-
-| Model Architecture | Input Modalities | Horizon ($H$) | Training Setup | Val MSE ($\times 10^{-3}$) | Test MSE ($\times 10^{-3}$) | Val DHR | Peak DHR | Key Finding & Gate Dynamics |
-| :--- | :--- | :--- | :--- | :--- | :--- | :--- | :--- | :--- | :--- |
-| **DLinear (Baseline)** | Price Only ($L=35$) | $H=35$ | 10 Epochs, Fixed LR $10^{-3}$ | 3.53 | 3.58 | 47.75% | 51.10% | Underfits; noisy directional betting |
-| **DLinear (Refined)** | Price Only ($L=35$) | $H=35$ | 50 Epochs, Cosine Annealing | **3.26** | **3.31** | **54.71%** | **55.91%** | +6.96% DHR gain via smooth LR decay |
-| **DLinear (Baseline)** | Price Only ($L=35$) | $H=140$ | 10 Epochs, Fixed LR $10^{-3}$ | 9.48 | 9.55 | 53.17% | 54.40% | Slower convergence on 2-day horizon |
-| **DLinear (Refined)** | Price Only ($L=35$) | $H=140$ | 50 Epochs, Cosine Annealing | **9.31** | **9.42** | **58.02%** | **58.87%** | +4.85% DHR gain; captures multi-day drift |
-| **GS-Fuse (Stage 1)** | Price Only (Sliding) | $H=140$ | 2 Epochs, MOMENT + Decoder | 5.71 | 5.82 | ~50.2% | 50.8% | Pre-trained continuous temporal feature space |
-| **GS-Fuse (Stage 2)** | Event Text Only | $H=140$ | 2 Epochs, LLaMA-3.2 + Decoder | **0.69** | **0.71** | ~53.4% | 54.1% | Text provides sharp volatility cues |
-| **GS-Fuse (Stage 3, Best)** | **Multimodal (TS + Text)** | $H=140$ | Full Granger Gate + MGA Alignment | **0.62** | **0.67** | **~56.8%** | **57.5%** | **Text Gate: 51.07% (Paper: 51.55%), +1.13% error reduction** |
-| **GS-Fuse (Stage 3, Best)** | **Multimodal (TS + Text)** | $H=70$ | Multi-Horizon Evaluation | **0.40** | **0.40** | **~57.2%** | **58.1%** | **MAE: 0.0131, SMAPE: 4.86%** |
-| **GS-Fuse (Stage 3, Best)** | **Multimodal (TS + Text)** | $H=35$ | Multi-Horizon Evaluation | **0.34** | **0.34** | **~58.4%** | **59.2%** | **MAE: 0.0121, SMAPE: 4.36%** |
-
----
-
-## 5. Discussion & Engineering Challenges (Snippets)
 
 * **Challenge 1: System RAM Exhaustion during LLM Initialization**
   * *Symptom:* Loading unquantized 3.2B LLaMA weights in `torch.float32` attempted to allocate ~13 GB in system RAM -> triggered `memory allocation failed` crashes.
@@ -150,8 +132,7 @@
 
 ---
 
-## 6. Proposed Innovation: Making the Gate Stricter via Volatility
-*(Our team's proposed novelty for the Final Report — simple connected ideas)*
+Proposed Innovation: Making the Gate Stricter via Volatility
 
 * **The Problem with the Paper's Current Gate:**
   * Original GS-Fuse gate opens $\sim 50.7\%$ of the time uniformly across the dataset.
