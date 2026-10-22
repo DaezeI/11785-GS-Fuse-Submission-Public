@@ -9,7 +9,7 @@
 
 ---
 
-## 1. High-Level Concepts & Intuition (Snippets)
+## 1. High-Level Concepts & Intuition 
 *(Quick mental model for everyone on the team — no paragraph fluff)*
 
 ### 1.1 The Task
