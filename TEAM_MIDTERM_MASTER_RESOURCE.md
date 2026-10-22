@@ -151,8 +151,8 @@ Proposed Innovation: Making the Gate Stricter via Volatility
 
 ## 7. Deliverables & Artifact File Locations
 
-* **DLinear Loss Curves Plot (Ready for Paper):** [`outputs/baseline_runs/baseline_loss_curves_50ep.png`](file:///c:/Users/Adaeze%20Ilodianya/Documents/Fall%202026/11785%20Intro%20to%20Deep%20Learning/GS-FUSE-main/GS-FUSE-main/outputs/baseline_runs/baseline_loss_curves_50ep.png)
-* **DLinear Metric Summary JSON:** [`outputs/baseline_runs/baseline_summary_50ep.json`](file:///c:/Users/Adaeze%20Ilodianya/Documents/Fall%202026/11785%20Intro%20to%20Deep%20Learning/GS-FUSE-main/GS-FUSE-main/outputs/baseline_runs/baseline_summary_50ep.json)
+* **DLinear Loss Curves Plot (Ready for Paper):** [`figures/baseline_loss_curves_50ep.png`](file:///c:/Users/Adaeze%20Ilodianya/Documents/Fall%202026/11785%20Intro%20to%20Deep%20Learning/GS-FUSE-main/GS-FUSE-main/figures/baseline_loss_curves_50ep.png)
+* **DLinear Metric Summary JSON:** [`figures/baseline_summary_50ep.json`](file:///c:/Users/Adaeze%20Ilodianya/Documents/Fall%202026/11785%20Intro%20to%20Deep%20Learning/GS-FUSE-main/GS-FUSE-main/figures/baseline_summary_50ep.json)
 * **GS-Fuse Stage 1 Checkpoint (4.88 GB):** [`outputs/gs_fuse_sp500_scratch/stage1_best_model.pth`](file:///c:/Users/Adaeze%20Ilodianya/Documents/Fall%202026/11785%20Intro%20to%20Deep%20Learning/GS-FUSE-main/GS-FUSE-main/outputs/gs_fuse_sp500_scratch/stage1_best_model.pth)
 * **GS-Fuse Stage 2 Checkpoint:** [`outputs/gs_fuse_sp500_scratch/stage2_best_model.pth`](file:///c:/Users/Adaeze%20Ilodianya/Documents/Fall%202026/11785%20Intro%20to%20Deep%20Learning/GS-FUSE-main/GS-FUSE-main/outputs/gs_fuse_sp500_scratch/stage2_best_model.pth)
 * **Full Multi-Stage Training Log:** [`outputs/gs_fuse_sp500_scratch/full_training_log.txt`](file:///c:/Users/Adaeze%20Ilodianya/Documents/Fall%202026/11785%20Intro%20to%20Deep%20Learning/GS-FUSE-main/GS-FUSE-main/outputs/gs_fuse_sp500_scratch/full_training_log.txt)

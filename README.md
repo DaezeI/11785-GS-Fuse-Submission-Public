@@ -139,6 +139,9 @@ python train.py \
 | **GS-Fuse (Stage 3, Best)** | **Multimodal (TS + Text)** | $H=70$ | Multi-Horizon Evaluation | **0.40** | **0.40** | **~57.2%** | **58.1%** | **MAE: 0.0131, SMAPE: 4.86%** |
 | **GS-Fuse (Stage 3, Best)** | **Multimodal (TS + Text)** | $H=35$ | Multi-Horizon Evaluation | **0.34** | **0.34** | **~58.4%** | **59.2%** | **MAE: 0.0121, SMAPE: 4.36%** |
 
+### Baseline Loss Curves & Directional Accuracy Progression
+![DLinear Baseline Loss Curves](figures/baseline_loss_curves_50ep.png)
+
 ---
 
 ## 6. Proposed Innovation for Final Project: Volatility-Restricted Gate
