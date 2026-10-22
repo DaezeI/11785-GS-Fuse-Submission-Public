@@ -88,6 +88,19 @@ GS-Fuse/
 
 ## 4. Quickstart: How to Run the Code
 
+### 4.0 Teammate Setup: Data & Checkpoint Placement (For Running Ablations)
+Because raw financial data and multi-gigabyte `.pth` model checkpoints exceed GitHub's 100 MB file limit, download the shared asset zip from our group drive and extract into the repository root:
+* **Raw Datasets:**
+  * `data/series/SP500.csv` (16-year 5-min OHLC prices)
+  * `data/event/` (151,979 macroeconomic release articles across 6 categories)
+* **Pre-Computed LLaMA Cache (Optional but strongly recommended):**
+  * `data/cache_llama_emb/` (28,503 `.pt` token tensors — enables fast training and bypasses live LLM GPU passes)
+* **Pre-Trained Stage Checkpoints (Required to skip Stages 1 & 2):**
+  * `outputs/gs_fuse_sp500_scratch/stage1_best_model.pth` (TS pre-trained weights)
+  * `outputs/gs_fuse_sp500_scratch/stage2_best_model.pth` (Text pre-trained weights)
+
+> **Instant Ablation Mode:** When `stage1_best_model.pth` and `stage2_best_model.pth` are present in `outputs/gs_fuse_sp500_scratch/`, `train.py` automatically skips Stages 1 and 2, jumping straight to Stage 3. You can modify the decoder head in `model/gs_fuse.py` and train in under 2 minutes per epoch!
+
 ### 4.1 Environment Setup
 Ensure Python 3.12 is active with CUDA 12.4 PyTorch:
 ```bash
@@ -128,7 +141,7 @@ python train.py \
 ## 5. Summary of Baseline Experimental Results
 
 | Model Architecture | Input Modalities | Horizon ($H$) | Training Setup | Val MSE ($\times 10^{-3}$) | Test MSE ($\times 10^{-3}$) | Val DHR | Peak DHR | Key Finding & Gate Dynamics |
-| :--- | :--- | :--- | :--- | :--- | :--- | :--- | :--- | :--- |
+| :--- | :--- | :--- | :--- | :--- | :--- | :--- | :--- | :--- | :--- |
 | **DLinear (Baseline)** | Price Only ($L=35$) | $H=35$ | 10 Epochs, Fixed LR $10^{-3}$ | 3.53 | 3.58 | 47.75% | 51.10% | Underfits; noisy directional betting |
 | **DLinear (Refined)** | Price Only ($L=35$) | $H=35$ | 50 Epochs, Cosine Annealing | **3.26** | **3.31** | **54.71%** | **55.91%** | +6.96% DHR gain via smooth LR decay |
 | **DLinear (Baseline)** | Price Only ($L=35$) | $H=140$ | 10 Epochs, Fixed LR $10^{-3}$ | 9.48 | 9.55 | 53.17% | 54.40% | Slower convergence on 2-day horizon |
