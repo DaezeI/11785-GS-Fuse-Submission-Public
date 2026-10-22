@@ -3,6 +3,7 @@
 
 > **Course:** CMU 11-785 Intro to Deep Learning (Fall 2026)  
 > **Team GitHub:** `https://github.com/DaezeI/11785-GS-Fuse.git`  
+> **Shared Google Drive:** [Team Asset Folder (Checkpoints, Data, & Cache)](https://drive.google.com/drive/folders/1ntwrD20YHgKfLea885mOHLBdsXgdGhDC?usp=sharing)  
 > **Weights & Biases Project:** `ailodian-carnegie-mellon-university/11785-GS-Fuse-Baseline`  
 > **Anchor Paper:** *GS-Fuse: Granger-Supervised Gated Fusion and Multi-Granularity Alignment for Event-Driven Financial Forecasting* (ACM SIGKDD 2026)  
 
@@ -89,7 +90,7 @@ GS-Fuse/
 ## 4. Quickstart: How to Run the Code
 
 ### 4.0 Teammate Setup: Data & Checkpoint Placement (For Running Ablations)
-Because raw financial data and multi-gigabyte `.pth` model checkpoints exceed GitHub's 100 MB file limit, download the shared asset zip from our group drive and extract into the repository root:
+Because raw financial data and multi-gigabyte `.pth` model checkpoints exceed GitHub's 100 MB file limit, download the shared assets from our **[Team Google Drive Asset Folder](https://drive.google.com/drive/folders/1ntwrD20YHgKfLea885mOHLBdsXgdGhDC?usp=sharing)** and extract into the repository root:
 * **Raw Datasets:**
   * `data/series/SP500.csv` (16-year 5-min OHLC prices)
   * `data/event/` (151,979 macroeconomic release articles across 6 categories)

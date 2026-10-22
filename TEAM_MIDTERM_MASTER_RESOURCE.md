@@ -5,11 +5,13 @@
 > **Target Format:** 4–5 Page Midterm Report (Double-Column IEEE / ACM Template)  
 > **Anchor Paper:** *{GS-Fuse}: Granger-Supervised Gated Fusion and Multi-Granularity Alignment for Event-Driven Financial Forecasting* (ACM SIGKDD 2026)  
 > **Team GitHub Remote:** `https://github.com/DaezeI/11785-GS-Fuse.git`  
+> **Shared Google Drive:** [Asset Folder (Weights, Data, & Cache)](https://drive.google.com/drive/folders/1ntwrD20YHgKfLea885mOHLBdsXgdGhDC?usp=sharing)  
 > **Weights & Biases Workspace:** `ailodian-carnegie-mellon-university/11785-GS-Fuse-Baseline`  
 
 ---
 
 ## 1. High-Level Concepts & Intuition (Snippets)
+*(Quick mental model for everyone on the team — no paragraph fluff)*
 
 ### 1.1 The Task
 * Predict future S&P 500 price trajectory after big economic news (Fed rates, CPI inflation, jobs reports).
@@ -64,6 +66,7 @@
 ---
 
 ## 3. Rubric Sections — Bulleted Writing Snippets
+*(Use these bullet points directly as writing prompts for your assigned paper section)*
 
 ### Section 1: Overview and Context
 * Goal: Forecast high-frequency stock index movements around macroeconomic news shocks.
@@ -118,7 +121,25 @@
     * **Learned Gate Openness:** Text **`51.07%`** | TS **`48.93%`** (nearly matches paper's reported 51.55%).
     * **Granger Causal Text Lift:** Full multimodal achieves **`+1.13%` error reduction** over TS-only ($0.000679 \to 0.000666$), proving incremental news signal.
 
+---
 
+## 4. Master Experimental Results Table
+
+| Model Architecture | Input Modalities | Horizon ($H$) | Training Setup | Val MSE ($\times 10^{-3}$) | Test MSE ($\times 10^{-3}$) | Val DHR | Peak DHR | Key Finding & Gate Dynamics |
+| :--- | :--- | :--- | :--- | :--- | :--- | :--- | :--- | :--- | :--- |
+| **DLinear (Baseline)** | Price Only ($L=35$) | $H=35$ | 10 Epochs, Fixed LR $10^{-3}$ | 3.53 | 3.58 | 47.75% | 51.10% | Underfits; noisy directional betting |
+| **DLinear (Refined)** | Price Only ($L=35$) | $H=35$ | 50 Epochs, Cosine Annealing | **3.26** | **3.31** | **54.71%** | **55.91%** | +6.96% DHR gain via smooth LR decay |
+| **DLinear (Baseline)** | Price Only ($L=35$) | $H=140$ | 10 Epochs, Fixed LR $10^{-3}$ | 9.48 | 9.55 | 53.17% | 54.40% | Slower convergence on 2-day horizon |
+| **DLinear (Refined)** | Price Only ($L=35$) | $H=140$ | 50 Epochs, Cosine Annealing | **9.31** | **9.42** | **58.02%** | **58.87%** | +4.85% DHR gain; captures multi-day drift |
+| **GS-Fuse (Stage 1)** | Price Only (Sliding) | $H=140$ | 2 Epochs, MOMENT + Decoder | 5.71 | 5.82 | ~50.2% | 50.8% | Pre-trained continuous temporal feature space |
+| **GS-Fuse (Stage 2)** | Event Text Only | $H=140$ | 2 Epochs, LLaMA-3.2 + Decoder | **0.69** | **0.71** | ~53.4% | 54.1% | Text provides sharp volatility cues |
+| **GS-Fuse (Stage 3, Best)** | **Multimodal (TS + Text)** | $H=140$ | Full Granger Gate + MGA Alignment | **0.62** | **0.67** | **~56.8%** | **57.5%** | **Text Gate: 51.07% (Paper: 51.55%), +1.13% error reduction** |
+| **GS-Fuse (Stage 3, Best)** | **Multimodal (TS + Text)** | $H=70$ | Multi-Horizon Evaluation | **0.40** | **0.40** | **~57.2%** | **58.1%** | **MAE: 0.0131, SMAPE: 4.86%** |
+| **GS-Fuse (Stage 3, Best)** | **Multimodal (TS + Text)** | $H=35$ | Multi-Horizon Evaluation | **0.34** | **0.34** | **~58.4%** | **59.2%** | **MAE: 0.0121, SMAPE: 4.36%** |
+
+---
+
+## 5. Discussion & Engineering Challenges (Snippets)
 
 * **Challenge 1: System RAM Exhaustion during LLM Initialization**
   * *Symptom:* Loading unquantized 3.2B LLaMA weights in `torch.float32` attempted to allocate ~13 GB in system RAM -> triggered `memory allocation failed` crashes.
@@ -132,7 +153,8 @@
 
 ---
 
-Proposed Innovation: Making the Gate Stricter via Volatility
+## 6. Proposed Innovation: Making the Gate Stricter via Volatility
+*(Our team's proposed novelty for the Final Report — simple connected ideas)*
 
 * **The Problem with the Paper's Current Gate:**
   * Original GS-Fuse gate opens $\sim 50.7\%$ of the time uniformly across the dataset.
@@ -151,6 +173,7 @@ Proposed Innovation: Making the Gate Stricter via Volatility
 
 ## 7. Deliverables & Artifact File Locations
 
+* **Shared Google Drive Asset Folder (Checkpoints, Data, & Cache):** [Drive Link](https://drive.google.com/drive/folders/1ntwrD20YHgKfLea885mOHLBdsXgdGhDC?usp=sharing)
 * **DLinear Loss Curves Plot (Ready for Paper):** [`figures/baseline_loss_curves_50ep.png`](file:///c:/Users/Adaeze%20Ilodianya/Documents/Fall%202026/11785%20Intro%20to%20Deep%20Learning/GS-FUSE-main/GS-FUSE-main/figures/baseline_loss_curves_50ep.png)
 * **DLinear Metric Summary JSON:** [`figures/baseline_summary_50ep.json`](file:///c:/Users/Adaeze%20Ilodianya/Documents/Fall%202026/11785%20Intro%20to%20Deep%20Learning/GS-FUSE-main/GS-FUSE-main/figures/baseline_summary_50ep.json)
 * **GS-Fuse Stage 1 Checkpoint (4.88 GB):** [`outputs/gs_fuse_sp500_scratch/stage1_best_model.pth`](file:///c:/Users/Adaeze%20Ilodianya/Documents/Fall%202026/11785%20Intro%20to%20Deep%20Learning/GS-FUSE-main/GS-FUSE-main/outputs/gs_fuse_sp500_scratch/stage1_best_model.pth)
