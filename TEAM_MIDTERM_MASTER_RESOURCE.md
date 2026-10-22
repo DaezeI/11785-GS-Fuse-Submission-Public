@@ -10,7 +10,6 @@
 ---
 
 ## 1. High-Level Concepts & Intuition 
-*(Quick mental model for everyone on the team — no paragraph fluff)*
 
 ### 1.1 The Task
 * Predict future S&P 500 price trajectory after big economic news (Fed rates, CPI inflation, jobs reports).
@@ -65,7 +64,6 @@
 ---
 
 ## 3. Rubric Sections — Bulleted Writing Snippets
-*(Use these bullet points directly as writing prompts for your assigned paper section)*
 
 ### Section 1: Overview and Context
 * Goal: Forecast high-frequency stock index movements around macroeconomic news shocks.
