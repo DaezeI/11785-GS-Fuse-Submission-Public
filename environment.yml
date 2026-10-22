@@ -25,7 +25,6 @@ dependencies:
       - fsspec==2024.5.0
 
       # Time-series backbones.
-      - momentfm==0.1.4
       - einops==0.8.1
 
       # Runtime utilities.

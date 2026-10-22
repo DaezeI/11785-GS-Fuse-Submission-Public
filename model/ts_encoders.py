@@ -49,17 +49,25 @@ class BaseTSEncoder(nn.Module, ABC):
 
 
 class MomentTSEncoder(BaseTSEncoder):
-    def __init__(self, model_path: str, device: torch.device, cache_dir: str = "moment_model"):
+    def __init__(self, model_path: str, device: torch.device, cache_dir: Optional[str] = None):
         super().__init__()
         if MOMENTPipeline is None:
             raise ImportError("momentfm is required for MomentTSEncoder")
         self.device = device
-        self.backbone = MOMENTPipeline.from_pretrained(
-            pretrained_model_name_or_path=model_path,
-            model_kwargs={"task_name": "embedding"},
-            cache_dir=cache_dir,
-            local_files_only=True,
-        ).to(device)
+        try:
+            self.backbone = MOMENTPipeline.from_pretrained(
+                pretrained_model_name_or_path=model_path,
+                model_kwargs={"task_name": "embedding"},
+                cache_dir=cache_dir,
+                local_files_only=True,
+            ).to(device)
+        except Exception:
+            self.backbone = MOMENTPipeline.from_pretrained(
+                pretrained_model_name_or_path=model_path,
+                model_kwargs={"task_name": "embedding"},
+                cache_dir=cache_dir,
+                local_files_only=False,
+            ).to(device)
         self.backbone.init()
         self._output_dim = 1024
 

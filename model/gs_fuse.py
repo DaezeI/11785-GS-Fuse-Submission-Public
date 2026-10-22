@@ -45,8 +45,8 @@ class DualLogger(object):
 
     def __init__(self, filename: str):
         self.terminal = sys.stdout
-        # Line-buffered text file: writes appear promptly in the log file.
-        self.log = open(filename, "w", encoding="utf-8", buffering=1)
+        # Line-buffered text file: writes appear promptly in the log file (append mode to preserve stage logs).
+        self.log = open(filename, "a", encoding="utf-8", buffering=1)
 
     def write(self, message: str):
         self.terminal.write(message)
@@ -66,7 +66,7 @@ class DualLogger(object):
 
 # ---------------- Config ----------------
 LLAMA_HIDDEN = 3072  # hidden size
-USE_4BIT = False
+USE_4BIT = True
 
 FUSE_DIM = 1024
 NUM_HEADS = 8
@@ -90,8 +90,8 @@ USE_EMA = False
 EMA_DECAY = 0.99
 
 # ============== LLM Fine-tuning Configuration ==============
-# Unfreeze the last transformer block of LLaMA for fine-tuning
-FINETUNE_LLM_LAST_LAYER = True  # Enable fine-tuning of the text encoder last layer
+# Backbone LLM and TS models remain frozen across all experiments (KDD 2026 Section 5.1)
+FINETUNE_LLM_LAST_LAYER = False  # Keep LLM frozen per paper specification & 4-bit compatibility
 FINETUNE_TS_LAST_BLOCK = False  # Optional partial unfreeze for MOMENT/Kronos
 LLM_FINETUNE_LR = 1e-6  # Very low LR for LLM (10x lower than base)
 
@@ -1250,16 +1250,31 @@ class GSFuse(nn.Module):
         meta = ckpt.get("metadata", {})
 
         if "ts_encoder" in sd and sd["ts_encoder"] is not None:
-            self.ts_encoder.load_state_dict(sd["ts_encoder"], strict=True)
+            try:
+                self.ts_encoder.load_state_dict(sd["ts_encoder"], strict=strict)
+            except Exception as exc:
+                if strict:
+                    raise
+                print(f"[load] Warning loading ts_encoder: {exc}")
         elif "moment" in sd and sd["moment"] is not None:
             try:
                 target = getattr(self.ts_encoder, "backbone", self.ts_encoder)
-                target.load_state_dict(sd["moment"], strict=True)
+                target.load_state_dict(sd["moment"], strict=strict)
             except Exception as exc:
-                raise
+                if strict:
+                    raise
+                print(f"[load] Warning loading moment: {exc}")
 
         if "text_encoder" in sd and sd["text_encoder"] is not None:
-            self.text_encoder.load_state_dict(sd["text_encoder"], strict=True)
+            try:
+                self.text_encoder.load_state_dict(sd["text_encoder"], strict=strict)
+            except Exception as exc:
+                if strict:
+                    raise
+                print(
+                    "[load] Skipping incompatible text_encoder state because strict=False. "
+                    "Using the text backbone loaded from --text-model-path."
+                )
         if "llm" in sd and sd["llm"] is not None:
             try:
                 self.text_encoder.llm.load_state_dict(sd["llm"], strict=strict)
@@ -1413,10 +1428,8 @@ def train(model, train_loader, test_loader, vali_loader, num_epochs, output_path
     device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
     model.train()
 
-    # Freeze / unfreeze
+    # Freeze all parameters first (avoids trying to set requires_grad on 4-bit uint8 weights)
     for p in model.parameters():
-        p.requires_grad = True
-    for p in model.llm.parameters():
         p.requires_grad = False
     for p in model.llm_proj.parameters():
         p.requires_grad = True
@@ -3121,20 +3134,34 @@ def train_three_stage(model, train_loader, test_loader, vali_loader, num_epochs,
         print("=" * 80)
 
         # ==================== Stage 1: TS Pre-training (Sliding Window) ====================
-        train_stage1_ts_only(
-            model, sw_train_loader, sw_vali_loader,
-            num_epochs=stage1_epochs,
-            output_path=output_path
-        )
-        print("\n=== STAGE 1 COMPLETED ===\n")
+        stage1_checkpoint = os.path.join(model_output_path, "stage1_best_model.pth")
+        if os.path.exists(stage1_checkpoint):
+            print(f"[Stage 1] Found existing completed Stage 1 checkpoint: {stage1_checkpoint}")
+            print(f"[Stage 1] Loading pre-trained TS branch and skipping Stage 1 retraining!")
+            model.load_model_combined(save_path=stage1_checkpoint, strict=False)
+            print("\n=== STAGE 1 RESTORED & COMPLETED ===\n")
+        else:
+            train_stage1_ts_only(
+                model, sw_train_loader, sw_vali_loader,
+                num_epochs=stage1_epochs,
+                output_path=output_path
+            )
+            print("\n=== STAGE 1 COMPLETED ===\n")
 
         # ==================== Stage 2: Text Pre-training ====================
-        train_stage2_text_only(
-            model, train_loader, vali_loader,
-            num_epochs=stage2_epochs,
-            output_path=output_path
-        )
-        print("\n=== STAGE 2 COMPLETED ===\n")
+        stage2_checkpoint = os.path.join(model_output_path, "stage2_best_model.pth")
+        if os.path.exists(stage2_checkpoint):
+            print(f"[Stage 2] Found existing completed Stage 2 checkpoint: {stage2_checkpoint}")
+            print(f"[Stage 2] Loading pre-trained text branch and skipping Stage 2 retraining!")
+            model.load_model_combined(save_path=stage2_checkpoint, strict=False)
+            print("\n=== STAGE 2 RESTORED & COMPLETED ===\n")
+        else:
+            train_stage2_text_only(
+                model, train_loader, vali_loader,
+                num_epochs=stage2_epochs,
+                output_path=output_path
+            )
+            print("\n=== STAGE 2 COMPLETED ===\n")
 
         # ==================== Stage 3: Full Multimodal Training ====================
         print("=" * 80)

@@ -3,6 +3,8 @@
 
 from __future__ import annotations
 
+import os
+import hashlib
 from abc import ABC, abstractmethod
 from typing import Optional, Tuple
 
@@ -18,7 +20,7 @@ def _load_causal_lm(name: str, use_4bit: bool = False):
             load_in_4bit=True,
             bnb_4bit_quant_type="nf4",
             bnb_4bit_use_double_quant=True,
-            bnb_4bit_compute_dtype=torch.float32,
+            bnb_4bit_compute_dtype=torch.float16,
         )
     tok = AutoTokenizer.from_pretrained(name, use_fast=True)
     if tok.pad_token is None:
@@ -26,7 +28,8 @@ def _load_causal_lm(name: str, use_4bit: bool = False):
     model = AutoModelForCausalLM.from_pretrained(
         name,
         device_map="auto",
-        torch_dtype=torch.float32,
+        torch_dtype=torch.float16,
+        low_cpu_mem_usage=True,
         quantization_config=bnb_config if use_4bit else None,
     )
     if hasattr(model, "config"):
@@ -82,6 +85,10 @@ class HuggingFaceTextEncoder(BaseTextEncoder):
         self._tokenizer, self.backbone = _load_causal_lm(model_path, use_4bit=use_4bit)
         cfg = getattr(self.backbone, "config", None)
         self._output_dim = int(getattr(cfg, "hidden_size", 3072))
+        
+        # Persistent disk cache directory (RAM dictionaries omitted to avoid memory exhaustion)
+        self.cache_dir = os.path.join("data", f"cache_{self.family}_emb")
+        os.makedirs(self.cache_dir, exist_ok=True)
 
     @property
     def output_dim(self) -> int:
@@ -107,6 +114,18 @@ class HuggingFaceTextEncoder(BaseTextEncoder):
 
     @torch.no_grad()
     def encode_instance(self, text: str, window: int, stride: int, device: torch.device) -> torch.Tensor:
+        h_key = hashlib.md5(text.encode("utf-8", errors="ignore")).hexdigest()
+
+        # 1. Check Disk cache
+        disk_path = os.path.join(self.cache_dir, f"{h_key}_inst.pt")
+        if os.path.exists(disk_path):
+            try:
+                emb = torch.load(disk_path, map_location=device, weights_only=True)
+                return emb.to(device)
+            except Exception:
+                pass
+
+        # 2. Compute via LLM
         ids = self._tokenizer(text, return_tensors="pt", truncation=False, add_special_tokens=True)
         input_ids = ids["input_ids"][0]
         attn_mask_full = torch.ones_like(input_ids)
@@ -120,8 +139,16 @@ class HuggingFaceTextEncoder(BaseTextEncoder):
             embeddings.append(h.mean(dim=0, keepdim=True))
             start += stride
         if not embeddings:
-            return torch.zeros(self._output_dim, device=device)
-        return torch.mean(torch.cat(embeddings, dim=0), dim=0, keepdim=False).to(device)
+            res = torch.zeros(self._output_dim, device=device)
+        else:
+            res = torch.mean(torch.cat(embeddings, dim=0), dim=0, keepdim=False).to(device)
+
+        # 3. Save to Disk
+        try:
+            torch.save(res.cpu(), disk_path)
+        except Exception:
+            pass
+        return res
 
     @torch.no_grad()
     def encode_tokens(
@@ -132,6 +159,18 @@ class HuggingFaceTextEncoder(BaseTextEncoder):
         max_text_tokens: int,
         device: torch.device,
     ) -> Tuple[torch.Tensor, torch.Tensor]:
+        h_key = hashlib.md5(f"{text}_{max_text_tokens}".encode("utf-8", errors="ignore")).hexdigest()
+
+        # 1. Check Disk cache
+        disk_path = os.path.join(self.cache_dir, f"{h_key}_tok.pt")
+        if os.path.exists(disk_path):
+            try:
+                data = torch.load(disk_path, map_location=device, weights_only=True)
+                return data["tok_h"].to(device), data["mask"].to(device)
+            except Exception:
+                pass
+
+        # 2. Compute via LLM
         ids = self._tokenizer(
             text,
             return_tensors="pt",
@@ -159,6 +198,13 @@ class HuggingFaceTextEncoder(BaseTextEncoder):
 
         tok_h = torch.cat(feats, dim=0).unsqueeze(0)
         mask = torch.zeros(1, tok_h.size(1), dtype=torch.bool, device=device)
+
+        # 3. Save to Disk
+        try:
+            torch.save({"tok_h": tok_h.cpu(), "mask": mask.cpu()}, disk_path)
+        except Exception:
+            pass
+
         return tok_h, mask
 
     def last_block_parameters(self):

@@ -2,8 +2,18 @@
 # -*- coding: utf-8 -*-
 """Unified GS-FUSE training entrypoint."""
 
+import os
+import sys
 import argparse
 import warnings
+
+# Auto-resolve nested repository directory
+repo_dir = os.path.dirname(os.path.abspath(__file__))
+if not os.path.exists(os.path.join(repo_dir, "data")) and os.path.exists(os.path.join(repo_dir, "GS-FUSE-main", "data")):
+    repo_dir = os.path.join(repo_dir, "GS-FUSE-main")
+
+sys.path.insert(0, repo_dir)
+os.chdir(repo_dir)
 
 import torch
 
@@ -42,6 +52,7 @@ def parse_args():
     p.add_argument("--batch-size", type=int, default=32)
     p.add_argument("--window", type=int, default=500)
     p.add_argument("--stride", type=int, default=400)
+    p.add_argument("--sw-stride", type=int, default=5, help="Stride for sliding window dataset in Stage 1")
 
     p.add_argument("--num-epochs", type=int, default=2)
     p.add_argument("--stage1-epochs", type=int, default=2)
@@ -55,7 +66,7 @@ def parse_args():
     p.add_argument("--use-ts-memory", action="store_true", default=False)
 
     p.add_argument("--finetune-ts-last-block", action="store_true", default=False)
-    p.add_argument("--finetune-text-last-block", action="store_true", default=None)
+    p.add_argument("--finetune-text-last-block", action="store_true", default=False)
 
     return p.parse_args()
 
@@ -94,7 +105,7 @@ def main():
         pred_len=args.pred_len,
         series_id=args.series_id,
         series_dir=args.series_dir,
-        stride=1,
+        stride=args.sw_stride,
         batch_size=args.batch_size,
     )
 
