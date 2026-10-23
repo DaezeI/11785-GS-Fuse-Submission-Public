@@ -97,11 +97,12 @@
   * Fusion: Multi-Granularity Alignment (InfoNCE) + Granger Causal Gate MLP.
   * Decoder: 3-layer Transformer Decoder -> predicts future prices ($H=35$ or $140$).
 * **Core Math Formulas:**
-  * **Forecast Loss:** $\mathcal{L}_{\text{forecast}} = 0.7 \cdot \text{MSE}(\hat{Y}, Y) + 0.3 \cdot \text{MAE}(\hat{Y}, Y)$.
-  * **Granger Utility Differential:** $\Delta_i = \text{MSE}(Y_i, \hat{Y}^{\text{ts}}_i) - \text{MSE}(Y_i, \hat{Y}^{\text{full}}_i)$.
-  * **Soft Responsibility Target:** $r_i = \sigma\left(\text{clip}\left(\frac{\Delta_i}{\tau_{\text{gc}}}, -c, c\right)\right) \in [0, 1]$.
-  * **Gate Supervision Loss:** $\mathcal{L}_{\text{gate}} = \frac{1}{N} \sum (\alpha_i - r_i)^2$.
-  * **Joint Total Loss:** $\mathcal{L}_{\text{total}} = \mathcal{L}_{\text{forecast}} + 0.2 \cdot \mathcal{L}_{\text{align}} + 0.1 \cdot \mathcal{L}_{\text{gate}}$.
+  * **Forecast Loss:** $\mathcal{L}\_ {\text{forecast}} = 0.7 \cdot \text{MSE}(\hat{Y}, Y) + 0.3 \cdot \text{MAE}(\hat{Y}, Y)$
+  * **Granger Utility Differential:** $\Delta\_ i = \text{MSE}(Y\_ i, \hat{Y}^{\text{ts}}\_ i) - \text{MSE}(Y\_ i, \hat{Y}^{\text{full}}\_ i)$
+  * **Soft Responsibility Target:** $r\_ i = \sigma \left( \text{clip} \left( \frac{\Delta\_ i}{\tau\_ {\text{gc}}}, -c, c \right) \right) \in [0, 1]$
+  * **Gate Supervision Loss:** $\mathcal{L}\_ {\text{gate}} = \frac{1}{N} \sum_{i=1}^{N} (\alpha\_ i - r\_ i)^2$
+  * **Joint Total Loss:** $\mathcal{L}\_ {\text{total}} = \mathcal{L}\_ {\text{forecast}} + 0.2 \cdot \mathcal{L}\_ {\text{align}} + 0.1 \cdot \mathcal{L}\_ {\text{gate}}$
+
 
 ### Section 4: Baselines & Iterative Progression
 * **Tier 1 Baseline: DLinear (Price-Only)**
@@ -127,17 +128,20 @@
 
 ## 4. Master Experimental Results Table
 
-| Model Architecture | Input Modalities | Horizon ($H$) | Training Setup | Val MSE ($\times 10^{-3}$) | Test MSE ($\times 10^{-3}$) | Val DHR | Peak DHR | Key Finding & Gate Dynamics |
-| :--- | :--- | :--- | :--- | :--- | :--- | :--- | :--- | :--- | :--- |
-| **DLinear (Baseline)** | Price Only ($L=35$) | $H=35$ | 10 Epochs, Fixed LR $10^{-3}$ | 3.53 | 3.58 | 47.75% | 51.10% | Underfits; noisy directional betting |
+
+| Model Architecture | Input Modalities | Horizon ($H$) | Training Setup | Val MSE (× 10⁻³) | Test MSE (× 10⁻³) | Val DHR | Peak DHR | Key Finding & Gate Dynamics |
+| :--- | :--- | :--- | :--- | :--- | :--- | :--- | :--- | :--- |
+| **DLinear (Baseline)** | Price Only ($L=35$) | $H=35$ | 10 Epochs, Fixed LR 10⁻³ | 3.53 | 3.58 | 47.75% | 51.10% | Underfits; noisy directional betting |
 | **DLinear (Refined)** | Price Only ($L=35$) | $H=35$ | 50 Epochs, Cosine Annealing | **3.26** | **3.31** | **54.71%** | **55.91%** | +6.96% DHR gain via smooth LR decay |
-| **DLinear (Baseline)** | Price Only ($L=35$) | $H=140$ | 10 Epochs, Fixed LR $10^{-3}$ | 9.48 | 9.55 | 53.17% | 54.40% | Slower convergence on 2-day horizon |
+| **DLinear (Baseline)** | Price Only ($L=35$) | $H=140$ | 10 Epochs, Fixed LR 10⁻³ | 9.48 | 9.55 | 53.17% | 54.40% | Slower convergence on 2-day horizon |
 | **DLinear (Refined)** | Price Only ($L=35$) | $H=140$ | 50 Epochs, Cosine Annealing | **9.31** | **9.42** | **58.02%** | **58.87%** | +4.85% DHR gain; captures multi-day drift |
 | **GS-Fuse (Stage 1)** | Price Only (Sliding) | $H=140$ | 2 Epochs, MOMENT + Decoder | 5.71 | 5.82 | ~50.2% | 50.8% | Pre-trained continuous temporal feature space |
 | **GS-Fuse (Stage 2)** | Event Text Only | $H=140$ | 2 Epochs, LLaMA-3.2 + Decoder | **0.69** | **0.71** | ~53.4% | 54.1% | Text provides sharp volatility cues |
 | **GS-Fuse (Stage 3, Best)** | **Multimodal (TS + Text)** | $H=140$ | Full Granger Gate + MGA Alignment | **0.62** | **0.67** | **~56.8%** | **57.5%** | **Text Gate: 51.07% (Paper: 51.55%), +1.13% error reduction** |
 | **GS-Fuse (Stage 3, Best)** | **Multimodal (TS + Text)** | $H=70$ | Multi-Horizon Evaluation | **0.40** | **0.40** | **~57.2%** | **58.1%** | **MAE: 0.0131, SMAPE: 4.86%** |
 | **GS-Fuse (Stage 3, Best)** | **Multimodal (TS + Text)** | $H=35$ | Multi-Horizon Evaluation | **0.34** | **0.34** | **~58.4%** | **59.2%** | **MAE: 0.0121, SMAPE: 4.36%** |
+
+
 
 ---
 
