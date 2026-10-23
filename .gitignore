@@ -18,6 +18,9 @@ moment_model/
 baselines/moment/
 Kronos-base/
 Kronos-Tokenizer-base/
+pretrained/
+downloads/
+outputs/
 
 # Python/runtime
 __pycache__/

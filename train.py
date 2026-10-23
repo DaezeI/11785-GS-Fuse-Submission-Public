@@ -5,6 +5,7 @@
 import os
 import sys
 import argparse
+import os
 import warnings
 
 # Auto-resolve nested repository directory
@@ -19,6 +20,7 @@ import torch
 
 from data.dataloader import event_set
 from data.sliding_window_dataloader import sliding_window_set
+from model import tracking
 from model.gs_fuse import GSFuse, train_three_stage
 
 warnings.simplefilter("ignore")
@@ -65,6 +67,20 @@ def parse_args():
     p.add_argument("--max-token-num", type=int, default=1024)
     p.add_argument("--use-ts-memory", action="store_true", default=False)
 
+    p.add_argument("--fusion-type", choices=["crossattn", "qformer"], default="crossattn")
+    p.add_argument("--gate-type", choices=["softmax", "moe"], default="softmax")
+    p.add_argument("--num-experts", type=int, default=4)
+    p.add_argument("--moe-top-k", type=int, default=2)
+    p.add_argument("--num-queries", type=int, default=16)
+    p.add_argument("--qformer-layers", type=int, default=2)
+    p.add_argument("--text-cache", type=str, default=None,
+                   help="Precomputed text embeddings from scripts/precompute_text_cache.py")
+    p.add_argument("--tf32", action="store_true", help="Allow TF32 matmuls (must match the text cache)")
+    p.add_argument("--no-4bit", action="store_true", help="Load the text backbone in full precision instead of 4-bit")
+    p.add_argument("--interpret-samples", type=int, default=0,
+                   help="After training, dump interpretability plots for this many test events (0 = skip)")
+    tracking.add_cli_args(p)
+
     p.add_argument("--finetune-ts-last-block", action="store_true", default=False)
     p.add_argument("--finetune-text-last-block", action="store_true", default=False)
 
@@ -87,6 +103,11 @@ def main():
     gs_fuse_mod.FINETUNE_TS_LAST_BLOCK = args.finetune_ts_last_block
     if args.finetune_text_last_block is not None:
         gs_fuse_mod.FINETUNE_LLM_LAST_LAYER = args.finetune_text_last_block
+    gs_fuse_mod.TEXT_CACHE_PATH = args.text_cache
+    if args.no_4bit:
+        gs_fuse_mod.USE_4BIT = False
+    torch.backends.cuda.matmul.allow_tf32 = args.tf32
+    torch.backends.cudnn.allow_tf32 = args.tf32
 
     events = event_set(
         args.seq_len,
@@ -130,22 +151,37 @@ def main():
         decoder_heads=args.decoder_heads,
         use_ts_memory=args.use_ts_memory,
         max_token_num=args.max_token_num,
+        fusion_type=args.fusion_type,
+        gate_type=args.gate_type,
+        num_experts=args.num_experts,
+        moe_top_k=args.moe_top_k,
+        num_queries=args.num_queries,
+        qformer_layers=args.qformer_layers,
     )
 
-    train_three_stage(
-        model,
-        train_loader,
-        test_loader,
-        vali_loader,
-        sw_train_loader=sw_data.train_loader,
-        sw_vali_loader=sw_data.vali_loader,
-        stage1_epochs=args.stage1_epochs,
-        stage2_epochs=args.stage2_epochs,
-        num_epochs=args.num_epochs,
-        output_path=args.output_path,
-        contrastive_lambda=args.contrastive_lambda,
-        eval_every_steps=args.eval_every_steps,
-    )
+    variant_name = f"fusion={args.fusion_type}, gate={args.gate_type}"
+    tracking.init_from_args(args, default_name=f"{args.series_id}_H{args.pred_len}_{args.fusion_type}_{args.gate_type}")
+    try:
+        train_three_stage(
+            model,
+            train_loader,
+            test_loader,
+            vali_loader,
+            sw_train_loader=sw_data.train_loader,
+            sw_vali_loader=sw_data.vali_loader,
+            stage1_epochs=args.stage1_epochs,
+            stage2_epochs=args.stage2_epochs,
+            num_epochs=args.num_epochs,
+            output_path=args.output_path,
+            contrastive_lambda=args.contrastive_lambda,
+            eval_every_steps=args.eval_every_steps,
+        )
+        if args.interpret_samples > 0:
+            from interpret import run_and_log
+            run_and_log(model, events.test_set, args.interpret_samples,
+                        os.path.join(args.output_path, "interpret"), variant_name, args.batch_size)
+    finally:
+        tracking.finish()
 
 
 if __name__ == "__main__":

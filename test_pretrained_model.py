@@ -74,6 +74,12 @@ def parse_args():
     p.add_argument("--decoder-layers", "--decoder_layers", type=int, default=3)
     p.add_argument("--decoder-heads", "--decoder_heads", type=int, default=8)
     p.add_argument("--max-token-num", "--max_token_num", type=int, default=1024)
+    p.add_argument("--fusion-type", choices=["crossattn", "qformer"], default="crossattn")
+    p.add_argument("--gate-type", choices=["softmax", "moe"], default="softmax")
+    p.add_argument("--num-experts", type=int, default=4)
+    p.add_argument("--moe-top-k", type=int, default=2)
+    p.add_argument("--num-queries", type=int, default=16)
+    p.add_argument("--qformer-layers", type=int, default=2)
 
     p.add_argument(
         "--feature-idx",
@@ -99,6 +105,10 @@ def parse_args():
     )
     p.add_argument("--output-json", "--output_json", default=None)
     p.add_argument("--output-csv", "--output_csv", default=None)
+    p.add_argument("--save-preds", default=None, help="Save preds/targets/seqs (scaled space) to this .npz")
+    p.add_argument("--text-cache", default=None, help="Precomputed text embeddings (see scripts/precompute_text_cache.py)")
+    p.add_argument("--tf32", action="store_true", help="Allow TF32 matmuls (must match the text cache)")
+    p.add_argument("--no-4bit", action="store_true", help="Load the text backbone in full precision instead of 4-bit")
     return p.parse_args()
 
 
@@ -426,6 +436,12 @@ def load_pretrained_model(args, d: int):
         decoder_heads=args.decoder_heads,
         use_ts_memory=False,
         max_token_num=args.max_token_num,
+        fusion_type=args.fusion_type,
+        gate_type=args.gate_type,
+        num_experts=args.num_experts,
+        moe_top_k=args.moe_top_k,
+        num_queries=args.num_queries,
+        qformer_layers=args.qformer_layers,
     )
     live_print("[load] Model initialized. Loading checkpoint weights ...")
     model.load_model_combined(save_path=args.model_path, strict=False)
@@ -487,12 +503,25 @@ def main():
         f"eval_batches={len(loader)}"
     )
 
+    import torch
+
+    import model.gs_fuse as gs_fuse_mod
+
+    gs_fuse_mod.TEXT_CACHE_PATH = args.text_cache
+    if args.no_4bit:
+        gs_fuse_mod.USE_4BIT = False
+    torch.backends.cuda.matmul.allow_tf32 = args.tf32
+    torch.backends.cudnn.allow_tf32 = args.tf32
+
     live_print(f"[GS-FUSE eval] Loading checkpoint: {args.model_path}")
     model = load_pretrained_model(args, d=dataset.d)
     device = model.device
 
     live_print(f"[GS-FUSE eval] Running {args.split} inference for series={args.series_id}")
     preds, targets, seqs = collect_predictions(model, loader, device)
+    if args.save_preds:
+        os.makedirs(os.path.dirname(args.save_preds) or ".", exist_ok=True)
+        np.savez_compressed(args.save_preds, preds=preds, targets=targets, seqs=seqs)
 
     endpoint_preds, endpoint_targets, endpoint_seqs = preds, targets, seqs
     if args.inverse_transform:
