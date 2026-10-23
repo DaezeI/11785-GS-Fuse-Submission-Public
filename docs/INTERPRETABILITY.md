@@ -102,14 +102,19 @@ last.
 
 ## Next steps suggested by these plots
 
-- Give the gate and router an explicit surprise signal, such as realized volatility of
-  the input window or an event-type embedding, and measure success with
-  corr(gate, text benefit), not only MSE.
-- Add a query-diversity term (for example, orthogonality or attention-entropy across
-  queries) and mask padding for the Q-Former.
 - Re-run everything with the chronological split (`split_by_time=True` in
   `data/dataloader.py`) after deduplicating shared windows, with a shuffled training
-  loader and 3 seeds.
+  loader and 3 seeds. The gate and attention patterns above are not trustworthy until
+  then.
+- Give the gate and router an explicit surprise signal (realized volatility, event-type
+  embedding, or a Granger-style prediction error), and measure success with
+  corr(gate, text benefit), not only MSE. This is the same role that hippocampal
+  prediction error and neuromodulation play when deciding whether to update a memory.
+- Treat each MoE expert as a temporal kernel with its own forgetting time, the way
+  memristor reservoir channels are given different `τ`. The router already knows event
+  type; the experts currently do not use that information.
+- Add a query-diversity term (for example, orthogonality or attention-entropy across
+  queries) and mask padding for the Q-Former.
 
 ## Reproducing
 
