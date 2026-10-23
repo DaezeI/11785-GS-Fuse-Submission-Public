@@ -11,7 +11,7 @@
 ---
 
 ## 1. High-Level Concepts & Intuition (Snippets)
-*(Quick mental model for everyone on the team — no paragraph fluff)*
+*(Quick mental model for everyone)*
 
 ### 1.1 The Task
 * Predict future S&P 500 price trajectory after big economic news (Fed rates, CPI inflation, jobs reports).
@@ -66,7 +66,7 @@
 ---
 
 ## 3. Rubric Sections — Bulleted Writing Snippets
-*(Use these bullet points directly as writing prompts for your assigned paper section)*
+*Use these bullet points directly as writing prompts for your assigned paper section*
 
 ### Section 1: Overview and Context
 * Goal: Forecast high-frequency stock index movements around macroeconomic news shocks.
@@ -104,14 +104,16 @@
   * **Joint Total Loss:** $\mathcal{L}_{\text{total}} = \mathcal{L}_{\text{forecast}} + 0.2 \cdot \mathcal{L}_{\text{align}} + 0.1 \cdot \mathcal{L}_{\text{gate}}$.
 
 ### Section 4: Baselines & Iterative Progression
-* **Fulfills rubric requirement:** "Results are our own" + "Multiple configurations & iterations attempted."
 * **Tier 1 Baseline: DLinear (Price-Only)**
   * Configuration A ($H=35$) vs. Configuration B ($H=140$).
   * Round 1 (10 epochs, fixed LR $10^{-3}$): Low MSE, but directional accuracy swung wildly ($44\%$ to $50\%$) due to noise overfitting.
   * Round 2 (50 epochs + Cosine Annealing $10^{-3} \to 10^{-5}$): Smooth decay stabilized convergence -> Directional accuracy jumped to **$54.71\%$ ($H=35$)** and **$58.02\%$ ($H=140$)**.
+
 * **Tier 2 Baseline: Full GS-Fuse 3-Stage Training**
   * Stage 1 (Time-Series Pre-training): 2 epochs on continuous sliding windows (4,966 batches) -> learned baseline price dynamics -> Vali MSE: `0.005714`.
+
   * Stage 2 (Text Pre-training): 2 epochs on event articles (1,748 batches) -> warmed up LLaMA projection head -> Vali MSE dropped to `0.000695`.
+
   * Stage 3 (Full Multimodal Fine-Tuning): 2 epochs joint training with Granger gate & MGA completed cleanly!
     * Loss dropped 94% ($1.1025 \to 0.0235$), final Training MSE `0.000882`.
     * **Vali MSE:** **`0.000621`** (MAE `0.016223`, SMAPE `6.50%`).
