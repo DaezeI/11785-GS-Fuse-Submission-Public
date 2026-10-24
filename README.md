@@ -193,10 +193,42 @@ On branch [`feat/moe-qformer-wandb-cache`](https://github.com/DaezeI/11785-GS-Fu
 
 ## References
 
-- **[Zhang et al., 2026]** Yang Zhang, En Chun, Ziyun Mao, Yulu Wu, and Jun Wang. *GS-Fuse: Granger-Supervised Gated Fusion and Multi-Granularity Alignment for Event-Driven Financial Forecasting*. Proceedings of the 32nd ACM SIGKDD Conference on Knowledge Discovery and Data Mining (KDD '26), 2026.
-- **[Zeng et al., 2023]** Ailing Zeng, Muxi Chen, Lei Zhang, and Qiang Xu. *Are Transformers Effective for Time Series?* Proceedings of the AAAI Conference on Artificial Intelligence (AAAI '23), 37(9):11121–11128, 2023.
-- **[Goswami et al., 2024]** Mononito Goswami, Konrad Szafer, Arjun Choudhry, Yifu Cai, Shuo Li, and Artur Dubrawski. *MOMENT: A Family of Open Time-Series Foundation Models*. International Conference on Machine Learning (ICML '24), 2024.
-- **[Li et al., 2023]** Junnan Li, Dongxu Li, Silvio Savarese, and Steven Hoi. *BLIP-2: Bootstrapping Language-Image Pre-training with Frozen Image Encoders and Large Language Models*. International Conference on Machine Learning (ICML '23), 2023.
-- **[Fedus et al., 2022]** William Fedus, Barret Zoph, and Noam Shazeer. *Switch Transformers: Scaling to Trillion Parameter Models with Simple and Efficient Sparsity*. Journal of Machine Learning Research (JMLR), 23(120):1–39, 2022.
-- **[Loshchilov & Hutter, 2017]** Ilya Loshchilov and Frank Hutter. *SGDR: Stochastic Gradient Descent with Warm Restarts*. International Conference on Learning Representations (ICLR '17), 2017.
-- **[Dettmers et al., 2023]** Tim Dettmers, Artidoro Pagnoni, Ari Holtzman, and Luke Zettlemoyer. *QLoRA: Efficient Finetuning of Quantized LLMs*. Advances in Neural Information Processing Systems (NeurIPS '23), 2023.
+## References
+
+1. Y. Zhang, E. Chun, Z. Mao, Y. Wu, and J. Wang. **GS-Fuse: Granger-supervised gated fusion and multi-granularity alignment for event-driven financial forecasting.** *Proceedings of the 32nd ACM SIGKDD Conference on Knowledge Discovery and Data Mining V.2*, pp. 6570–6581, 2026. [DOI](https://doi.org/10.1145/3770855.3817927)
+
+2. Y. Zhang, W. Yang, J. Wang, Q. Ma, and J. Xiong. **CAMEF: Causal-augmented multi-modality event-driven financial forecasting by integrating time series patterns and salient macroeconomic announcements.** *Proceedings of the 31st ACM SIGKDD Conference on Knowledge Discovery and Data Mining V.2*, 2025. [DOI](https://doi.org/10.1145/3711896.3736872)
+
+3. M. Goswami, K. Szafer, A. Choudhry, Y. Cai, S. Li, and A. Dubrawski. **MOMENT: A family of open time-series foundation models.** *International Conference on Machine Learning (ICML)*, 2024.
+
+4. A. Grattafiori et al. **The Llama 3 herd of models.** *arXiv preprint arXiv:2407.21783*, 2024. [arXiv](https://arxiv.org/abs/2407.21783)
+
+5. A. van den Oord, Y. Li, and O. Vinyals. **Representation learning with contrastive predictive coding.** *arXiv preprint arXiv:1807.03748*, 2018. [arXiv](https://arxiv.org/abs/1807.03748)
+
+6. C. W. J. Granger. **Investigating causal relations by econometric models and cross-spectral methods.** *Econometrica*, 37(3):424–438, 1969.
+
+7. M. Jin et al. **Time-LLM: Time series forecasting by reprogramming large language models.** *International Conference on Learning Representations (ICLR)*, 2024.
+
+8. C. Liu et al. **TimeCMA: Towards LLM-empowered multivariate time series forecasting via cross-modality alignment.** *AAAI Conference on Artificial Intelligence*, 2025.
+
+9. N. Shazeer et al. **Outrageously large neural networks: The sparsely-gated mixture-of-experts layer.** *International Conference on Learning Representations (ICLR)*, 2017.
+
+10. W. Fedus, B. Zoph, and N. Shazeer. **Switch transformers: Scaling to trillion parameter models with simple and efficient sparsity.** *Journal of Machine Learning Research*, 23(120):1–39, 2022.
+
+11. J. Li, D. Li, S. Savarese, and S. Hoi. **BLIP-2: Bootstrapping language-image pre-training with frozen image encoders and large language models.** *International Conference on Machine Learning (ICML)*, 2023.
+
+12. R. J. Hyndman and A. B. Koehler. **Another look at measures of forecast accuracy.** *International Journal of Forecasting*, 22(4):679–688, 2006.
+
+13. M. H. Pesaran and A. Timmermann. **A simple nonparametric test of predictive performance.** *Journal of Business & Economic Statistics*, 10(4):461–465, 1992.
+
+14. E. F. Fama. **Efficient capital markets: A review of theory and empirical work.** *Journal of Finance*, 25(2):383–417, 1970.
+
+15. A. Zeng, M. Chen, L. Zhang, and Q. Xu. **Are transformers effective for time series forecasting?** *AAAI Conference on Artificial Intelligence*, 2023.
+
+16. F. Schroff, D. Kalenichenko, and J. Philbin. **FaceNet: A unified embedding for face recognition and clustering.** *IEEE Conference on Computer Vision and Pattern Recognition (CVPR)*, 2015.
+
+17. I. Loshchilov and F. Hutter. **Decoupled weight decay regularization.** *International Conference on Learning Representations (ICLR)*, 2019.
+
+18. W. F. Sharpe. **The Sharpe ratio.** *Journal of Portfolio Management*, 21(1):49–58, 1994.
+
+19. D. H. Bailey and M. López de Prado. **The deflated Sharpe ratio: Correcting for selection bias, backtest overfitting, and non-normality.** *Journal of Portfolio Management*, 40(5):94–107, 2014.
