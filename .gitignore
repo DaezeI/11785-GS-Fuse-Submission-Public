@@ -9,12 +9,18 @@ data/series/
 data/cache_*_emb/
 *.zip
 *.pdf
-PROJECT_MIDTERM_GUIDE.md
-PAPER_EXPLANATION.md
-CHANGELOG.md
+
+# Personal and Team Private Folders
+personal/
+team_shared/
 TEAM_MIDTERM_MASTER_RESOURCE.md
 report_sections/
 private_notes/
+PROJECT_MIDTERM_GUIDE.md
+PAPER_EXPLANATION.md
+CHANGELOG.md
+
+# Pretrained backbones
 Llama-3.1-8B/
 llama3-2-3B/
 moment_model/
