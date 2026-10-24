@@ -4,7 +4,6 @@
 > **Course:** CMU 11-785 Intro to Deep Learning (Fall 2026)  
 > **Team GitHub:** `https://github.com/DaezeI/11785-GS-Fuse.git`  
 > **Active Feature Branch:** [`feat/moe-qformer-wandb-cache`](https://github.com/DaezeI/11785-GS-Fuse/tree/feat/moe-qformer-wandb-cache)  
-> **Shared Google Drive:** [Team Asset Folder (Checkpoints, Data, & Cache)](https://drive.google.com/drive/folders/1ntwrD20YHgKfLea885mOHLBdsXgdGhDC?usp=sharing)  
 > **Weights & Biases Project:** `ailodian-carnegie-mellon-university/11785-GS-Fuse-Baseline`  
 > **Anchor Paper:** *GS-Fuse: Granger-Supervised Gated Fusion and Multi-Granularity Alignment for Event-Driven Financial Forecasting* (ACM SIGKDD 2026)  
 
@@ -102,10 +101,10 @@ GS-Fuse/
 
 ## 4. Quickstart: How to Run the Code
 
-### 4.0 Teammate Setup: Data & Checkpoint Placement
-Download shared assets from our **[Team Google Drive Asset Folder](https://drive.google.com/drive/folders/1ntwrD20YHgKfLea885mOHLBdsXgdGhDC?usp=sharing)**:
-* **Raw Datasets:** Extract `data_raw.zip` into repository root (`data/series/` and `data/event/`).
-* **Pre-Trained Stage Checkpoints:** Place into `outputs/gs_fuse_sp500_scratch/` (`stage1_best_model.pth` and `stage2_best_model.pth`).
+### 4.0 Data & Checkpoint Placement Layout
+Place your dataset and checkpoints according to the following directory layout:
+* **Raw Datasets:** Place `data/series/SP500.csv` and the macroeconomic release subfolders into `data/event/`.
+* **Pre-Trained Stage Checkpoints (Optional):** Place `stage1_best_model.pth` and `stage2_best_model.pth` into `outputs/gs_fuse_sp500_scratch/` to skip Stages 1 and 2 and jump directly to Stage 3.
 
 ### 4.1 Environment Setup
 Ensure Python 3.12 is active with CUDA 12.4 PyTorch:
