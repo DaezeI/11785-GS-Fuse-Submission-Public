@@ -1,24 +1,18 @@
-# Large local assets
+# Large local assets & model checkpoints
 model_output/
 log/
 outputs/
 wandb/
 *.pth
+*.pt
+*.bin
+*.zip
+*.tar.gz
+
+# Data directories
 data/event/
 data/series/
 data/cache_*_emb/
-*.zip
-*.pdf
-
-# Personal and Team Private Folders
-personal/
-team_shared/
-TEAM_MIDTERM_MASTER_RESOURCE.md
-report_sections/
-private_notes/
-PROJECT_MIDTERM_GUIDE.md
-PAPER_EXPLANATION.md
-CHANGELOG.md
 
 # Pretrained backbones
 Llama-3.1-8B/
@@ -28,7 +22,7 @@ baselines/moment/
 Kronos-base/
 Kronos-Tokenizer-base/
 
-# Python/runtime
+# Python / runtime
 __pycache__/
 *.py[cod]
 .pytest_cache/
@@ -37,3 +31,4 @@ __pycache__/
 # Local editor
 .idea/
 .cursor/
+.vscode/
