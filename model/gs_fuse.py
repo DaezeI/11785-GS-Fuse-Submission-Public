@@ -25,6 +25,9 @@ from transformers.optimization import get_cosine_schedule_with_warmup
 
 from model.ts_encoders import build_ts_encoder
 from model.text_encoders import build_text_encoder
+from model.variants import MoEModalityGate, QFormerFusion
+from model import tracking
+from model.text_cache import TextEmbeddingCache, cache_signature
 
 
 
@@ -67,6 +70,8 @@ class DualLogger(object):
 # ---------------- Config ----------------
 LLAMA_HIDDEN = 3072  # hidden size
 USE_4BIT = True
+# Precomputed pooled text embeddings (scripts/precompute_text_cache.py); None = in-run memo only.
+TEXT_CACHE_PATH = None
 
 FUSE_DIM = 1024
 NUM_HEADS = 8
@@ -122,6 +127,7 @@ class TrainingConfig:
     TOKEN_ALIGN_TAU_NCE = 0.07
     TS_ONLY_LAMBDA = 0.1
     GATE_ENTROPY_LAMBDA = 0.01
+    MOE_AUX_LAMBDA = 0.01  # load-balancing weight, only used with gate_type="moe"
 
     # ---- Granger sigmoid scaling (prevents gc_score ~ 0.5000 when diff is tiny) ----
     GC_USE_ADAPTIVE_SCALE = True   # robust default; auto-scales to current diff magnitude
@@ -605,10 +611,23 @@ class GSFuse(nn.Module):
             decoder_heads=8,
             use_ts_memory=True,
             max_token_num=20000,
+            # interpretable variants (defaults reproduce the original GS-FUSE)
+            fusion_type="crossattn",
+            gate_type="softmax",
+            num_experts=4,
+            moe_top_k=2,
+            num_queries=16,
+            qformer_layers=2,
             # legacy aliases
             llama_name=None,
     ):
         super(GSFuse, self).__init__()
+        if fusion_type not in ("crossattn", "qformer"):
+            raise ValueError(f"Unknown fusion_type: {fusion_type}")
+        if gate_type not in ("softmax", "moe"):
+            raise ValueError(f"Unknown gate_type: {gate_type}")
+        self.fusion_type = fusion_type
+        self.gate_type = gate_type
 
         if text_model_path is None and llama_name is None:
             raise ValueError("text_model_path (or legacy llama_name) is required")
@@ -627,6 +646,16 @@ class GSFuse(nn.Module):
         # -------- Text encoder (LLaMA or Phi) --------
         self.text_encoder = build_text_encoder(text_backbone, text_model_path, use_4bit=USE_4BIT)
         text_hidden = self.text_encoder.output_dim
+
+        signature = cache_signature(text_model_path, window, stride, torch.backends.cuda.matmul.allow_tf32,
+                                    use_4bit=USE_4BIT)
+        if TEXT_CACHE_PATH and os.path.exists(TEXT_CACHE_PATH):
+            self.text_inst_cache = TextEmbeddingCache.load(TEXT_CACHE_PATH, signature)
+            print(f"[text-cache] Loaded {len(self.text_inst_cache)} embeddings from {TEXT_CACHE_PATH}")
+        else:
+            if TEXT_CACHE_PATH:
+                print(f"[text-cache] {TEXT_CACHE_PATH} not found; embeddings are memoized in memory only")
+            self.text_inst_cache = TextEmbeddingCache(signature)
 
         self.llm_proj = nn.Sequential(
             nn.LayerNorm(text_hidden),
@@ -723,6 +752,17 @@ class GSFuse(nn.Module):
         ).to(self.device)
         self.gate_tau = 1.0
 
+        self.moe_gate = None
+        if gate_type == "moe":
+            self.moe_gate = MoEModalityGate(
+                FUSE_DIM, num_experts=num_experts, top_k=moe_top_k, tau=self.gate_tau
+            ).to(self.device)
+        self.qformer = None
+        if fusion_type == "qformer":
+            self.qformer = QFormerFusion(
+                FUSE_DIM, num_queries=num_queries, num_layers=qformer_layers, num_heads=NUM_HEADS
+            ).to(self.device)
+
         # Enhanced decoder with temporal shortcut
         self.decoder = TinyDecoderV3(
             context_dim=FUSE_DIM, d=self.d, pred_len=self.pred_len, width=FUSE_DIM,
@@ -785,7 +825,12 @@ class GSFuse(nn.Module):
 
     @torch.no_grad()
     def text_embedding(self, text: str):
-        return self.text_encoder.encode_instance(text, self.window, self.stride, self.device)
+        vec = self.text_inst_cache.get(text)
+        if vec is None:
+            vec = self.text_encoder.encode_instance(text, self.window, self.stride, self.device)
+            self.text_inst_cache.put(text, vec)
+            return vec
+        return vec.to(self.device)
 
     @torch.no_grad()
     def get_text_tokens_all(self, text: str):
@@ -852,17 +897,6 @@ class GSFuse(nn.Module):
 
     def _fuse_from_sequences(self, text_tokens, ts_tokens, text_mask=None, ts_mask=None,
                              ts_inst=None, return_analysis: bool = False):
-        attn_text2ts, w_text2ts = self.cross_attn_text_to_ts(
-            query=text_tokens, key=ts_tokens, value=ts_tokens,
-            key_padding_mask=ts_mask if ts_mask is not None else None,
-            need_weights=return_analysis, average_attn_weights=False
-        )
-        attn_ts2text, w_ts2text = self.cross_attn_ts_to_text(
-            query=ts_tokens, key=text_tokens, value=text_tokens,
-            key_padding_mask=text_mask if text_mask is not None else None,
-            need_weights=return_analysis, average_attn_weights=False
-        )
-
         t_vec_raw = self._masked_mean(text_tokens, text_mask)
 
         if ts_inst is not None:
@@ -873,9 +907,35 @@ class GSFuse(nn.Module):
         t_vec = F.layer_norm(t_vec_raw, (FUSE_DIM,))
         s_vec = F.layer_norm(s_vec_raw, (FUSE_DIM,))
 
-        H_text = text_tokens + attn_text2ts
+        variant_info = {}
+        if self.fusion_type == "qformer":
+            query_tok, w_query2text = self.qformer(
+                text_tokens, text_mask, cond=s_vec_raw, need_weights=return_analysis
+            )
+            attn_ts2text, w_ts2text = self.cross_attn_ts_to_text(
+                query=ts_tokens, key=query_tok, value=query_tok,
+                need_weights=return_analysis, average_attn_weights=False
+            )
+            w_text2ts = None
+            H_text = query_tok
+            align_text_mask = None
+            variant_info["qformer_attn"] = w_query2text
+        else:
+            attn_text2ts, w_text2ts = self.cross_attn_text_to_ts(
+                query=text_tokens, key=ts_tokens, value=ts_tokens,
+                key_padding_mask=ts_mask if ts_mask is not None else None,
+                need_weights=return_analysis, average_attn_weights=False
+            )
+            attn_ts2text, w_ts2text = self.cross_attn_ts_to_text(
+                query=ts_tokens, key=text_tokens, value=text_tokens,
+                key_padding_mask=text_mask if text_mask is not None else None,
+                need_weights=return_analysis, average_attn_weights=False
+            )
+            H_text = text_tokens + attn_text2ts
+            align_text_mask = text_mask
+
         H_ts = ts_tokens + attn_ts2text
-        t_vec_residual = F.layer_norm(self._masked_mean(H_text, text_mask), (FUSE_DIM,))
+        t_vec_residual = F.layer_norm(self._masked_mean(H_text, align_text_mask), (FUSE_DIM,))
 
         s_vec_residual_base = F.layer_norm(self._masked_mean(H_ts, ts_mask), (FUSE_DIM,))
         if USE_RAW_TS_RESIDUAL and ts_inst is not None:
@@ -888,7 +948,7 @@ class GSFuse(nn.Module):
             token_align_loss, token_align_info = self.token_align_module(
                 text_tokens=H_text,
                 ts_tokens=H_ts,
-                text_mask=text_mask,
+                text_mask=align_text_mask,
                 ts_mask=ts_mask,
                 return_alignment=True,
             )
@@ -896,7 +956,7 @@ class GSFuse(nn.Module):
             token_align_loss = self.token_align_module(
                 text_tokens=H_text,
                 ts_tokens=H_ts,
-                text_mask=text_mask,
+                text_mask=align_text_mask,
                 ts_mask=ts_mask,
                 return_alignment=False,
             )
@@ -905,13 +965,18 @@ class GSFuse(nn.Module):
         t_vec_norm = F.normalize(t_vec_residual, p=2, dim=-1)
         s_vec_norm = F.normalize(s_vec_residual, p=2, dim=-1)
 
-        concat_all = torch.cat([t_vec_norm, s_vec_norm], dim=-1)
-        gate_logits = self.bi_gate_layer(concat_all).reshape(-1, 2, FUSE_DIM)
-        gate = F.softmax(gate_logits / max(self.gate_tau, 1e-6), dim=1)
+        if self.gate_type == "moe":
+            gate, moe_info = self.moe_gate(t_vec_norm, s_vec_norm)
+            variant_info.update(moe_info)
+        else:
+            concat_all = torch.cat([t_vec_norm, s_vec_norm], dim=-1)
+            gate_logits = self.bi_gate_layer(concat_all).reshape(-1, 2, FUSE_DIM)
+            gate = F.softmax(gate_logits / max(self.gate_tau, 1e-6), dim=1)
         fused_emb = gate[:, 0] * t_vec_norm + gate[:, 1] * s_vec_norm
 
         if return_analysis:
             return fused_emb, {
+                **variant_info,
                 "gate_softmax": gate,
                 "attn_t2s": w_text2ts,
                 "attn_s2t": w_ts2text,
@@ -929,6 +994,7 @@ class GSFuse(nn.Module):
             }
         else:
             return fused_emb, {
+                **variant_info,
                 "t_vec": t_vec,
                 "s_vec": s_vec,
                 "s_vec_residual": s_vec_residual,
@@ -1119,6 +1185,15 @@ class GSFuse(nn.Module):
     def predict_one(self, text, seq_data):
         return self.forward(text, seq_data)
 
+    def variant_modules(self):
+        """Name -> module for the optional MoE gate / Q-Former fusion that are active."""
+        mods = {}
+        if self.moe_gate is not None:
+            mods["moe_gate"] = self.moe_gate
+        if self.qformer is not None:
+            mods["qformer"] = self.qformer
+        return mods
+
     def ts_encoder_last_block_parameters(self):
         return self.ts_encoder.last_block_parameters()
 
@@ -1189,6 +1264,8 @@ class GSFuse(nn.Module):
             "text_model_path": llm_name,
             "text_backbone": self.text_backbone,
             "ts_backbone": self.ts_backbone,
+            "fusion_type": self.fusion_type,
+            "gate_type": self.gate_type,
             "llm_hidden": llm_hidden,
             "use_4bit": bool(USE_4BIT),
             "decoder_layers": int(dec_layers) if dec_layers is not None else None,
@@ -1228,6 +1305,8 @@ class GSFuse(nn.Module):
             state_dicts["multi_scale_extractor"] = self.multi_scale_extractor.state_dict()
         if USE_LEARNABLE_LAST_VALUE:
             state_dicts["last_value_module"] = self.last_value_module.state_dict()
+        for name, mod in self.variant_modules().items():
+            state_dicts[name] = mod.state_dict()
 
         checkpoint = {
             "state_dicts": state_dicts,
@@ -1315,6 +1394,10 @@ class GSFuse(nn.Module):
             self.text_only_head.load_state_dict(sd["text_only_head"], strict=False)
         if "token_align_module" in sd and sd["token_align_module"] is not None:
             self.token_align_module.load_state_dict(sd["token_align_module"], strict=False)
+        for name, mod in self.variant_modules().items():
+            if name not in sd:
+                raise KeyError(f"Checkpoint has no '{name}' weights; was it trained with this variant?")
+            mod.load_state_dict(sd[name], strict=True)
 
         self.align_loss_w = float(meta.get("align_loss_w", getattr(self, "align_loss_w", 1.0)))
         self.gate_tau = float(meta.get("gate_tau", 1.0))
@@ -1523,6 +1606,9 @@ def train(model, train_loader, test_loader, vali_loader, num_epochs, output_path
     if USE_LEARNABLE_LAST_VALUE:
         trainable_groups.append({'params': model.last_value_module.parameters(), 'lr': base_lr * 2,
                                  'weight_decay': 0.01})  # Higher LR for last value module
+    for name, mod in model.variant_modules().items():
+        trainable_groups.append({'params': mod.parameters(), 'lr': base_lr, 'weight_decay': 0.01})
+        print(f"[CONFIG] Variant module '{name}': {sum(p.numel() for p in mod.parameters()):,} params")
 
     # Add LLM last block parameters with very low learning rate
     if FINETUNE_LLM_LAST_LAYER and len(llm_last_block_params) > 0:
@@ -1806,6 +1892,27 @@ def train(model, train_loader, test_loader, vali_loader, num_epochs, output_path
                     )
                     print(msg_h)
 
+        if tracking.active():
+            m = {}
+            for split, res, mod in (("vali", vali_result, vali_modality), ("test", test_result, test_modality)):
+                comb, mse, mae, contr, rmse, sm = res[:6]
+                m.update({f"{split}/comb": comb, f"{split}/mse": mse, f"{split}/mae": mae,
+                          f"{split}/rmse": rmse, f"{split}/contrastive": contr, f"{split}/smape": sm})
+                if not isinstance(mod, dict):
+                    continue
+                m.update({
+                    f"{split}/gate_text": mod.get("gate_text", 0.0),
+                    f"{split}/ts_only_mse": mod.get("ts_only_mse", 0.0),
+                    f"{split}/text_only_mse": mod.get("text_only_mse", 0.0),
+                    f"{split}/text_helps_pct": mod.get("granger_text_helps_pct", 0.0) * 100,
+                    f"{split}/ts_helps_pct": mod.get("granger_ts_helps_pct", 0.0) * 100,
+                })
+                for hh, r in (mod.get("horizon_results") or {}).items():
+                    m.update({f"{split}_H{hh}/mse": r["mse"], f"{split}_H{hh}/mae": r["mae"],
+                              f"{split}_H{hh}/ts_only_mse": r["ts_only_mse"],
+                              f"{split}_H{hh}/text_only_mse": r["text_only_mse"]})
+            tracking.log(m, stage="stage3", step=global_step)
+
     for epoch in range(num_epochs):
         model.train()
         epoch_loss_sum = 0.0
@@ -1934,6 +2041,9 @@ def train(model, train_loader, test_loader, vali_loader, num_epochs, output_path
                 combined_loss = combined_loss + model.token_align_loss_w * token_align_loss
                 loss_token_align = float(token_align_loss.detach().cpu()) * model.token_align_loss_w
 
+            if analysis is not None and analysis.get("moe_aux_loss") is not None:
+                combined_loss = combined_loss + TrainingConfig.MOE_AUX_LAMBDA * analysis["moe_aux_loss"]
+
             ts_only_lambda = TrainingConfig.TS_ONLY_LAMBDA if not simplified_mode else 0.0
             if ts_only_lambda > 0 and analysis is not None:
                 s_vec_residual = analysis.get("s_vec_residual")
@@ -2053,6 +2163,22 @@ def train(model, train_loader, test_loader, vali_loader, num_epochs, output_path
                     epoch_granger_text_helps_raw_sum += float(raw_text_helps.detach().cpu())
                     epoch_granger_ts_helps_raw_sum += float(raw_ts_helps.detach().cpu())
 
+            if tracking.active():
+                step_metrics = {
+                    "train/loss_step": step_loss, "train/mse_step": batch_mse_metric,
+                    "train/mae_step": batch_mae_metric, "train/smape_step": step_smape,
+                    "loss/core_reg": loss_core_reg, "loss/contrastive": loss_contrastive,
+                    "loss/gate_causal": loss_gate_causal, "loss/token_align": loss_token_align,
+                    "loss/ts_only": loss_ts_only, "lr": scheduler.get_last_lr()[0],
+                }
+                if analysis is not None and analysis.get("gate_softmax") is not None:
+                    step_metrics["gate/text_openness_step"] = float(analysis["gate_softmax"][:, 0].mean())
+                if analysis is not None and analysis.get("moe_aux_loss") is not None:
+                    step_metrics["loss/moe_aux"] = float(analysis["moe_aux_loss"].detach())
+                    load = analysis["moe_dispatch"].detach().mean(dim=0).cpu().tolist()
+                    step_metrics.update({f"moe/expert{k}_load": v for k, v in enumerate(load)})
+                tracking.log(step_metrics, stage="stage3", step=global_step)
+
             print(
                 f'Epoch {epoch + 1}/{num_epochs} | step {step_in_epoch}/{len(train_loader)} | global {global_step} | loss {step_loss:.6f}')
 
@@ -2080,6 +2206,10 @@ def train(model, train_loader, test_loader, vali_loader, num_epochs, output_path
             f'Contr {epoch_train_contr:.6f} | train SMAPE(%): {epoch_train_smape:.4f}'
         )
         print(epoch_end_msg)
+        tracking.log({"epoch": epoch + 1, "train/loss": epoch_avg_loss, "train/mse": epoch_train_mse,
+                      "train/rmse": epoch_train_rmse, "train/mae": epoch_train_mae,
+                      "train/contrastive": epoch_train_contr, "train/smape": epoch_train_smape},
+                     stage="stage3", step=global_step)
 
         if epoch_gate_count > 0:
             epoch_gate_avg = (epoch_gate_sum / epoch_gate_count).tolist()
@@ -2137,6 +2267,9 @@ def train(model, train_loader, test_loader, vali_loader, num_epochs, output_path
                 f'[Save Best] epoch {epoch + 1} | '
                 f'Vali MSE {vali_mse_loss:.6f} | Test MSE {test_mse_loss:.6f}'
             )
+            tracking.summary({"best/epoch": epoch + 1, "best/vali_mse": vali_mse_loss,
+                              "best/vali_mae": vali_mae_loss, "best/test_mse": test_mse_loss,
+                              "best/test_mae": test_mae_loss})
 
         save_path = os.path.join(model_output_path, "lastest_model.pth")
         model.save_model_combined(save_path=save_path)
@@ -2836,6 +2969,9 @@ def train_stage1_ts_only(model, sw_train_loader, sw_vali_loader, num_epochs=None
             step_smape = float(smape(output.float(), target.float()).detach().cpu())
             epoch_loss_sum += step_loss
             epoch_smape_sum += step_smape
+            tracking.log({"train/loss_step": step_loss, "train/smape_step": step_smape,
+                          "lr": scheduler.get_last_lr()[0]},
+                         stage="stage1", step=epoch * len(sw_train_loader) + step_in_epoch)
 
             if step_in_epoch % 50 == 0:
                 print(
@@ -2869,6 +3005,9 @@ def train_stage1_ts_only(model, sw_train_loader, sw_vali_loader, num_epochs=None
 
         msg = f'[Stage 1] Epoch {epoch + 1}/{num_epochs} | Train Loss: {epoch_avg_loss:.6f} | Train SMAPE: {epoch_avg_smape:.4f} | Vali MSE: {vali_loss:.6f}'
         print(msg)
+        tracking.log({"epoch": epoch + 1, "train/loss": epoch_avg_loss, "train/smape": epoch_avg_smape,
+                      "vali/mse": vali_loss},
+                     stage="stage1", step=(epoch + 1) * len(sw_train_loader))
         log_file += msg + "\n"
 
         if vali_loss < best_loss:
@@ -3017,6 +3156,9 @@ def train_stage2_text_only(model, train_loader, vali_loader, num_epochs=None, ou
             step_smape = float(smape(output.float(), target.float()).detach().cpu())
             epoch_loss_sum += step_loss
             epoch_smape_sum += step_smape
+            tracking.log({"train/loss_step": step_loss, "train/smape_step": step_smape,
+                          "lr": scheduler.get_last_lr()[0]},
+                         stage="stage2", step=epoch * len(train_loader) + step_in_epoch)
 
             if step_in_epoch % 50 == 0:
                 print(
@@ -3059,6 +3201,9 @@ def train_stage2_text_only(model, train_loader, vali_loader, num_epochs=None, ou
 
         msg = f'[Stage 2] Epoch {epoch + 1}/{num_epochs} | Train Loss: {epoch_avg_loss:.6f} | Train SMAPE: {epoch_avg_smape:.4f} | Vali MSE: {vali_loss:.6f}'
         print(msg)
+        tracking.log({"epoch": epoch + 1, "train/loss": epoch_avg_loss, "train/smape": epoch_avg_smape,
+                      "vali/mse": vali_loss},
+                     stage="stage2", step=(epoch + 1) * len(train_loader))
         log_file += msg + "\n"
 
         if vali_loss < best_loss:

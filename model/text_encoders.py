@@ -27,8 +27,9 @@ def _load_causal_lm(name: str, use_4bit: bool = False):
         tok.pad_token = tok.eos_token
     model = AutoModelForCausalLM.from_pretrained(
         name,
-        device_map="auto",
-        torch_dtype=torch.float16,
+        # GSFuse places its own modules on cuda-or-cpu; "auto" would pick MPS/disk offload on non-CUDA hosts.
+        device_map="auto" if torch.cuda.is_available() else None,
+        torch_dtype=torch.float16 if use_4bit else torch.float32,
         low_cpu_mem_usage=True,
         quantization_config=bnb_config if use_4bit else None,
     )

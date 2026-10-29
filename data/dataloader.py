@@ -78,10 +78,11 @@ class event_set(object):
         event_dirs = []
 
         # Find all event subfolders and store directories
-        for main_folder in os.listdir(event_dir):
+        # Sorted: the train/vali/test split is positional, so raw listdir order would make it OS-dependent.
+        for main_folder in sorted(os.listdir(event_dir)):
             main_folder_path = os.path.join(event_dir, main_folder)
             if os.path.isdir(main_folder_path):
-                for sub_folder in os.listdir(main_folder_path):
+                for sub_folder in sorted(os.listdir(main_folder_path)):
                     sub_folder_path = os.path.join(main_folder_path, sub_folder)
                     if os.path.isdir(sub_folder_path):
                         event_dirs.append(sub_folder_path)
@@ -112,7 +113,7 @@ class event_set(object):
 
         event_files = []
         for event_folder in event_dirs:
-            folder_files = os.listdir(event_folder)
+            folder_files = sorted(os.listdir(event_folder))
             event_type = os.path.basename(os.path.dirname(event_folder))
             for file in folder_files:
                 if file.endswith('txt_full_summary.txt'):

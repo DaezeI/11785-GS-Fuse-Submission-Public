@@ -1,0 +1,1216 @@
+{
+ "summary": {
+  "variant": "fusion=crossattn, gate=softmax",
+  "n_samples": 200,
+  "gate_text_by_event_type": {
+   "3": 0.5247363719073209,
+   "4": 0.5232840559699319,
+   "5": 0.5252987407147884,
+   "6": 0.5245314501225948,
+   "7": 0.5237354015817448,
+   "8": 0.5227974235397024
+  }
+ },
+ "records": [
+  {
+   "index": 0,
+   "event_type": "3",
+   "date": "20131220",
+   "gate_text": 0.5247147679328918
+  },
+  {
+   "index": 11,
+   "event_type": "3",
+   "date": "20141125",
+   "gate_text": 0.5221698880195618
+  },
+  {
+   "index": 23,
+   "event_type": "3",
+   "date": "20151124",
+   "gate_text": 0.5278993844985962
+  },
+  {
+   "index": 35,
+   "event_type": "3",
+   "date": "20161129",
+   "gate_text": 0.5241410732269287
+  },
+  {
+   "index": 46,
+   "event_type": "3",
+   "date": "20171027",
+   "gate_text": 0.525461733341217
+  },
+  {
+   "index": 58,
+   "event_type": "3",
+   "date": "20181025",
+   "gate_text": 0.5232855081558228
+  },
+  {
+   "index": 70,
+   "event_type": "3",
+   "date": "20191127",
+   "gate_text": 0.5272615551948547
+  },
+  {
+   "index": 81,
+   "event_type": "3",
+   "date": "20201029",
+   "gate_text": 0.5195745825767517
+  },
+  {
+   "index": 93,
+   "event_type": "3",
+   "date": "20211028",
+   "gate_text": 0.5242652893066406
+  },
+  {
+   "index": 105,
+   "event_type": "3",
+   "date": "20221027",
+   "gate_text": 0.5283125638961792
+  },
+  {
+   "index": 116,
+   "event_type": "3",
+   "date": "20230928",
+   "gate_text": 0.5250137448310852
+  },
+  {
+   "index": 128,
+   "event_type": "4",
+   "date": "20081007",
+   "gate_text": 0.5282710194587708
+  },
+  {
+   "index": 140,
+   "event_type": "4",
+   "date": "20100406",
+   "gate_text": 0.52103590965271
+  },
+  {
+   "index": 152,
+   "event_type": "4",
+   "date": "20111012",
+   "gate_text": 0.5218079686164856
+  },
+  {
+   "index": 163,
+   "event_type": "4",
+   "date": "20130220",
+   "gate_text": 0.5270703434944153
+  },
+  {
+   "index": 175,
+   "event_type": "4",
+   "date": "20140820",
+   "gate_text": 0.5254465937614441
+  },
+  {
+   "index": 187,
+   "event_type": "4",
+   "date": "20160217",
+   "gate_text": 0.5222083330154419
+  },
+  {
+   "index": 198,
+   "event_type": "4",
+   "date": "20170705",
+   "gate_text": 0.52095627784729
+  },
+  {
+   "index": 210,
+   "event_type": "4",
+   "date": "20190109",
+   "gate_text": 0.5222131013870239
+  },
+  {
+   "index": 222,
+   "event_type": "4",
+   "date": "20200819",
+   "gate_text": 0.5181219577789307
+  },
+  {
+   "index": 233,
+   "event_type": "4",
+   "date": "20220105",
+   "gate_text": 0.5238804817199707
+  },
+  {
+   "index": 245,
+   "event_type": "4",
+   "date": "20230816",
+   "gate_text": 0.5251126289367676
+  },
+  {
+   "index": 257,
+   "event_type": "5",
+   "date": "20081016",
+   "gate_text": 0.522992730140686
+  },
+  {
+   "index": 269,
+   "event_type": "5",
+   "date": "20091118",
+   "gate_text": 0.5252293348312378
+  },
+  {
+   "index": 280,
+   "event_type": "5",
+   "date": "20101015",
+   "gate_text": 0.5267303586006165
+  },
+  {
+   "index": 292,
+   "event_type": "5",
+   "date": "20111019",
+   "gate_text": 0.5229092836380005
+  },
+  {
+   "index": 304,
+   "event_type": "5",
+   "date": "20121016",
+   "gate_text": 0.5297870635986328
+  },
+  {
+   "index": 315,
+   "event_type": "5",
+   "date": "20130917",
+   "gate_text": 0.5283938646316528
+  },
+  {
+   "index": 327,
+   "event_type": "5",
+   "date": "20140917",
+   "gate_text": 0.5241481065750122
+  },
+  {
+   "index": 339,
+   "event_type": "5",
+   "date": "20150916",
+   "gate_text": 0.5213053226470947
+  },
+  {
+   "index": 350,
+   "event_type": "5",
+   "date": "20160816",
+   "gate_text": 0.5227557420730591
+  },
+  {
+   "index": 362,
+   "event_type": "5",
+   "date": "20170811",
+   "gate_text": 0.5197933316230774
+  },
+  {
+   "index": 374,
+   "event_type": "5",
+   "date": "20180810",
+   "gate_text": 0.5237858295440674
+  },
+  {
+   "index": 386,
+   "event_type": "5",
+   "date": "20190813",
+   "gate_text": 0.5295130014419556
+  },
+  {
+   "index": 397,
+   "event_type": "5",
+   "date": "20200714",
+   "gate_text": 0.5267992615699768
+  },
+  {
+   "index": 409,
+   "event_type": "5",
+   "date": "20210713",
+   "gate_text": 0.5247482061386108
+  },
+  {
+   "index": 421,
+   "event_type": "5",
+   "date": "20220810",
+   "gate_text": 0.5259494185447693
+  },
+  {
+   "index": 432,
+   "event_type": "5",
+   "date": "20230712",
+   "gate_text": 0.5299389958381653
+  },
+  {
+   "index": 444,
+   "event_type": "6",
+   "date": "20080318",
+   "gate_text": 0.5219062566757202
+  },
+  {
+   "index": 456,
+   "event_type": "6",
+   "date": "20090317",
+   "gate_text": 0.5241792798042297
+  },
+  {
+   "index": 467,
+   "event_type": "6",
+   "date": "20100218",
+   "gate_text": 0.5262610912322998
+  },
+  {
+   "index": 479,
+   "event_type": "6",
+   "date": "20110216",
+   "gate_text": 0.5271430015563965
+  },
+  {
+   "index": 491,
+   "event_type": "6",
+   "date": "20120216",
+   "gate_text": 0.5250459909439087
+  },
+  {
+   "index": 503,
+   "event_type": "6",
+   "date": "20130220",
+   "gate_text": 0.5262731313705444
+  },
+  {
+   "index": 514,
+   "event_type": "6",
+   "date": "20140115",
+   "gate_text": 0.5222961902618408
+  },
+  {
+   "index": 526,
+   "event_type": "6",
+   "date": "20150218",
+   "gate_text": 0.5245932340621948
+  },
+  {
+   "index": 538,
+   "event_type": "6",
+   "date": "20160315",
+   "gate_text": 0.5255482792854309
+  },
+  {
+   "index": 549,
+   "event_type": "6",
+   "date": "20170314",
+   "gate_text": 0.5255744457244873
+  },
+  {
+   "index": 561,
+   "event_type": "6",
+   "date": "20180410",
+   "gate_text": 0.522499144077301
+  },
+  {
+   "index": 573,
+   "event_type": "6",
+   "date": "20190509",
+   "gate_text": 0.5192493200302124
+  },
+  {
+   "index": 584,
+   "event_type": "6",
+   "date": "20200513",
+   "gate_text": 0.5217080116271973
+  },
+  {
+   "index": 596,
+   "event_type": "6",
+   "date": "20210615",
+   "gate_text": 0.5361106395721436
+  },
+  {
+   "index": 608,
+   "event_type": "6",
+   "date": "20220714",
+   "gate_text": 0.5220110416412354
+  },
+  {
+   "index": 620,
+   "event_type": "6",
+   "date": "20230811",
+   "gate_text": 0.5221041440963745
+  },
+  {
+   "index": 631,
+   "event_type": "7",
+   "date": "20100623",
+   "gate_text": 0.5247176885604858
+  },
+  {
+   "index": 643,
+   "event_type": "7",
+   "date": "20100921",
+   "gate_text": 0.5254665613174438
+  },
+  {
+   "index": 655,
+   "event_type": "7",
+   "date": "20101027",
+   "gate_text": 0.5202334523200989
+  },
+  {
+   "index": 666,
+   "event_type": "7",
+   "date": "20101214",
+   "gate_text": 0.5199122428894043
+  },
+  {
+   "index": 678,
+   "event_type": "7",
+   "date": "20110302",
+   "gate_text": 0.524865984916687
+  },
+  {
+   "index": 690,
+   "event_type": "7",
+   "date": "20110418",
+   "gate_text": 0.5236514210700989
+  },
+  {
+   "index": 701,
+   "event_type": "7",
+   "date": "20110608",
+   "gate_text": 0.5198142528533936
+  },
+  {
+   "index": 713,
+   "event_type": "7",
+   "date": "20110728",
+   "gate_text": 0.5239162445068359
+  },
+  {
+   "index": 725,
+   "event_type": "7",
+   "date": "20110907",
+   "gate_text": 0.5210599899291992
+  },
+  {
+   "index": 737,
+   "event_type": "7",
+   "date": "20111207",
+   "gate_text": 0.51988685131073
+  },
+  {
+   "index": 748,
+   "event_type": "7",
+   "date": "20120111",
+   "gate_text": 0.519053041934967
+  },
+  {
+   "index": 760,
+   "event_type": "7",
+   "date": "20120222",
+   "gate_text": 0.5296645164489746
+  },
+  {
+   "index": 772,
+   "event_type": "7",
+   "date": "20120408",
+   "gate_text": 0.5229473114013672
+  },
+  {
+   "index": 783,
+   "event_type": "7",
+   "date": "20120606",
+   "gate_text": 0.5207791924476624
+  },
+  {
+   "index": 795,
+   "event_type": "7",
+   "date": "20120725",
+   "gate_text": 0.5283873081207275
+  },
+  {
+   "index": 807,
+   "event_type": "7",
+   "date": "20120920",
+   "gate_text": 0.5198674201965332
+  },
+  {
+   "index": 818,
+   "event_type": "7",
+   "date": "20121028",
+   "gate_text": 0.5191451907157898
+  },
+  {
+   "index": 830,
+   "event_type": "7",
+   "date": "20121205",
+   "gate_text": 0.5170789361000061
+  },
+  {
+   "index": 842,
+   "event_type": "7",
+   "date": "20130123",
+   "gate_text": 0.5251733064651489
+  },
+  {
+   "index": 853,
+   "event_type": "7",
+   "date": "20130326",
+   "gate_text": 0.5218957662582397
+  },
+  {
+   "index": 865,
+   "event_type": "7",
+   "date": "20130529",
+   "gate_text": 0.5250017642974854
+  },
+  {
+   "index": 877,
+   "event_type": "7",
+   "date": "20130724",
+   "gate_text": 0.5175317525863647
+  },
+  {
+   "index": 889,
+   "event_type": "7",
+   "date": "20130924",
+   "gate_text": 0.5182511210441589
+  },
+  {
+   "index": 900,
+   "event_type": "7",
+   "date": "20131016",
+   "gate_text": 0.5211865901947021
+  },
+  {
+   "index": 912,
+   "event_type": "7",
+   "date": "20141102",
+   "gate_text": 0.5282416343688965
+  },
+  {
+   "index": 924,
+   "event_type": "7",
+   "date": "20180509",
+   "gate_text": 0.5247321128845215
+  },
+  {
+   "index": 935,
+   "event_type": "7",
+   "date": "20190206",
+   "gate_text": 0.524388313293457
+  },
+  {
+   "index": 947,
+   "event_type": "7",
+   "date": "20190724",
+   "gate_text": 0.5241143107414246
+  },
+  {
+   "index": 959,
+   "event_type": "7",
+   "date": "20191029",
+   "gate_text": 0.5205838084220886
+  },
+  {
+   "index": 970,
+   "event_type": "7",
+   "date": "20200108",
+   "gate_text": 0.5215595960617065
+  },
+  {
+   "index": 982,
+   "event_type": "7",
+   "date": "20200319",
+   "gate_text": 0.5296229124069214
+  },
+  {
+   "index": 994,
+   "event_type": "7",
+   "date": "20200527",
+   "gate_text": 0.5205350518226624
+  },
+  {
+   "index": 1006,
+   "event_type": "7",
+   "date": "20200805",
+   "gate_text": 0.5272799730300903
+  },
+  {
+   "index": 1017,
+   "event_type": "7",
+   "date": "20201007",
+   "gate_text": 0.5257853269577026
+  },
+  {
+   "index": 1029,
+   "event_type": "7",
+   "date": "20201222",
+   "gate_text": 0.5247682332992554
+  },
+  {
+   "index": 1041,
+   "event_type": "7",
+   "date": "20210303",
+   "gate_text": 0.5237053632736206
+  },
+  {
+   "index": 1052,
+   "event_type": "7",
+   "date": "20210519",
+   "gate_text": 0.5220723152160645
+  },
+  {
+   "index": 1064,
+   "event_type": "7",
+   "date": "20210825",
+   "gate_text": 0.5224847793579102
+  },
+  {
+   "index": 1076,
+   "event_type": "7",
+   "date": "20211103",
+   "gate_text": 0.5246341228485107
+  },
+  {
+   "index": 1087,
+   "event_type": "7",
+   "date": "20220105",
+   "gate_text": 0.5260674953460693
+  },
+  {
+   "index": 1099,
+   "event_type": "7",
+   "date": "20220330",
+   "gate_text": 0.5259394645690918
+  },
+  {
+   "index": 1111,
+   "event_type": "7",
+   "date": "20220622",
+   "gate_text": 0.5254224538803101
+  },
+  {
+   "index": 1123,
+   "event_type": "7",
+   "date": "20220914",
+   "gate_text": 0.5275390148162842
+  },
+  {
+   "index": 1134,
+   "event_type": "7",
+   "date": "20221130",
+   "gate_text": 0.5243219137191772
+  },
+  {
+   "index": 1146,
+   "event_type": "7",
+   "date": "20230208",
+   "gate_text": 0.5245361328125
+  },
+  {
+   "index": 1158,
+   "event_type": "7",
+   "date": "20230430",
+   "gate_text": 0.5283207893371582
+  },
+  {
+   "index": 1169,
+   "event_type": "7",
+   "date": "20230712",
+   "gate_text": 0.527305006980896
+  },
+  {
+   "index": 1181,
+   "event_type": "7",
+   "date": "20230927",
+   "gate_text": 0.5330944061279297
+  },
+  {
+   "index": 1193,
+   "event_type": "7",
+   "date": "20231129",
+   "gate_text": 0.5264922380447388
+  },
+  {
+   "index": 1204,
+   "event_type": "8",
+   "date": "20100614",
+   "gate_text": 0.530858039855957
+  },
+  {
+   "index": 1216,
+   "event_type": "8",
+   "date": "20100714",
+   "gate_text": 0.5212007761001587
+  },
+  {
+   "index": 1228,
+   "event_type": "8",
+   "date": "20100929",
+   "gate_text": 0.521653950214386
+  },
+  {
+   "index": 1240,
+   "event_type": "8",
+   "date": "20101027",
+   "gate_text": 0.5195592045783997
+  },
+  {
+   "index": 1251,
+   "event_type": "8",
+   "date": "20101123",
+   "gate_text": 0.5230691432952881
+  },
+  {
+   "index": 1263,
+   "event_type": "8",
+   "date": "20101220",
+   "gate_text": 0.5204018354415894
+  },
+  {
+   "index": 1275,
+   "event_type": "8",
+   "date": "20110216",
+   "gate_text": 0.5243973731994629
+  },
+  {
+   "index": 1286,
+   "event_type": "8",
+   "date": "20110306",
+   "gate_text": 0.5270447731018066
+  },
+  {
+   "index": 1298,
+   "event_type": "8",
+   "date": "20110403",
+   "gate_text": 0.5228492021560669
+  },
+  {
+   "index": 1310,
+   "event_type": "8",
+   "date": "20110427",
+   "gate_text": 0.5219060182571411
+  },
+  {
+   "index": 1321,
+   "event_type": "8",
+   "date": "20110511",
+   "gate_text": 0.5203192830085754
+  },
+  {
+   "index": 1333,
+   "event_type": "8",
+   "date": "20110530",
+   "gate_text": 0.523308515548706
+  },
+  {
+   "index": 1345,
+   "event_type": "8",
+   "date": "20110614",
+   "gate_text": 0.5218703150749207
+  },
+  {
+   "index": 1357,
+   "event_type": "8",
+   "date": "20110711",
+   "gate_text": 0.5272961854934692
+  },
+  {
+   "index": 1368,
+   "event_type": "8",
+   "date": "20110803",
+   "gate_text": 0.5221422910690308
+  },
+  {
+   "index": 1380,
+   "event_type": "8",
+   "date": "20110822",
+   "gate_text": 0.5266099572181702
+  },
+  {
+   "index": 1392,
+   "event_type": "8",
+   "date": "20110912",
+   "gate_text": 0.5280089974403381
+  },
+  {
+   "index": 1403,
+   "event_type": "8",
+   "date": "20110927",
+   "gate_text": 0.524302065372467
+  },
+  {
+   "index": 1415,
+   "event_type": "8",
+   "date": "20111011",
+   "gate_text": 0.5288633704185486
+  },
+  {
+   "index": 1427,
+   "event_type": "8",
+   "date": "20111129",
+   "gate_text": 0.5270218253135681
+  },
+  {
+   "index": 1438,
+   "event_type": "8",
+   "date": "20111221",
+   "gate_text": 0.5244959592819214
+  },
+  {
+   "index": 1450,
+   "event_type": "8",
+   "date": "20120123",
+   "gate_text": 0.528495728969574
+  },
+  {
+   "index": 1462,
+   "event_type": "8",
+   "date": "20120207",
+   "gate_text": 0.5228183269500732
+  },
+  {
+   "index": 1474,
+   "event_type": "8",
+   "date": "20120305",
+   "gate_text": 0.521761953830719
+  },
+  {
+   "index": 1485,
+   "event_type": "8",
+   "date": "20120321",
+   "gate_text": 0.5194215774536133
+  },
+  {
+   "index": 1497,
+   "event_type": "8",
+   "date": "20120408",
+   "gate_text": 0.5224217176437378
+  },
+  {
+   "index": 1509,
+   "event_type": "8",
+   "date": "20120426",
+   "gate_text": 0.5256599187850952
+  },
+  {
+   "index": 1520,
+   "event_type": "8",
+   "date": "20120510",
+   "gate_text": 0.5231154561042786
+  },
+  {
+   "index": 1532,
+   "event_type": "8",
+   "date": "20120530",
+   "gate_text": 0.5248311758041382
+  },
+  {
+   "index": 1544,
+   "event_type": "8",
+   "date": "20120626",
+   "gate_text": 0.5167365074157715
+  },
+  {
+   "index": 1555,
+   "event_type": "8",
+   "date": "20120716",
+   "gate_text": 0.523684561252594
+  },
+  {
+   "index": 1567,
+   "event_type": "8",
+   "date": "20120805",
+   "gate_text": 0.5195903778076172
+  },
+  {
+   "index": 1579,
+   "event_type": "8",
+   "date": "20120905",
+   "gate_text": 0.5210732221603394
+  },
+  {
+   "index": 1590,
+   "event_type": "8",
+   "date": "20121001",
+   "gate_text": 0.5240200161933899
+  },
+  {
+   "index": 1602,
+   "event_type": "8",
+   "date": "20121024",
+   "gate_text": 0.5156872272491455
+  },
+  {
+   "index": 1614,
+   "event_type": "8",
+   "date": "20121115",
+   "gate_text": 0.5239583849906921
+  },
+  {
+   "index": 1626,
+   "event_type": "8",
+   "date": "20121207",
+   "gate_text": 0.5219172835350037
+  },
+  {
+   "index": 1637,
+   "event_type": "8",
+   "date": "20121229",
+   "gate_text": 0.5209170579910278
+  },
+  {
+   "index": 1649,
+   "event_type": "8",
+   "date": "20130127",
+   "gate_text": 0.5189189910888672
+  },
+  {
+   "index": 1661,
+   "event_type": "8",
+   "date": "20130217",
+   "gate_text": 0.5251225233078003
+  },
+  {
+   "index": 1672,
+   "event_type": "8",
+   "date": "20130306",
+   "gate_text": 0.5249742269515991
+  },
+  {
+   "index": 1684,
+   "event_type": "8",
+   "date": "20130327",
+   "gate_text": 0.5250350832939148
+  },
+  {
+   "index": 1696,
+   "event_type": "8",
+   "date": "20130411",
+   "gate_text": 0.5243655443191528
+  },
+  {
+   "index": 1707,
+   "event_type": "8",
+   "date": "20130503",
+   "gate_text": 0.5185176134109497
+  },
+  {
+   "index": 1719,
+   "event_type": "8",
+   "date": "20130602",
+   "gate_text": 0.5239214897155762
+  },
+  {
+   "index": 1731,
+   "event_type": "8",
+   "date": "20130626",
+   "gate_text": 0.521655797958374
+  },
+  {
+   "index": 1743,
+   "event_type": "8",
+   "date": "20130722",
+   "gate_text": 0.5236480236053467
+  },
+  {
+   "index": 1754,
+   "event_type": "8",
+   "date": "20130808",
+   "gate_text": 0.5204718708992004
+  },
+  {
+   "index": 1766,
+   "event_type": "8",
+   "date": "20130911",
+   "gate_text": 0.5242813229560852
+  },
+  {
+   "index": 1778,
+   "event_type": "8",
+   "date": "20131009",
+   "gate_text": 0.5206180214881897
+  },
+  {
+   "index": 1789,
+   "event_type": "8",
+   "date": "20131029",
+   "gate_text": 0.5175731182098389
+  },
+  {
+   "index": 1801,
+   "event_type": "8",
+   "date": "20131121",
+   "gate_text": 0.5246236324310303
+  },
+  {
+   "index": 1813,
+   "event_type": "8",
+   "date": "20140206",
+   "gate_text": 0.5231587886810303
+  },
+  {
+   "index": 1824,
+   "event_type": "8",
+   "date": "20140603",
+   "gate_text": 0.517825722694397
+  },
+  {
+   "index": 1836,
+   "event_type": "8",
+   "date": "20141002",
+   "gate_text": 0.5228232145309448
+  },
+  {
+   "index": 1848,
+   "event_type": "8",
+   "date": "20141203",
+   "gate_text": 0.5198429226875305
+  },
+  {
+   "index": 1860,
+   "event_type": "8",
+   "date": "20150208",
+   "gate_text": 0.5190955996513367
+  },
+  {
+   "index": 1871,
+   "event_type": "8",
+   "date": "20150407",
+   "gate_text": 0.5184241533279419
+  },
+  {
+   "index": 1883,
+   "event_type": "8",
+   "date": "20150701",
+   "gate_text": 0.5199306011199951
+  },
+  {
+   "index": 1895,
+   "event_type": "8",
+   "date": "20150830",
+   "gate_text": 0.5214099884033203
+  },
+  {
+   "index": 1906,
+   "event_type": "8",
+   "date": "20151126",
+   "gate_text": 0.5157345533370972
+  },
+  {
+   "index": 1918,
+   "event_type": "8",
+   "date": "20160224",
+   "gate_text": 0.5215572714805603
+  },
+  {
+   "index": 1930,
+   "event_type": "8",
+   "date": "20160601",
+   "gate_text": 0.5288400650024414
+  },
+  {
+   "index": 1941,
+   "event_type": "8",
+   "date": "20160807",
+   "gate_text": 0.5210976004600525
+  },
+  {
+   "index": 1953,
+   "event_type": "8",
+   "date": "20161103",
+   "gate_text": 0.5243866443634033
+  },
+  {
+   "index": 1965,
+   "event_type": "8",
+   "date": "20170301",
+   "gate_text": 0.522203266620636
+  },
+  {
+   "index": 1977,
+   "event_type": "8",
+   "date": "20170426",
+   "gate_text": 0.5196582674980164
+  },
+  {
+   "index": 1988,
+   "event_type": "8",
+   "date": "20170611",
+   "gate_text": 0.5273689031600952
+  },
+  {
+   "index": 2000,
+   "event_type": "8",
+   "date": "20170826",
+   "gate_text": 0.5165082216262817
+  },
+  {
+   "index": 2012,
+   "event_type": "8",
+   "date": "20171105",
+   "gate_text": 0.5197604894638062
+  },
+  {
+   "index": 2023,
+   "event_type": "8",
+   "date": "20180103",
+   "gate_text": 0.526445209980011
+  },
+  {
+   "index": 2035,
+   "event_type": "8",
+   "date": "20180226",
+   "gate_text": 0.5212128162384033
+  },
+  {
+   "index": 2047,
+   "event_type": "8",
+   "date": "20180408",
+   "gate_text": 0.5286508798599243
+  },
+  {
+   "index": 2058,
+   "event_type": "8",
+   "date": "20180515",
+   "gate_text": 0.5158563852310181
+  },
+  {
+   "index": 2070,
+   "event_type": "8",
+   "date": "20180617",
+   "gate_text": 0.5239109992980957
+  },
+  {
+   "index": 2082,
+   "event_type": "8",
+   "date": "20180717",
+   "gate_text": 0.5252677798271179
+  },
+  {
+   "index": 2094,
+   "event_type": "8",
+   "date": "20180821",
+   "gate_text": 0.5176239013671875
+  },
+  {
+   "index": 2105,
+   "event_type": "8",
+   "date": "20180916",
+   "gate_text": 0.5209028720855713
+  },
+  {
+   "index": 2117,
+   "event_type": "8",
+   "date": "20181031",
+   "gate_text": 0.5249080657958984
+  },
+  {
+   "index": 2129,
+   "event_type": "8",
+   "date": "20190106",
+   "gate_text": 0.5214673280715942
+  },
+  {
+   "index": 2140,
+   "event_type": "8",
+   "date": "20190204",
+   "gate_text": 0.5259810090065002
+  },
+  {
+   "index": 2152,
+   "event_type": "8",
+   "date": "20190318",
+   "gate_text": 0.5221557021141052
+  },
+  {
+   "index": 2164,
+   "event_type": "8",
+   "date": "20191003",
+   "gate_text": 0.5227487683296204
+  },
+  {
+   "index": 2175,
+   "event_type": "8",
+   "date": "20200414",
+   "gate_text": 0.5199772715568542
+  },
+  {
+   "index": 2187,
+   "event_type": "8",
+   "date": "20200630",
+   "gate_text": 0.5282571911811829
+  },
+  {
+   "index": 2199,
+   "event_type": "8",
+   "date": "20200903",
+   "gate_text": 0.522920548915863
+  },
+  {
+   "index": 2211,
+   "event_type": "8",
+   "date": "20201222",
+   "gate_text": 0.5240259170532227
+  },
+  {
+   "index": 2222,
+   "event_type": "8",
+   "date": "20210330",
+   "gate_text": 0.5219681262969971
+  },
+  {
+   "index": 2234,
+   "event_type": "8",
+   "date": "20211007",
+   "gate_text": 0.5236411094665527
+  },
+  {
+   "index": 2246,
+   "event_type": "8",
+   "date": "20220223",
+   "gate_text": 0.5253479480743408
+  },
+  {
+   "index": 2257,
+   "event_type": "8",
+   "date": "20220403",
+   "gate_text": 0.5231436491012573
+  },
+  {
+   "index": 2269,
+   "event_type": "8",
+   "date": "20220602",
+   "gate_text": 0.5220125913619995
+  },
+  {
+   "index": 2281,
+   "event_type": "8",
+   "date": "20220807",
+   "gate_text": 0.5306732654571533
+  },
+  {
+   "index": 2292,
+   "event_type": "8",
+   "date": "20220907",
+   "gate_text": 0.5225000381469727
+  },
+  {
+   "index": 2304,
+   "event_type": "8",
+   "date": "20221102",
+   "gate_text": 0.5204344987869263
+  },
+  {
+   "index": 2316,
+   "event_type": "8",
+   "date": "20221214",
+   "gate_text": 0.525062084197998
+  },
+  {
+   "index": 2328,
+   "event_type": "8",
+   "date": "20230131",
+   "gate_text": 0.5276110172271729
+  }
+ ]
+}
