@@ -14,8 +14,16 @@ echo "=========================================================="
 
 # 1. Update system packages
 echo "[1/6] Updating system packages..."
-sudo apt-get update -y
-sudo apt-get install -y python3-pip python3-venv git unzip curl build-essential
+if command -v apt-get &> /dev/null; then
+    sudo apt-get update -y
+    sudo apt-get install -y python3-pip python3-venv git unzip curl build-essential
+elif command -v dnf &> /dev/null; then
+    sudo dnf update -y
+    sudo dnf install -y python3-pip git unzip curl gcc gcc-c++ make
+elif command -v yum &> /dev/null; then
+    sudo yum update -y
+    sudo yum install -y python3-pip git unzip curl gcc gcc-c++ make
+fi
 
 # 2. Check NVIDIA GPU
 echo "[2/6] Checking NVIDIA GPU and drivers..."
