@@ -1,0 +1,33 @@
+{
+  "total_events": 12267,
+  "n_train": 7360,
+  "n_test": 2453,
+  "n_vali": 2454,
+  "train_categories": [
+    "1",
+    "10",
+    "11",
+    "12",
+    "2",
+    "3"
+  ],
+  "test_categories": [
+    "3",
+    "4",
+    "5",
+    "6",
+    "7",
+    "8"
+  ],
+  "vali_categories": [
+    "8",
+    "9"
+  ],
+  "test_events_exact_date_overlap_count": 2015,
+  "test_events_exact_date_overlap_pct": 82.14,
+  "unique_test_dates": 1974,
+  "unique_overlap_dates": 1551,
+  "unique_overlap_dates_pct": 78.57,
+  "test_in_140bar_window_count": 2424,
+  "test_in_140bar_window_pct": 98.82
+}
