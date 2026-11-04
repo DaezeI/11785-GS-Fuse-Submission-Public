@@ -1,10 +1,20 @@
 # GS-Fuse (Customized for CMU 11-785 Intro to Deep Learning)
 ## Event-Driven S&P 500 Market Forecasting via Multimodal Gated Fusion
 
+> **Team: start with [TEAM_WORKFLOW.md](TEAM_WORKFLOW.md).** It records the
+> November 4 agreement to use **C1 as the main split**, ownership, service setup,
+> dependencies, and next actions. **Agents: read [AGENTS.md](AGENTS.md).**
+>
+> **Current shared code:** [`main`](https://github.com/DaezeI/11785-GS-Fuse-Submission-Public/tree/main).
+> **Shared model runs:** [Joye's W&B project](https://forge.coreweave.com/wandb/zhaohan2-carnegie-mellon-university/11785-GS-Fuse).
+> **C1 integration remains pending:** historical commands/results below do not
+> establish that training or evaluation uses C1. Verify checkpoint training
+> history before treating an old model as a corrected C1 result.
+
 > **Course:** CMU 11-785 Intro to Deep Learning (Fall 2026)  
-> **Team GitHub:** `https://github.com/DaezeI/11785-GS-Fuse.git`  
-> **Active Feature Branch:** [`feat/moe-qformer-wandb-cache`](https://github.com/DaezeI/11785-GS-Fuse/tree/feat/moe-qformer-wandb-cache)  
-> **Weights & Biases Project:** `ailodian-carnegie-mellon-university/11785-GS-Fuse-Baseline`  
+> **Team GitHub:** [DaezeI/11785-GS-Fuse-Submission-Public](https://github.com/DaezeI/11785-GS-Fuse-Submission-Public)<br>
+> **Historical model-development branch:** [`feat/moe-qformer-wandb-cache`](https://github.com/DaezeI/11785-GS-Fuse-Submission-Public/tree/feat/moe-qformer-wandb-cache) (integrated into `main`)<br>
+> **Separate historical Adaeze baseline W&B project:** `ailodian-carnegie-mellon-university/11785-GS-Fuse-Baseline`<br>
 > **Anchor Paper:** *GS-Fuse: Granger-Supervised Gated Fusion and Multi-Granularity Alignment for Event-Driven Financial Forecasting* (ACM SIGKDD 2026)  
 
 ---

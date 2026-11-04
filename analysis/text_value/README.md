@@ -1,5 +1,12 @@
 # Text value: code, results, and meeting handoff
 
+**Current team plan:** [TEAM_WORKFLOW.md](../../TEAM_WORKFLOW.md) records the
+November 4 C1 decision and ownership. These calculations describe Adaeze's
+uploaded experiment, not Joye's baseline. C1 integration and full-checkpoint
+evaluation remain pending. The agreed historical reference for initial diagnosis
+is [Joye's baseline](https://forge.coreweave.com/wandb/zhaohan2-carnegie-mellon-university/11785-GS-Fuse/runs/2c5m4xe2/overview);
+match its actual checkpoint and model configuration before evaluation.
+
 **Question:** Does the correct event article improve forecasts beyond price inputs, and does the answer change with the forecasting horizon?
 
 This is Nicole's analysis contribution, building on Adaeze's uploaded control experiment. Start with [the meeting brief](MEETING_BRIEF.md). The source experiment remains credited to Adaeze; the calculations, independent price audit, explicit no-text control, tests, and reproducible analysis tools are added here.
