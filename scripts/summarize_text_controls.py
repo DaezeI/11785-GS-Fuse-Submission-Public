@@ -62,7 +62,7 @@ def plot(rows, out):
     axes[0].barh(y, matching, left=retained, label="Extra gap from correct matching", color="#D88A3A")
     axes[0].set(yticks=y, yticklabels=[r["metric"] for r in rows],
         xlabel="MSE reduction versus no text (%)", title="Most observed MSE benefit survives shuffling")
-    axes[0].invert_yaxis(); axes[0].legend(fontsize=8, loc="lower right")
+    axes[0].invert_yaxis()
     xx = np.arange(3)
     for offset, key, label, color in [(-.2, "real_dhr_pct", "Real text", "#426C8B"),
                                      (.2, "zero_dhr_pct", "No text", "#D88A3A")]:
@@ -70,10 +70,13 @@ def plot(rows, out):
         axes[1].bar_label(bars, fmt="%.2f", fontsize=8, padding=3)
     axes[1].set(xticks=xx, xticklabels=[r["metric"] for r in rows[1:]], ylim=(0, 60),
         ylabel="Reported direction accuracy (%)", title="No text has higher reported direction accuracy")
-    axes[1].legend(fontsize=8)
+    for ax, x, columns in ((axes[0], .065, 1), (axes[1], .56, 2)):
+        handles, labels = ax.get_legend_handles_labels()
+        fig.legend(handles, labels, loc="lower left", bbox_to_anchor=(x, .065),
+                   fontsize=8, ncol=columns, frameon=False)
     fig.text(.5, .025, "Reanalysis of the uploaded aggregates; descriptive gaps, no new inference or confidence intervals.",
         ha="center", fontsize=9, color="#555555")
-    fig.tight_layout(rect=(0, .06, 1, 1))
+    fig.tight_layout(rect=(0, .20, 1, 1))
     svg = out / "text_value.svg"
     fig.savefig(svg, metadata={"Date": None})
     svg.write_text("\n".join(line.rstrip() for line in svg.read_text().splitlines()) + "\n")
