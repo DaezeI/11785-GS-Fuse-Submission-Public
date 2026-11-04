@@ -35,3 +35,7 @@ __pycache__/
 .idea/
 .cursor/
 .vscode/
+
+# Generated local audit data (summaries under analysis/text_value are shared)
+analysis/nov03/results/
+analysis/nov03/source/training_log.txt
