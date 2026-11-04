@@ -1,0 +1,15 @@
+{
+  "prepared_date": "2026-11-03",
+  "aggregate_analysis": "executed on CPU from uploaded metric JSON",
+  "price_audit": "executed on CPU using shared CSV",
+  "c1_price_references": "trained and evaluated on CPU; validation-only ridge selection",
+  "focused_tests": {
+    "passed": 25,
+    "skipped": 0,
+    "includes": "four real CPU PyTorch no-text helper tests"
+  },
+  "full_llama_inference": "not run",
+  "colab_gpu_used": false,
+  "fresh_tree_reproduction": "passed",
+  "reference_commit": "02f2b742960384161a7ea0c79aacabb9eea43d9b"
+}

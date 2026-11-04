@@ -1,0 +1,78 @@
+{
+  "source_path": "task2_shuffled_text/outputs/task2_shuffled_text_control.json",
+  "source_commit": "02f2b742960384161a7ea0c79aacabb9eea43d9b",
+  "source_sha256": "f8cc4db714057d213e8433ed3fd4edcae2ae0ad6ab1a4cf7b193586be84fffab",
+  "execution": "CPU arithmetic on supplied aggregate results; no new model inference",
+  "rows": [
+    {
+      "metric": "overall",
+      "real_mse": 0.0006670067997017293,
+      "shuffled_mse": 0.000667798049706752,
+      "zero_mse": 0.0007086636929353516,
+      "real_vs_zero_gain_pct": 5.87823161379632,
+      "shuffle_vs_real_error_increase_pct": 0.11862697732265638,
+      "zero_minus_real_mse": 4.165689323362232e-05,
+      "zero_minus_shuffled_mse": 4.086564322859957e-05,
+      "shuffled_minus_real_mse": 7.912500050227464e-07,
+      "benefit_retained_with_shuffled_pct": 98.10055444945156,
+      "matching_gap_share_pct": 1.8994455505484236
+    },
+    {
+      "metric": "H=35",
+      "real_mse": 0.0004482975083274792,
+      "shuffled_mse": 0.00045011768377469066,
+      "zero_mse": 0.0004791843680907106,
+      "real_vs_zero_gain_pct": 6.445715223620247,
+      "shuffle_vs_real_error_increase_pct": 0.40601953243109495,
+      "zero_minus_real_mse": 3.088685976323141e-05,
+      "zero_minus_shuffled_mse": 2.906668431601993e-05,
+      "shuffled_minus_real_mse": 1.82017544721148e-06,
+      "benefit_retained_with_shuffled_pct": 94.10695855401181,
+      "matching_gap_share_pct": 5.8930414459882,
+      "real_dhr_pct": 51.524259338772005,
+      "shuffled_dhr_pct": 51.675257731958766,
+      "zero_dhr_pct": 52.64061829111206,
+      "zero_minus_real_dhr_pp": 1.1163589523400574
+    },
+    {
+      "metric": "H=70",
+      "real_mse": 0.0005099512812474413,
+      "shuffled_mse": 0.0005116875188368191,
+      "zero_mse": 0.0005446055356848882,
+      "real_vs_zero_gain_pct": 6.363184390673935,
+      "shuffle_vs_real_error_increase_pct": 0.34047126720236726,
+      "zero_minus_real_mse": 3.465425443744698e-05,
+      "zero_minus_shuffled_mse": 3.291801684806911e-05,
+      "shuffled_minus_real_mse": 1.736237589377871e-06,
+      "benefit_retained_with_shuffled_pct": 94.98982847109903,
+      "matching_gap_share_pct": 5.010171528900974,
+      "real_dhr_pct": 48.99098325461571,
+      "shuffled_dhr_pct": 48.94804637183341,
+      "zero_dhr_pct": 50.75139544869043,
+      "zero_minus_real_dhr_pp": 1.760412194074712
+    },
+    {
+      "metric": "H=140",
+      "real_mse": 0.0007830087320097761,
+      "shuffled_mse": 0.0007846784763339807,
+      "zero_mse": 0.0008266021639378742,
+      "real_vs_zero_gain_pct": 5.273810525782083,
+      "shuffle_vs_real_error_increase_pct": 0.21324721627546128,
+      "zero_minus_real_mse": 4.359343192809808e-05,
+      "zero_minus_shuffled_mse": 4.1923687603893445e-05,
+      "shuffled_minus_real_mse": 1.6697443242046344e-06,
+      "benefit_retained_with_shuffled_pct": 96.16973417702312,
+      "matching_gap_share_pct": 3.830265822976886,
+      "real_dhr_pct": 49.935594675826536,
+      "shuffled_dhr_pct": 50.10734220695577,
+      "zero_dhr_pct": 51.137827393731214,
+      "zero_minus_real_dhr_pp": 1.2022327179046832
+    }
+  ],
+  "interpretation_limits": [
+    "The decomposition is arithmetic sensitivity, not causal or semantic attribution.",
+    "Overall and horizon MSE definitions are not verified; compare conditions within a metric only.",
+    "No individual predictions or repeated shuffles were provided; significance and subgroup gains are unknown.",
+    "The uploaded no-text implementation is not verified; it is distinct from the new explicit no-text controls."
+  ]
+}

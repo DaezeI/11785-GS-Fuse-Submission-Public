@@ -1,0 +1,588 @@
+{
+  "source_commit": "02f2b742960384161a7ea0c79aacabb9eea43d9b",
+  "price_quality": {
+    "source_sha256": "6a873b1d72d27f9188c6bf12acb756775916be8ed9ff42d9e9dd98028f68de2a",
+    "raw_rows": 331256,
+    "clean_rows": 331094,
+    "timestamp_text_mismatches": 0,
+    "extra_duplicate_rows": 162,
+    "duplicate_dates": {
+      "20111107": 81,
+      "20120202": 81
+    },
+    "conflicting_duplicate_timestamps": 0,
+    "backward_jumps": [
+      {
+        "row": 78470,
+        "from": 20111107161000,
+        "to": 20111107093000
+      },
+      {
+        "row": 83296,
+        "from": 20120202161000,
+        "to": 20120202093000
+      }
+    ],
+    "first_timestamp": 20080102093000,
+    "last_timestamp": 20240417161500,
+    "ohlc_invariant_violations": 0,
+    "timezone": "not recorded in CSV; must be confirmed",
+    "bar_label": "start/end meaning not recorded in CSV; must be confirmed"
+  },
+  "splits": {
+    "purged_split_c1_macro_eras.json": {
+      "sha256": "7da0d5666ccf54fa41f99f2b947c83344acc1fd4c40c4017127e3a5bb87276fa",
+      "name": "C1_Macro_Eras",
+      "policies": {
+        "legacy_all0830_floor": {
+          "roles": {
+            "train": {
+              "events": 6167,
+              "invalid_windows": 0,
+              "unique_full_windows": 1887,
+              "first_event_date": "20080110",
+              "last_event_date": "20171004",
+              "categories": {
+                "1": 389,
+                "6": 114,
+                "5": 116,
+                "3": 117,
+                "2": 116,
+                "4": 75,
+                "12": 1580,
+                "9": 1366,
+                "8": 808,
+                "11": 1014,
+                "7": 290,
+                "10": 182
+              }
+            },
+            "vali": {
+              "events": 2500,
+              "invalid_windows": 0,
+              "unique_full_windows": 754,
+              "first_event_date": "20171011",
+              "last_event_date": "20210105",
+              "categories": {
+                "10": 712,
+                "7": 113,
+                "4": 25,
+                "12": 440,
+                "11": 324,
+                "6": 35,
+                "5": 39,
+                "9": 463,
+                "3": 38,
+                "8": 203,
+                "2": 38,
+                "1": 70
+              }
+            },
+            "test": {
+              "events": 2921,
+              "invalid_windows": 0,
+              "unique_full_windows": 706,
+              "first_event_date": "20210112",
+              "last_event_date": "20240405",
+              "categories": {
+                "9": 400,
+                "12": 583,
+                "11": 402,
+                "10": 823,
+                "7": 164,
+                "5": 38,
+                "1": 169,
+                "6": 36,
+                "3": 39,
+                "2": 39,
+                "8": 206,
+                "4": 22
+              }
+            }
+          },
+          "pairwise_overlap": {
+            "train_vali": {
+              "shared_dates": 0,
+              "shared_full_window_bars": 0,
+              "shared_target_bars": 0,
+              "a_events_touching_b": 0,
+              "b_events_touching_a": 0
+            },
+            "train_test": {
+              "shared_dates": 0,
+              "shared_full_window_bars": 0,
+              "shared_target_bars": 0,
+              "a_events_touching_b": 0,
+              "b_events_touching_a": 0
+            },
+            "vali_test": {
+              "shared_dates": 0,
+              "shared_full_window_bars": 0,
+              "shared_target_bars": 0,
+              "a_events_touching_b": 0,
+              "b_events_touching_a": 0
+            }
+          },
+          "full_windows_disjoint": true
+        },
+        "category4_1400_strict_before": {
+          "roles": {
+            "train": {
+              "events": 6167,
+              "invalid_windows": 0,
+              "unique_full_windows": 1950,
+              "first_event_date": "20080110",
+              "last_event_date": "20171004",
+              "categories": {
+                "1": 389,
+                "6": 114,
+                "5": 116,
+                "3": 117,
+                "2": 116,
+                "4": 75,
+                "12": 1580,
+                "9": 1366,
+                "8": 808,
+                "11": 1014,
+                "7": 290,
+                "10": 182
+              }
+            },
+            "vali": {
+              "events": 2500,
+              "invalid_windows": 0,
+              "unique_full_windows": 779,
+              "first_event_date": "20171011",
+              "last_event_date": "20210105",
+              "categories": {
+                "10": 712,
+                "7": 113,
+                "4": 25,
+                "12": 440,
+                "11": 324,
+                "6": 35,
+                "5": 39,
+                "9": 463,
+                "3": 38,
+                "8": 203,
+                "2": 38,
+                "1": 70
+              }
+            },
+            "test": {
+              "events": 2921,
+              "invalid_windows": 0,
+              "unique_full_windows": 728,
+              "first_event_date": "20210112",
+              "last_event_date": "20240405",
+              "categories": {
+                "9": 400,
+                "12": 583,
+                "11": 402,
+                "10": 823,
+                "7": 164,
+                "5": 38,
+                "1": 169,
+                "6": 36,
+                "3": 39,
+                "2": 39,
+                "8": 206,
+                "4": 22
+              }
+            }
+          },
+          "pairwise_overlap": {
+            "train_vali": {
+              "shared_dates": 0,
+              "shared_full_window_bars": 0,
+              "shared_target_bars": 0,
+              "a_events_touching_b": 0,
+              "b_events_touching_a": 0
+            },
+            "train_test": {
+              "shared_dates": 0,
+              "shared_full_window_bars": 0,
+              "shared_target_bars": 0,
+              "a_events_touching_b": 0,
+              "b_events_touching_a": 0
+            },
+            "vali_test": {
+              "shared_dates": 0,
+              "shared_full_window_bars": 0,
+              "shared_target_bars": 0,
+              "a_events_touching_b": 0,
+              "b_events_touching_a": 0
+            }
+          },
+          "full_windows_disjoint": true
+        }
+      },
+      "forward_chronology": true
+    },
+    "purged_split_c2_iconic_years.json": {
+      "sha256": "ed2c0cdceec7c560881bce80186bb1d589c21bf2d0d8a66b536e6cf5e2498d3e",
+      "name": "C2_Iconic_Years",
+      "policies": {
+        "legacy_all0830_floor": {
+          "roles": {
+            "train": {
+              "events": 7556,
+              "invalid_windows": 0,
+              "unique_full_windows": 2014,
+              "first_event_date": "20100106",
+              "last_event_date": "20240411",
+              "categories": {
+                "4": 67,
+                "1": 356,
+                "2": 112,
+                "5": 112,
+                "6": 106,
+                "8": 937,
+                "9": 1625,
+                "3": 110,
+                "12": 1775,
+                "11": 1226,
+                "7": 389,
+                "10": 741
+              }
+            },
+            "vali": {
+              "events": 1404,
+              "invalid_windows": 0,
+              "unique_full_windows": 537,
+              "first_event_date": "20090106",
+              "last_event_date": "20211228",
+              "categories": {
+                "4": 24,
+                "1": 102,
+                "2": 36,
+                "6": 34,
+                "5": 34,
+                "3": 36,
+                "12": 340,
+                "9": 220,
+                "8": 87,
+                "11": 170,
+                "7": 56,
+                "10": 265
+              }
+            },
+            "test": {
+              "events": 2549,
+              "invalid_windows": 0,
+              "unique_full_windows": 776,
+              "first_event_date": "20080104",
+              "last_event_date": "20221228",
+              "categories": {
+                "2": 48,
+                "1": 161,
+                "6": 46,
+                "5": 48,
+                "3": 48,
+                "4": 29,
+                "12": 472,
+                "11": 331,
+                "8": 186,
+                "9": 363,
+                "10": 700,
+                "7": 117
+              }
+            }
+          },
+          "pairwise_overlap": {
+            "train_vali": {
+              "shared_dates": 0,
+              "shared_full_window_bars": 0,
+              "shared_target_bars": 0,
+              "a_events_touching_b": 0,
+              "b_events_touching_a": 0
+            },
+            "train_test": {
+              "shared_dates": 0,
+              "shared_full_window_bars": 0,
+              "shared_target_bars": 0,
+              "a_events_touching_b": 0,
+              "b_events_touching_a": 0
+            },
+            "vali_test": {
+              "shared_dates": 0,
+              "shared_full_window_bars": 0,
+              "shared_target_bars": 0,
+              "a_events_touching_b": 0,
+              "b_events_touching_a": 0
+            }
+          },
+          "full_windows_disjoint": true
+        },
+        "category4_1400_strict_before": {
+          "roles": {
+            "train": {
+              "events": 7556,
+              "invalid_windows": 0,
+              "unique_full_windows": 2079,
+              "first_event_date": "20100106",
+              "last_event_date": "20240411",
+              "categories": {
+                "4": 67,
+                "1": 356,
+                "2": 112,
+                "5": 112,
+                "6": 106,
+                "8": 937,
+                "9": 1625,
+                "3": 110,
+                "12": 1775,
+                "11": 1226,
+                "7": 389,
+                "10": 741
+              }
+            },
+            "vali": {
+              "events": 1404,
+              "invalid_windows": 0,
+              "unique_full_windows": 555,
+              "first_event_date": "20090106",
+              "last_event_date": "20211228",
+              "categories": {
+                "4": 24,
+                "1": 102,
+                "2": 36,
+                "6": 34,
+                "5": 34,
+                "3": 36,
+                "12": 340,
+                "9": 220,
+                "8": 87,
+                "11": 170,
+                "7": 56,
+                "10": 265
+              }
+            },
+            "test": {
+              "events": 2549,
+              "invalid_windows": 0,
+              "unique_full_windows": 801,
+              "first_event_date": "20080104",
+              "last_event_date": "20221228",
+              "categories": {
+                "2": 48,
+                "1": 161,
+                "6": 46,
+                "5": 48,
+                "3": 48,
+                "4": 29,
+                "12": 472,
+                "11": 331,
+                "8": 186,
+                "9": 363,
+                "10": 700,
+                "7": 117
+              }
+            }
+          },
+          "pairwise_overlap": {
+            "train_vali": {
+              "shared_dates": 0,
+              "shared_full_window_bars": 0,
+              "shared_target_bars": 0,
+              "a_events_touching_b": 0,
+              "b_events_touching_a": 0
+            },
+            "train_test": {
+              "shared_dates": 0,
+              "shared_full_window_bars": 0,
+              "shared_target_bars": 0,
+              "a_events_touching_b": 0,
+              "b_events_touching_a": 0
+            },
+            "vali_test": {
+              "shared_dates": 0,
+              "shared_full_window_bars": 0,
+              "shared_target_bars": 0,
+              "a_events_touching_b": 0,
+              "b_events_touching_a": 0
+            }
+          },
+          "full_windows_disjoint": true
+        }
+      },
+      "forward_chronology": false
+    },
+    "purged_split_c3_retrodiction_2008.json": {
+      "sha256": "fdfeb8ac62cdc90d1ad55310620e9e3f460ce0743da7c3934c349ae7b1cb3b3e",
+      "name": "C3_Retrodiction_2008",
+      "policies": {
+        "legacy_all0830_floor": {
+          "roles": {
+            "train": {
+              "events": 10666,
+              "invalid_windows": 0,
+              "unique_full_windows": 2948,
+              "first_event_date": "20110104",
+              "last_event_date": "20240411",
+              "categories": {
+                "12": 2415,
+                "4": 97,
+                "1": 475,
+                "2": 160,
+                "9": 2050,
+                "6": 150,
+                "11": 1634,
+                "5": 159,
+                "8": 1143,
+                "3": 158,
+                "7": 519,
+                "10": 1706
+              }
+            },
+            "vali": {
+              "events": 737,
+              "invalid_windows": 0,
+              "unique_full_windows": 286,
+              "first_event_date": "20090106",
+              "last_event_date": "20101228",
+              "categories": {
+                "4": 16,
+                "1": 93,
+                "2": 24,
+                "6": 24,
+                "5": 23,
+                "3": 24,
+                "12": 172,
+                "9": 158,
+                "8": 67,
+                "11": 93,
+                "7": 43
+              }
+            },
+            "test": {
+              "events": 106,
+              "invalid_windows": 0,
+              "unique_full_windows": 93,
+              "first_event_date": "20080104",
+              "last_event_date": "20081224",
+              "categories": {
+                "2": 12,
+                "1": 51,
+                "6": 12,
+                "5": 12,
+                "3": 12,
+                "4": 7
+              }
+            }
+          },
+          "pairwise_overlap": {
+            "train_vali": {
+              "shared_dates": 0,
+              "shared_full_window_bars": 0,
+              "shared_target_bars": 0,
+              "a_events_touching_b": 0,
+              "b_events_touching_a": 0
+            },
+            "train_test": {
+              "shared_dates": 0,
+              "shared_full_window_bars": 0,
+              "shared_target_bars": 0,
+              "a_events_touching_b": 0,
+              "b_events_touching_a": 0
+            },
+            "vali_test": {
+              "shared_dates": 0,
+              "shared_full_window_bars": 0,
+              "shared_target_bars": 0,
+              "a_events_touching_b": 0,
+              "b_events_touching_a": 0
+            }
+          },
+          "full_windows_disjoint": true
+        },
+        "category4_1400_strict_before": {
+          "roles": {
+            "train": {
+              "events": 10666,
+              "invalid_windows": 0,
+              "unique_full_windows": 3044,
+              "first_event_date": "20110104",
+              "last_event_date": "20240411",
+              "categories": {
+                "12": 2415,
+                "4": 97,
+                "1": 475,
+                "2": 160,
+                "9": 2050,
+                "6": 150,
+                "11": 1634,
+                "5": 159,
+                "8": 1143,
+                "3": 158,
+                "7": 519,
+                "10": 1706
+              }
+            },
+            "vali": {
+              "events": 737,
+              "invalid_windows": 0,
+              "unique_full_windows": 295,
+              "first_event_date": "20090106",
+              "last_event_date": "20101228",
+              "categories": {
+                "4": 16,
+                "1": 93,
+                "2": 24,
+                "6": 24,
+                "5": 23,
+                "3": 24,
+                "12": 172,
+                "9": 158,
+                "8": 67,
+                "11": 93,
+                "7": 43
+              }
+            },
+            "test": {
+              "events": 106,
+              "invalid_windows": 0,
+              "unique_full_windows": 96,
+              "first_event_date": "20080104",
+              "last_event_date": "20081224",
+              "categories": {
+                "2": 12,
+                "1": 51,
+                "6": 12,
+                "5": 12,
+                "3": 12,
+                "4": 7
+              }
+            }
+          },
+          "pairwise_overlap": {
+            "train_vali": {
+              "shared_dates": 0,
+              "shared_full_window_bars": 0,
+              "shared_target_bars": 0,
+              "a_events_touching_b": 0,
+              "b_events_touching_a": 0
+            },
+            "train_test": {
+              "shared_dates": 0,
+              "shared_full_window_bars": 0,
+              "shared_target_bars": 0,
+              "a_events_touching_b": 0,
+              "b_events_touching_a": 0
+            },
+            "vali_test": {
+              "shared_dates": 0,
+              "shared_full_window_bars": 0,
+              "shared_target_bars": 0,
+              "a_events_touching_b": 0,
+              "b_events_touching_a": 0
+            }
+          },
+          "full_windows_disjoint": true
+        }
+      },
+      "forward_chronology": false
+    }
+  },
+  "publication_times_verified": false
+}
