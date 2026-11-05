@@ -103,6 +103,24 @@ class HuggingFaceTextEncoder(BaseTextEncoder):
     def llm(self):
         return self.backbone
 
+    def _window_pad_mask(self, text, window, stride, max_text_tokens, device):
+        """Padding mask aligned with the windowed hidden states. True = PAD."""
+        ids = self._tokenizer(
+            text,
+            return_tensors="pt",
+            truncation=True,
+            max_length=max_text_tokens,
+            add_special_tokens=True,
+            padding="max_length",
+        )
+        attn = ids["attention_mask"][0]
+        pieces, start = [], 0
+        while start < attn.size(0):
+            pieces.append(attn[start:min(start + window, attn.size(0))])
+            start += stride
+        pad = torch.cat(pieces) == 0
+        return pad.unsqueeze(0).to(device)
+
     @torch.no_grad()
     def _forward_chunk(self, chunk_ids, chunk_mask):
         out = self.backbone.model(
@@ -166,8 +184,13 @@ class HuggingFaceTextEncoder(BaseTextEncoder):
         disk_path = os.path.join(self.cache_dir, f"{h_key}_tok.pt")
         if os.path.exists(disk_path):
             try:
+                # Cached masks were saved as all False; rebuild the real one from the tokenizer.
                 data = torch.load(disk_path, map_location=device, weights_only=True)
-                return data["tok_h"].to(device), data["mask"].to(device)
+                tok_h = data["tok_h"].to(device)
+                mask = self._window_pad_mask(text, window, stride, max_text_tokens, device)
+                if mask.size(1) != tok_h.size(1):
+                    mask = data["mask"].to(device).bool()
+                return tok_h, mask
             except Exception:
                 pass
 
@@ -198,7 +221,7 @@ class HuggingFaceTextEncoder(BaseTextEncoder):
             return tokens, mask
 
         tok_h = torch.cat(feats, dim=0).unsqueeze(0)
-        mask = torch.zeros(1, tok_h.size(1), dtype=torch.bool, device=device)
+        mask = self._window_pad_mask(text, window, stride, max_text_tokens, device)
 
         # 3. Save to Disk
         try:
