@@ -843,7 +843,8 @@ class GSFuse(nn.Module):
             return tokens, mask
         T = self.llm_proj(tok_h[0])
         T = T.unsqueeze(0)
-        out_mask = torch.zeros(1, T.size(1), dtype=torch.bool, device=self.device)
+        # Keep the real padding mask from the encoder (True = PAD).
+        out_mask = mask.to(self.device).bool()
         return T, out_mask
 
     def _pad_and_stack(self, seqs, masks, pad_value=0.0):
