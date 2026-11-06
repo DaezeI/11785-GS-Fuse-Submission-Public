@@ -7,7 +7,7 @@
 #SBATCH --cpus-per-task=8
 #SBATCH --gpus-per-node=1
 #SBATCH --mem=64G
-#SBATCH --time=04:00:00
+#SBATCH --time=16:00:00
 #SBATCH --output=/work/hdd/bjjg/gs-fuse/runs/logs/%x-%j.out
 
 set -euo pipefail

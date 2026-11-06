@@ -44,7 +44,7 @@ def main():
     p.add_argument("--tf32", action="store_true")
     p.add_argument("--use-4bit", action="store_true", help="Load the text backbone in 4-bit NF4 (must match training)")
     p.add_argument("--out", required=True)
-    p.add_argument("--save-every", type=int, default=5000)
+    p.add_argument("--save-every", type=int, default=1000)
     args = p.parse_args()
 
     torch.backends.cuda.matmul.allow_tf32 = args.tf32
@@ -70,19 +70,25 @@ def main():
     else:
         cache = TextEmbeddingCache(signature)
 
+    print(f"{len(paths)} document paths | signature {signature}", flush=True)
+    print("loading text encoder...", flush=True)
     encoder = build_text_encoder(args.text_backbone, args.text_model_path, use_4bit=args.use_4bit)
-    todo = [p for p in paths if read(p) not in cache]
-    print(f"{len(paths)} unique documents, {len(todo)} to encode | signature {signature}")
+    print("encoder ready", flush=True)
 
     start = time.time()
-    for i, path in enumerate(todo, 1):
+    encoded = 0
+    for i, path in enumerate(paths, 1):
         text = read(path)
-        cache.put(text, encoder.encode_instance(text, args.window, args.stride, device))
-        if i % args.save_every == 0 or i == len(todo):
-            cache.save(args.out)
-        if i % 500 == 0 or i == len(todo):
-            rate = i / (time.time() - start)
-            print(f"[{i}/{len(todo)}] {rate:.1f} docs/s | ETA {(len(todo) - i) / rate / 3600:.2f} h", flush=True)
+        if text not in cache:
+            cache.put(text, encoder.encode_instance(text, args.window, args.stride, device))
+            encoded += 1
+            if encoded % args.save_every == 0:
+                cache.save(args.out)
+                print(f"saved {len(cache)} embeddings", flush=True)
+        if i % 200 == 0 or i == len(paths):
+            rate = i / max(time.time() - start, 1e-6)
+            print(f"[{i}/{len(paths)}] new {encoded} cached {len(cache)} | {rate:.1f} paths/s", flush=True)
+    cache.save(args.out)
     print(f"Done: {len(cache)} embeddings in {args.out}")
 
 
