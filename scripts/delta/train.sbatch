@@ -46,7 +46,7 @@ python -u train.py \
   --series-dir data/series \
   --batch-size "$BATCH_SIZE" \
   --text-cache "$TEXT_CACHE" \
-  --tf32 \
+  --tf32 --no-4bit \
   "${flags[@]}" \
   --output-path "$out" \
   --num-epochs "$EPOCHS" \
