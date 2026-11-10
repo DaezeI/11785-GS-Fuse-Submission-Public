@@ -24,6 +24,7 @@ identified where it predates this update.
 | Nicole's initial contribution | [PR 1](https://github.com/DaezeI/11785-GS-Fuse-Submission-Public/pull/1) merged into `main`. | The audit, analysis, inference tools, tests, and results are available to everyone. |
 | C1 training integration | **Implemented and tested in open PR #4; pending review/merge.** | Normal training, smoke training, and paired evaluation now use the same opt-in C1 loader. Pull the PR branch to inspect before merge. |
 | Nicole's full-model text-control evaluation | **Eight-event smoke completed on a new 16-training-event checkpoint.** | Correct, three shuffled seeds, and two separate article-free modes ran; these are execution checks, not a C1 benchmark. |
+| Jessica's text padding-mask fix | **Merged to `main` in commit `96cc6d7` on November 9.** | Her change propagates the tokenizer padding mask and adds three CPU unit tests. Her PR says full-model validation was not yet run; ask her for any later private results before assigning more work. |
 | Shared GPU resource | **NCSA Delta GPU** allocation confirmed in the team portal. | Joye coordinates the working setup; it is not confirmed ready by this document. |
 | Individual Delta access | **Nicole's noninteractive SSH access verified November 10.** Other users' login readiness is unverified here. | Each teammate still verifies their own access. |
 | Delta paths, environment, launch example | **Nicole verified shared inputs/environment and completed two separate Slurm jobs.** Joye's common setup handoff remains separately owned. | Exact commands, job IDs, and output locations are in PR #4; do not infer that every teammate's setup is ready. |
@@ -216,6 +217,11 @@ can run their own experiments with their own checkout/output directories.
 ### Jessica: Q-Former
 
 Question: are queries complementary, and is padding interfering with attention?
+
+Jessica's padding-mask implementation and three CPU tests are already merged
+into `main` (commit `96cc6d7`). The following are **follow-up research checks**,
+not a request to implement that fix again. Her PR reported no full-model run;
+confirm with her whether she has since completed or saved these analyses.
 
 - Measure attention mass on padding; verify actual mask semantics and
   variable-length/all-padding handling where relevant.
@@ -462,19 +468,28 @@ controls and a bounded explanation in Adaeze's own PR when ready.
 
 ### Jessica — Q-Former
 
-**Start:** use the current merged padding-mask fix as the code baseline and
-identify the checkpoint/examples for diagnostics. Verify mask semantics with
-variable-length and all-padding cases; measure actual attention mass on
-padding rather than inferring it from a picture.
+**Already done:** Jessica's padding-mask fix and three CPU tests landed in
+`main` through merge commit `96cc6d7`. Do not ask her to redo that work.
+Her [padding-fix PR](https://github.com/DaezeI/11785-GS-Fuse-Submission-Public/pull/2)
+explicitly reported that the fix had not yet been run on the full model at
+that time. Ask her first for a link to any later real-model analysis she has
+already finished; private or unpushed results are unknown from this repository.
 
-**Diagnose:** measure query-attention similarity and query-output similarity
-separately. Test padding-mask behavior and query ablations as separate changes.
-Once the common C1 baseline exists, measure the forecast effect on matching
-examples; until then label old-checkpoint analyses as exploratory.
+**If she wants to continue Q-Former diagnosis:** run a small real cached-text
+batch using the fixed code and record the fraction of tokens marked PAD and
+the measured attention mass on PAD. The current CPU tests use a fake tokenizer
+and do not exercise the disk-cache path. On a cache length mismatch,
+`encode_tokens` currently falls back to the saved mask, which may be the old
+all-False mask; verify or repair this before interpreting a cached run.
 
-**Bring Wednesday:** a link to the mask test or first attention/query artifact,
-plus the planned ablation and needed checkpoint. Publish code/tests and matched
-results in Jessica's own PR.
+**Then, if still open:** measure query-attention similarity and query-output
+similarity separately after masking. A later query ablation should compare
+matching examples/checkpoints; measure forecast effects after the common C1
+baseline exists. Label historical-checkpoint analyses as exploratory.
+
+**Bring Wednesday:** the merged-fix link, any existing post-fix result, and
+whether she wants to own the remaining Q-Former analysis or pick up another
+team need. No new Q-Former GPU result is required for this meeting.
 
 ### Nicole — C1/text comparison and integration
 

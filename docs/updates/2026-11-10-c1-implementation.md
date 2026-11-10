@@ -66,5 +66,8 @@ counts as evidence for each diagnostic stream.
    verified per-event release metadata. See source links and the bounded
    evidence in the technical handoff. C1 commands require the timing policy
    explicitly.
-4. **Adaeze/Joye/Jessica:** continue the separately owned gate, MoE, and
-   Q-Former diagnostics; PR #4 does not change those model functions.
+4. **Adaeze/Joye:** continue the separately owned gate and MoE diagnostics.
+   **Jessica:** her padding-mask fix and CPU tests are already merged in
+   `main`. Ask for any post-fix Q-Former results she has already produced
+   before deciding whether she should extend that diagnosis or take another
+   team task. PR #4 does not change those model functions.
