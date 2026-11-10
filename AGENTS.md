@@ -4,6 +4,13 @@ Read [TEAM_WORKFLOW.md](TEAM_WORKFLOW.md) first. It records the November 4 team
 decision, ownership, implementation gaps, and experiment handoff requirements.
 Follow current user instructions when they update this plan.
 
+Then read [PROJECT_STATUS.md](PROJECT_STATUS.md) and its latest dated update.
+They track progress after the original workflow, including reported Delta account
+access, feature-branch setup, and the merged padding correction. Preserve the
+distinction between verified code/results, teammate reports, and proposed work.
+Develop on personal/task branches and open focused PRs for ready changes, following
+the November 5 meeting guidance recorded in the update.
+
 ## Ownership and agreed protocol
 
 - **C1 is the main split:** `splits/manifests/purged_split_c1_macro_eras.json`.

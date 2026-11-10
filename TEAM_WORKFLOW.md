@@ -4,6 +4,11 @@
 It records the confirmed C1 decision and TA work split, then makes the working
 plan and pending handoffs explicit. Coding agents should also read [AGENTS.md](AGENTS.md).
 
+**Latest progress and handoffs are maintained in [PROJECT_STATUS.md](PROJECT_STATUS.md).**
+The dated [November 10 update](docs/updates/2026-11-10.md) records account progress,
+Delta branch work, and the merged padding correction since this workflow was
+written. Read that update before using the November 4 status table below.
+
 ## 1. Agreed decisions and actual status
 
 | Item | Status | What this means |
