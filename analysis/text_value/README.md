@@ -1,9 +1,15 @@
 # Text value: code, results, and meeting handoff
 
+**C1 implementation update:** [C1 protocol, Delta audit, and running
+smoke job](C1_PROTOCOL.md) records the new opt-in C1 training/evaluation
+path and its actual emitted windows. The aggregate numbers below remain
+Adaeze's earlier experiment; they are not C1 full-model results.
+
 **Current team plan:** [TEAM_WORKFLOW.md](../../TEAM_WORKFLOW.md) records the
 November 4 C1 decision and ownership. These calculations describe Adaeze's
-uploaded experiment, not Joye's baseline. C1 integration and full-checkpoint
-evaluation remain pending. The agreed historical reference for initial diagnosis
+uploaded experiment, not Joye's baseline. C1 integration is now implemented
+on this branch; a full C1 checkpoint evaluation remains pending. The agreed
+historical reference for initial diagnosis
 is [Joye's baseline](https://forge.coreweave.com/wandb/zhaohan2-carnegie-mellon-university/11785-GS-Fuse/runs/2c5m4xe2/overview);
 match its actual checkpoint and model configuration before evaluation.
 
@@ -83,6 +89,10 @@ python scripts/analyze_text_predictions.py \
 ```
 
 This defaults to an evenly spaced 64-event smoke sample on the **original** event-loader protocol for diagnosing an existing checkpoint. `--max-events 0` uses the full chosen split. It does not establish leakage-corrected C1 performance. Set `--checkpoint-training-split` only when known. Match architecture, backbone, precision, and checkpoint settings. `--no-text-mode fusion_bypass_ts_inst` selects the separate bypass intervention. `--shuffle-within-type` preserves event categories; donor IDs, same-date matches, and identical-content matches are recorded.
+
+Pass `--c1-manifest splits/manifests/purged_split_c1_macro_eras.json` to use
+the audited C1 IDs, windows, and training-only scaler. A checkpoint trained on
+an earlier split remains an earlier-split model even when evaluated on C1.
 
 The output has paired predictions and common event IDs, prices, dates, types, training-only volatility reference, checkpoint/code hashes, and intervention definitions. The analyzer reports gains by type, past-only volatility, and horizon, with date-block bootstrap intervals when enough blocks exist. Intervals are conditional on the checkpoint and supplied shuffle draws.
 

@@ -74,6 +74,10 @@ seeded-shuffled, and article-free predictions for each selected event.
 Keep the two available article-free interventions separate. This inference
 helper does not alter gate supervision during training.
 
+DLinear still uses its separate continuous-window baseline protocol. Its old
+scores should not be ranked against this event-based C1 evaluation without
+matching samples and scaling.
+
 ## Checks and limits
 
 - Four new synthetic C1 regression tests passed on Delta's shared PyTorch 2.8

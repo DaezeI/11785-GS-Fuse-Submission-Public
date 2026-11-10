@@ -46,7 +46,12 @@ def test_c1_windows_scaler_negatives_and_batch_contract(tmp_path):
                                 batch_size=3, sw_stride=1)
     assert data.audit["emitted_counts"] == {"train": 12, "vali": 12, "test": 12}
     assert data.audit["scaler_fit_unique_bars"] == 12
-    assert data.scaler.mean_[0] < 400  # held-out high-price days are not fitted
+    covered_train = {bar for w in data.train_set.windows for bar in range(w["start"], w["stop"])}
+    covered_heldout = {bar for ds in (data.vali_set, data.test_set)
+                       for w in ds.windows for bar in range(w["start"], w["stop"])}
+    assert not covered_train & covered_heldout
+    assert np.allclose(data.scaler.mean_,
+                       data.sw_train_set.data[sorted(covered_train)].mean(axis=0))
     assert len(data.sw_train_set.indices) >= 2
     assert len(data.sw_vali_set.indices) >= 2
     assert len(data.train_set.event_ids) == len(set(data.train_set.event_ids))
@@ -61,6 +66,8 @@ def test_c1_windows_scaler_negatives_and_batch_contract(tmp_path):
         assert len(sample) == 7 and sample[3].shape == (4, 2)
     assert next(iter(data.train_loader))[3].shape == (3, 4, 2)
     assert all(data.sw_train_set.data[i:i + 4].shape == (4, 4)
+               for i in data.sw_train_set.indices)
+    assert all(not set(range(i, i + 4)) & covered_heldout
                for i in data.sw_train_set.indices)
 
 
