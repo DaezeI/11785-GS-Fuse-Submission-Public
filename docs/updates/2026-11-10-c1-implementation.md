@@ -54,9 +54,13 @@ the smoke checkpoint completes.
 3. **Team/TA:** confirm actual article release times and the price CSV's
    timezone and bar-label convention. The current C1 timing is an explicit
    `category4_1400_strict_before` sensitivity assumption, selected for the
-   smoke run. The upstream CAMEF category map calls category 4 GDP; a 2024
-   BEA schedule lists GDP advance releases at 08:30. See the source links
-   and caveat in the technical handoff. This assumption is not verified
-   release metadata, and C1 commands require the timing policy explicitly.
+   smoke run. The upstream CAMEF README category numbers differ from the
+   actual Delta article tree: sampled category 4 is FOMC minutes and category
+   3 is GDP. The manifest has 12 categories; categories 7–12 make up most
+   C1 entries and have no publication-time field. Official 2024 release
+   examples make 14:00 for FOMC and 08:30 for GDP plausible, but this is not
+   verified per-event release metadata. See source links and the bounded
+   evidence in the technical handoff. C1 commands require the timing policy
+   explicitly.
 4. **Adaeze/Joye/Jessica:** continue the separately owned gate, MoE, and
    Q-Former diagnostics; PR #4 does not change those model functions.

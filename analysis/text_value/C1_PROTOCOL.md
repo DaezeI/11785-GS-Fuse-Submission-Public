@@ -26,16 +26,30 @@ policy explicitly. **Actual release times, CSV timezone, and whether bar
 timestamps label starts or ends are still unverified.** This is a sensitivity
 protocol, not verified historical publication timing.
 
-The [upstream CAMEF category map](https://github.com/lakebodhi/CAMEF#-dataset-access)
-calls category 4 GDP Advance Releases and category 1 FOMC Minutes. Its
+The [upstream CAMEF README's category list](https://github.com/lakebodhi/CAMEF#-dataset-access)
+describes six categories, while this C1 manifest contains **12**. Its first
+six category labels also do not match the team's actual Delta article tree.
+Keyword counts on one private summary from each of categories 1–6 (without
+publishing article text) indicate: 1 claims, 2 employment, 3 GDP, 4 FOMC
+minutes, 5 CPI, 6 PPI.
+For example, the category-4 summary dated 2008-02-20 mentions FOMC five
+times and GDP zero times. The upstream
 [loader's 14:00 branch](https://github.com/lakebodhi/CAMEF/blob/publish-camef-code/CAMEF/data/dataloader.py#L95-L103)
-tests the `event_id` setting, not the parsed category. A
-[2024 BEA release schedule](https://www.bea.gov/system/files/2024-06/2024-News-Release-Schedule.pdf)
-lists GDP advance estimates at 08:30, while a
+tests the `event_id` setting, not the parsed category. An official
 [2024 Federal Reserve minutes release](https://www.federalreserve.gov/newsevents/pressreleases/monetary20240821a.htm)
-states 14:00. These examples make the category-4 assumption questionable;
-they do not supply event-specific release times for every year. A corrected
-publication-time table remains a separate task before scientific C1 claims.
+states 14:00, and a
+[2024 BEA schedule](https://www.bea.gov/system/files/2024-06/2024-News-Release-Schedule.pdf)
+lists GDP advance estimates at 08:30. This supports the *direction* of the
+selected sensitivity policy for those sampled event types. One sample per
+category and 2024 examples do not verify all historical release times. A
+per-event publication-time table remains a separate task before scientific
+C1 claims.
+
+Categories 7–12 account for 5,240/6,167 training, 2,255/2,500 validation,
+and 2,578/2,921 test entries. The manifest provides their dates and category
+IDs but no article publication time. Assigning all these articles 08:30 can
+make text available to the model before it was actually public. The zero
+cross-partition bar overlap check does not address that availability risk.
 
 ## Real-input audit
 
