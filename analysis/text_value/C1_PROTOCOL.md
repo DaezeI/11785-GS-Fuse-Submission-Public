@@ -19,11 +19,23 @@ input-plus-target bar coverage for train/validation/test overlap and fails if
 it finds any. Missing summaries, sentence reports, windows, or negative reports
 fail by default; opt-in exclusions are counted and listed in the audit.
 
-The timing assumption is `category4_1400_strict_before`: category-4 events
-are placed at 14:00 and the input ends strictly before the assumed release;
-other categories are placed at 08:30. **Actual release times, CSV timezone,
-and whether bar timestamps label starts or ends are still unverified.** This
-is a sensitivity protocol, not verified historical publication timing.
+The audit and smoke job selected `category4_1400_strict_before`: category-4
+events are placed at 14:00 and the input ends strictly before that assumed
+time; other categories are placed at 08:30. C1 commands now require a timing
+policy explicitly. **Actual release times, CSV timezone, and whether bar
+timestamps label starts or ends are still unverified.** This is a sensitivity
+protocol, not verified historical publication timing.
+
+The [upstream CAMEF category map](https://github.com/lakebodhi/CAMEF#-dataset-access)
+calls category 4 GDP Advance Releases and category 1 FOMC Minutes. Its
+[loader's 14:00 branch](https://github.com/lakebodhi/CAMEF/blob/publish-camef-code/CAMEF/data/dataloader.py#L95-L103)
+tests the `event_id` setting, not the parsed category. A
+[2024 BEA release schedule](https://www.bea.gov/system/files/2024-06/2024-News-Release-Schedule.pdf)
+lists GDP advance estimates at 08:30, while a
+[2024 Federal Reserve minutes release](https://www.federalreserve.gov/newsevents/pressreleases/monetary20240821a.htm)
+states 14:00. These examples make the category-4 assumption questionable;
+they do not supply event-specific release times for every year. A corrected
+publication-time table remains a separate task before scientific C1 claims.
 
 ## Real-input audit
 
@@ -56,13 +68,15 @@ Run the CPU-only emitted-window audit from this repository root:
 python scripts/audit_c1_protocol.py \
   --event-dir /work/hdd/bjjg/gs-fuse/data/event \
   --series /work/hdd/bjjg/gs-fuse/data/series/SP500.csv \
+  --timing-policy category4_1400_strict_before \
   --out outputs/c1_audit_summary.json \
   --windows-csv outputs/c1_emitted_windows.csv
 ```
 
 Train from a **fresh** output directory with `train.py --c1-manifest
-splits/manifests/purged_split_c1_macro_eras.json` and the same article/series
-paths. `smoke_train.py` accepts the same C1 option for a bounded end-to-end
+splits/manifests/purged_split_c1_macro_eras.json --c1-timing-policy
+<explicit-policy>` and the same article/series paths. `smoke_train.py`
+accepts the same C1 options for a bounded end-to-end
 validation. C1 training refuses to silently resume old checkpoints; explicit
 resume requires independently checking their training history.
 
@@ -80,7 +94,7 @@ matching samples and scaling.
 
 ## Checks and limits
 
-- Four new synthetic C1 regression tests passed on Delta's shared PyTorch 2.8
+- Five new synthetic C1 regression tests passed on Delta's shared PyTorch 2.8
   environment. They cover paths, deduplication, exclusions, the batch contract,
   train-only scaling, role-specific negatives, and Stage-1 windows.
 - The existing 25 focused text-value tests also passed with `--require-torch`.

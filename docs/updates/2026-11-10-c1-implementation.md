@@ -23,7 +23,7 @@ windows, and reproduction instructions are in the
   match Nicole's earlier published audit. The scaler fitted 180,151 unique
   train-covered bars. Stage-1 emitted 15,945 training and 6,523 validation
   windows at stride 10.
-- Four new C1 regression tests and the existing 25 focused text-control tests
+- Five new C1 regression tests and the existing 25 focused text-control tests
   passed in the Delta PyTorch 2.8 environment. This verifies the loader and
   CPU inference helper contracts; it is not full-model performance evidence.
 - The provided team Drive folder is accessible and contains documents. A
@@ -53,7 +53,10 @@ the smoke checkpoint completes.
    checkpoint must not serve as that baseline.
 3. **Team/TA:** confirm actual article release times and the price CSV's
    timezone and bar-label convention. The current C1 timing is an explicit
-   `category4_1400_strict_before` assumption. It is not verified release
-   metadata.
+   `category4_1400_strict_before` sensitivity assumption, selected for the
+   smoke run. The upstream CAMEF category map calls category 4 GDP; a 2024
+   BEA schedule lists GDP advance releases at 08:30. See the source links
+   and caveat in the technical handoff. This assumption is not verified
+   release metadata, and C1 commands require the timing policy explicitly.
 4. **Adaeze/Joye/Jessica:** continue the separately owned gate, MoE, and
    Q-Former diagnostics; PR #4 does not change those model functions.

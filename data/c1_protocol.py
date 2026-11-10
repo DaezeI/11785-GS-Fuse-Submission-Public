@@ -137,7 +137,7 @@ def _stage1_indices(coverage, total, stride):
 
 def build_c1_dataloaders(manifest_path, event_dir, series_path, seq_len=35,
                          pred_len=140, batch_size=8, sw_stride=10,
-                         timing_policy="category4_1400_strict_before",
+                         timing_policy=None,
                          num_workers=0, skip_missing=False):
     """Build all three event splits and Stage-1 windows from the same C1 protocol.
 
@@ -147,6 +147,8 @@ def build_c1_dataloaders(manifest_path, event_dir, series_path, seq_len=35,
     """
     if sw_stride < 1 or batch_size < 1:
         raise ValueError("sw_stride and batch_size must be positive")
+    if timing_policy not in POLICIES:
+        raise ValueError(f"C1 requires an explicit timing_policy from {POLICIES}")
     manifest = json.loads(Path(manifest_path).read_text())
     stamps, values, price_audit = load_price_timeline(series_path)
     event_dir = Path(event_dir)

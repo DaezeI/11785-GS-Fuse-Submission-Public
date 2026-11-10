@@ -77,7 +77,8 @@ def parse_args():
     p.add_argument("--series-dir", default="data/series")
     p.add_argument("--c1-manifest")
     p.add_argument("--c1-timing-policy", choices=["legacy_all0830_floor",
-                   "category4_1400_strict_before"], default="category4_1400_strict_before")
+                   "category4_1400_strict_before"], default=None,
+                   help="Required with --c1-manifest; must match checkpoint training")
     p.add_argument("--c1-skip-missing", action="store_true")
     p.add_argument("--split", choices=["test", "vali"], default="test")
     p.add_argument("--batch-size", type=int, default=2)

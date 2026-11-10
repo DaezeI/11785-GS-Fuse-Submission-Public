@@ -43,7 +43,8 @@ def fixture_inputs(tmp_path):
 def test_c1_windows_scaler_negatives_and_batch_contract(tmp_path):
     manifest, event_dir, series = fixture_inputs(tmp_path)
     data = build_c1_dataloaders(manifest, event_dir, series, seq_len=2, pred_len=2,
-                                batch_size=3, sw_stride=1)
+                                batch_size=3, sw_stride=1,
+                                timing_policy="category4_1400_strict_before")
     assert data.audit["emitted_counts"] == {"train": 12, "vali": 12, "test": 12}
     assert data.audit["scaler_fit_unique_bars"] == 12
     covered_train = {bar for w in data.train_set.windows for bar in range(w["start"], w["stop"])}
@@ -76,9 +77,10 @@ def test_missing_articles_are_reported_and_opt_in_filtered(tmp_path):
     missing = event_dir / "1" / "20200102.txt" / "20200102.txt_full_summary.txt"
     missing.unlink()
     with pytest.raises(ValueError, match="missing_summary"):
-        build_c1_dataloaders(manifest, event_dir, series, seq_len=2, pred_len=2)
+        build_c1_dataloaders(manifest, event_dir, series, seq_len=2, pred_len=2,
+                             timing_policy="category4_1400_strict_before")
     data = build_c1_dataloaders(manifest, event_dir, series, seq_len=2, pred_len=2,
-                                skip_missing=True)
+                                skip_missing=True, timing_policy="category4_1400_strict_before")
     assert data.audit["excluded_counts"] == {"train:missing_summary": 1}
     assert data.audit["emitted_counts"]["train"] == 11
 
@@ -97,3 +99,9 @@ def test_price_deduplication_requires_identical_ohlc(tmp_path):
 
 def test_manifest_key_is_stable_across_path_separators():
     assert event_key(r"data/event\4\20200102.txt") == ("4", "20200102", "4/20200102.txt")
+
+
+def test_c1_requires_explicit_timing(tmp_path):
+    manifest, event_dir, series = fixture_inputs(tmp_path)
+    with pytest.raises(ValueError, match="explicit timing_policy"):
+        build_c1_dataloaders(manifest, event_dir, series, seq_len=2, pred_len=2)

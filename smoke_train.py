@@ -39,7 +39,8 @@ def parse_args():
     p.add_argument("--series-dir", type=str, default="data/series")
     p.add_argument("--c1-manifest")
     p.add_argument("--c1-timing-policy", choices=["legacy_all0830_floor",
-                   "category4_1400_strict_before"], default="category4_1400_strict_before")
+                   "category4_1400_strict_before"], default=None,
+                   help="Required with --c1-manifest; publication times are unverified")
     p.add_argument("--c1-skip-missing", action="store_true")
     p.add_argument("--output-path", type=str, required=True)
     p.add_argument("--series-id", type=str, default="SP500")

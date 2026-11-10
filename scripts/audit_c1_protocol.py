@@ -28,7 +28,7 @@ def main():
     p.add_argument("--event-dir", default="data/event")
     p.add_argument("--series", default="data/series/SP500.csv")
     p.add_argument("--timing-policy", choices=["legacy_all0830_floor",
-                   "category4_1400_strict_before"], default="category4_1400_strict_before")
+                   "category4_1400_strict_before"], required=True)
     p.add_argument("--skip-missing", action="store_true")
     p.add_argument("--out", type=Path, required=True)
     p.add_argument("--windows-csv", type=Path,

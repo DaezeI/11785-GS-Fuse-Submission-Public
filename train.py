@@ -51,7 +51,8 @@ def parse_args():
     p.add_argument("--c1-manifest", type=str, default=None,
                    help="Use the committed C1 manifest for every training stage")
     p.add_argument("--c1-timing-policy", choices=["legacy_all0830_floor",
-                   "category4_1400_strict_before"], default="category4_1400_strict_before")
+                   "category4_1400_strict_before"], default=None,
+                   help="Required with --c1-manifest; publication times are unverified")
     p.add_argument("--c1-skip-missing", action="store_true",
                    help="Exclude and report incomplete C1 inputs instead of failing")
     p.add_argument("--c1-allow-resume", action="store_true",
