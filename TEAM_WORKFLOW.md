@@ -145,8 +145,8 @@ audit and tests are in the [technical handoff](analysis/text_value/C1_PROTOCOL.m
 6. Record the exact price version and timing policy. Audit actual loader-emitted
    windows, then add CPU checks for membership, boundaries, scaling, path handling,
    and missing inputs. Preserve the model's expected batch structure.
-7. Connect evaluation to the same C1 IDs/scaler. The current paired runner still
-   needs this integration; do not invent an already-supported C1 command.
+7. Connect evaluation to the same C1 IDs/scaler. PR #4 now supplies this opt-in
+   path; use its explicit manifest and timing flags and verify checkpoint history.
 
 **Then evaluate text:** keep checkpoint and price examples fixed; compare correct
 articles, several seeded shuffled assignments, and explicit no-text. Save paired
@@ -237,8 +237,10 @@ results once compute and common inputs are available.
 | C. Shared C1 baseline | Joye coordinates; Nicole verifies data side | Recorded configuration, training history, checkpoint, predictions, metrics, and run link | Common reference and final C1 text controls. |
 | D. Per-stream diagnosis | Each owner above | Diagnostic scripts/results and controlled comparisons | Supported improvements and final-report conclusions. |
 
-A and B proceed in parallel. Everyone can inspect code and write small tests now.
-Historical checkpoints/logs support exploratory diagnosis while C1 is pending;
+A and B originally proceeded in parallel; Nicole's B is now implemented in
+open PR #4. Everyone can inspect code and write small tests now.
+Historical checkpoints/logs support exploratory diagnosis while the common full
+C1 baseline is pending;
 label those results with their historical protocol. Final corrected performance
 comparisons depend on B and C. Gate/MoE/Q-Former inspection does not need to wait
 for Nicole's complete text analysis.
@@ -367,19 +369,121 @@ The [text-value handoff](analysis/text_value/README.md) describes the
 two no-text interventions: keep normal-fusion zero-token and fusion-bypass results
 separate, and distinguish both from a separately trained price-only model.
 
-## 9. Immediate next actions
+## 9. Immediate next actions: agent handoff for Wednesday, November 11
 
-1. **Nicole:** address PR #4 review and continue release-time/source checks;
-   preserve the two distinct no-text controls in later paired evaluation.
-2. **Joye:** coordinate a separately trained common full C1 baseline after
-   the timing decision, record its configuration/checkpoint/run link, and
-   continue MoE diagnostics. The 16-event smoke checkpoint is not that baseline.
-3. **Adaeze:** continue original-gate targets, gradients, and learned-versus-
-   constant controls. Coordinate the exact no-text definition with Nicole.
-4. **Jessica:** continue padding-mask and query diagnostics; label historical
-   versus C1 outputs and record controlled ablations.
-5. **Team/TA:** name an owner to verify article release times, the price CSV
-   timezone, and whether bar timestamps denote starts or ends. Agree on the
-   resulting timing policy before interpreting a full C1 result.
-6. **All:** review PR #4, bring a code/result link and blocker to the Wednesday
-   meeting, and keep experiment provenance current as work lands.
+### Start here, regardless of owner
+
+1. Read [PR #4](https://github.com/DaezeI/11785-GS-Fuse-Submission-Public/pull/4),
+   the [C1 protocol](analysis/text_value/C1_PROTOCOL.md), and the
+   [smoke result](analysis/text_value/C1_SMOKE_RESULTS.md). PR #4 is open as
+   of November 10; its branch is `nicole/c1-protocol-controls`. `main` does
+   not contain these changes until the PR merges. In a fresh checkout, fetch
+   the branch and create **your own** work branch from it if you need C1 code.
+   Preserve any existing local edits or separate branches.
+
+   ```sh
+   git fetch origin
+   git switch -c YOUR_TASK_BRANCH origin/nicole/c1-protocol-controls
+   ```
+2. Treat the 16-training-event checkpoint and eight-test-event comparison as
+   an execution check. They cannot establish model performance or text value.
+   The full NPZ files and checkpoint remain on Delta; the PR contains safe
+   derived results. Do not compare its MSE to Adaeze's or Joye's historical
+   scores as if they shared a checkpoint, scaler, or evaluation population.
+3. By the Wednesday meeting, each owner should bring a link to an existing
+   artifact or a concrete experiment plan, the input/checkpoint it needs, and
+   one blocker or decision. A completed new GPU experiment is **not** required
+   for this meeting. Put substantive code/results in a focused PR and record
+   provenance with the [handoff fields in Section 7](#7-what-every-experiment-handoff-should-contain).
+
+### Shared timing decision — team and TA, coordinated by Nicole
+
+**Question:** Was each article publicly available before the price window it
+is paired with? The manifest has 12 category folders and dates, but no
+publication timestamps. Categories 7–12 contain most C1 entries. The smoke
+run explicitly assumed `category4_1400_strict_before`; the price CSV timezone
+and whether a timestamp labels the bar start or end are unverified.
+
+**Do next:** assign one owner to locate the dataset's source/time definitions
+and a release-time source for each event type, including 7–12. Document the
+category mapping from the team's actual Delta files; do not copy the upstream
+six-category numbering without checking it. Determine the price CSV timezone
+and bar-label convention from its source or an independently checkable sample.
+Record which events have verified times and which remain unknown. If a new
+timing rule is chosen, rerun the emitted-window audit and record exclusions,
+overlap, and input hashes.
+
+**Bring Wednesday:** a named owner, source links/files, a proposed policy for
+unknown times, and a decision on whether a full C1 run can start. An explicit
+"still unknown" decision is acceptable; do not silently treat 08:30 as fact.
+
+### Joye — common C1 baseline and MoE
+
+**Baseline now:** inspect the [C1 smoke job script](scripts/delta/nicole_c1_smoke.sbatch)
+and handoff for the verified environment, paths, account, and command. The
+smoke checkpoint is in Nicole's separate output directory and is **not** the
+common baseline. Check whether any earlier *completed* GS-Fuse checkpoint has
+matching code/data history before reusing it; pretrained Llama/MOMENT weights
+alone are not a trained GS-Fuse checkpoint.
+
+**Prepare now; submit after the timing decision:** specify one fresh full C1
+training run:
+code commit, manifest/price hashes, release-time policy, architecture and
+backbones, all three stage settings, training-only scaler, seed, Slurm resource
+request, estimated GPU cost, output directory, and W&B logging. Use a fresh
+output directory so old Stage-1/2 checkpoints cannot resume silently. Record
+the finished checkpoint hash and training history before other streams use it.
+
+**MoE in parallel:** on an identified checkpoint, save per-event router
+probabilities, expert utilization, and pre-aggregation expert outputs; compare
+normal routing with fixed/forced-expert controls on the same examples. Label
+historical-checkpoint results as historical. Bring Wednesday a baseline plan,
+any located checkpoint provenance, and the first MoE artifact or exact missing
+input. Publish the eventual run record/diagnostics in Joye's own PR.
+
+### Adaeze — original gate
+
+**Start:** identify the code and checkpoint that produced the current gate
+plots/scores. Read [Nicole's text-control explanation](analysis/text_value/README.md#a-code-issue-identified-during-review):
+the built-in named TS-only comparison can contain article-conditioned price
+features; Nicole's clean no-text helper is **inference-only** and does not
+replace a differentiable training target.
+
+**Diagnose:** save distributions of gate supervision targets, learned gate
+weights, and per-event text benefit with the exact benefit formula. Check
+gradients in intended trainable gate/fusion components. Compare the learned
+gate with constants chosen on validation, then evaluated on the *same* test
+examples and metric. Keep architecture/checkpoint differences explicit; if a
+gate-training change is proposed, test its gradient/runtime path separately.
+
+**Bring Wednesday:** the current artifact/code link, the gate-target formula,
+and the first plot or a precise missing checkpoint/input. Publish matched
+controls and a bounded explanation in Adaeze's own PR when ready.
+
+### Jessica — Q-Former
+
+**Start:** use the current merged padding-mask fix as the code baseline and
+identify the checkpoint/examples for diagnostics. Verify mask semantics with
+variable-length and all-padding cases; measure actual attention mass on
+padding rather than inferring it from a picture.
+
+**Diagnose:** measure query-attention similarity and query-output similarity
+separately. Test padding-mask behavior and query ablations as separate changes.
+Once the common C1 baseline exists, measure the forecast effect on matching
+examples; until then label old-checkpoint analyses as exploratory.
+
+**Bring Wednesday:** a link to the mask test or first attention/query artifact,
+plus the planned ablation and needed checkpoint. Publish code/tests and matched
+results in Jessica's own PR.
+
+### Nicole — C1/text comparison and integration
+
+Review comments on PR #4, keep the audit/manifest hashes and explicit timing
+policy in any revised run, and coordinate the timing decision above. After
+Joye supplies a provenance-checked full C1 checkpoint, run the paired controls
+on the same C1 test events with correct text, multiple seeded shuffles, and
+both separately named no-text interventions. Analyze horizons 35/70/140 and
+uncertainty by distinct event dates; publish small derived results and exact
+commands, leaving raw articles/prices and weights off GitHub. Bring Wednesday
+the PR link, smoke limitation, and timing questions; do not present the smoke
+MSE as the team's final score.

@@ -44,6 +44,11 @@ only; it is not a C1 benchmark.
 
 ## Next handoffs
 
+For a teammate or agent starting fresh, use the concrete
+[owner-by-owner action plan](../../TEAM_WORKFLOW.md#9-immediate-next-actions-agent-handoff-for-wednesday-november-11).
+It names starting artifacts, dependencies, Wednesday deliverables, and what
+counts as evidence for each diagnostic stream.
+
 1. **Nicole:** review the paired smoke artifacts in PR #4 and preserve the
    two article-free modes as separate controls. No larger GPU run is started
    until the timing assumption is resolved and a full baseline is planned.
