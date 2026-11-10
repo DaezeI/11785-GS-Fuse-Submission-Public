@@ -30,24 +30,23 @@ windows, and reproduction instructions are in the
   search there did not find a trained GS-Fuse checkpoint. GitHub remains the
   distribution point for code and small derived records.
 
-## Running work
+## Completed GPU smoke work
 
-Slurm job `23701798` is a one-GPU, one-hour, 16-training-event, three-stage
-smoke test using a separate personal checkout and output directory. It was
-submitted to `gpuA100x4-interactive` with `sbatch` under
-`bjjg-delta-gpu`. The reserved amount is one GPU-hour, within Nicole's
-eight-hour task cap. Its purpose is to establish an end-to-end checkpoint
-and surface runtime problems; any score from 16 training examples is not a
-C1 benchmark. A second one-GPU batch script is prepared for eight fixed
-test events, three shuffle seeds, and both article-free inference modes if
-the smoke checkpoint completes.
+Slurm job `23701798` completed all three training stages and saved a
+full-model smoke checkpoint. Job `23701969` then evaluated eight fixed C1 test
+events with correct articles, three shuffled-article seeds, and both distinct
+article-free modes. Both jobs completed successfully on one A100 at a time;
+total use was 20m36s, or 0.343 GPU-hours, within Nicole's eight-hour cap.
+The [derived paired results](../../analysis/text_value/C1_SMOKE_RESULTS.md)
+and per-event records are on GitHub. Full NPZ files with price arrays and the
+checkpoint remain on Delta. This 16-training-event run establishes execution
+only; it is not a C1 benchmark.
 
 ## Next handoffs
 
-1. **Nicole:** inspect job `23701798` and account for actual GPU time. If it
-   saves a full-model checkpoint, run the paired smoke evaluation and publish
-   individual derived predictions and analysis. Fix any runtime issue on
-   this same PR with a regression test when appropriate.
+1. **Nicole:** review the paired smoke artifacts in PR #4 and preserve the
+   two article-free modes as separate controls. No larger GPU run is started
+   until the timing assumption is resolved and a full baseline is planned.
 2. **Joye:** a common full C1 baseline still needs a planned training budget
    and a separate, provenance-checked checkpoint. The 16-example smoke
    checkpoint must not serve as that baseline.

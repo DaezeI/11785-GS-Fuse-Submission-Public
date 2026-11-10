@@ -1,9 +1,9 @@
 # C1 training and text-control handoff
 
-**Owner:** Nicole Lyu. **Status:** C1 loader and CPU checks complete; one-GPU
-three-stage smoke job `23701798` submitted on November 10, 2026. Full C1
-benchmark and paired prediction results remain pending until a usable full-model
-checkpoint is verified.
+**Owner:** Nicole Lyu. **Status:** C1 loader, CPU checks, three-stage smoke
+training, and paired text-control smoke inference complete on November 10,
+2026. The [smoke results](C1_SMOKE_RESULTS.md) are execution checks, not a
+full C1 benchmark.
 
 ## What the code now does
 
@@ -94,7 +94,7 @@ accepts the same C1 options for a bounded end-to-end
 validation. C1 training refuses to silently resume old checkpoints; explicit
 resume requires independently checking their training history.
 
-After a compatible C1 checkpoint exists, run paired controls with
+The paired smoke controls ran from the new C1 checkpoint with
 `scripts/run_text_controls.py --c1-manifest ...`. That runner uses the same
 event IDs, price windows, and training-only scaler, and saves correct,
 seeded-shuffled, and article-free predictions for each selected event.
@@ -113,18 +113,17 @@ matching samples and scaling.
   train-only scaling, role-specific negatives, and Stage-1 windows.
 - The existing 25 focused text-value tests also passed with `--require-torch`.
 - The real-input CPU audit completed with no exclusions or cross-split bars.
-- These checks are not a full-model accuracy result. The prior shared
-  `runs/smoke/baseline` log stopped during Stage 2 and saved only a Stage-1
-  checkpoint. No completed full-model checkpoint was found in the inspected
-  shared Delta run tree or the provided Drive folder.
+- These checks and the 16-example smoke checkpoint are not a full C1
+  benchmark. The prior shared `runs/smoke/baseline` log stopped during Stage 2
+  and saved only a Stage-1 checkpoint; the new smoke job saved a complete
+  three-stage checkpoint in Nicole's separate Delta workspace.
 
-## Running job
+## Completed batch jobs
 
-Slurm job `23701798`: one A100 GPU, eight CPUs, 80 GB RAM, one-hour limit,
-funded project account `bjjg-delta-gpu`, batch submission to
-`gpuA100x4-interactive`. Output directory:
-`/work/hdd/bjjg/gs-fuse/nicole/c1-nov10/smoke/run1`.
-This is a 16-train-event three-stage **smoke test**, so any resulting scores
-will validate execution only and must not be presented as a trained C1
-benchmark. Budget reserved: at most one GPU-hour so far; actual usage is
-recorded after the job finishes.
+Slurm jobs `23701798` (three-stage training, 12m38s) and `23701969`
+(paired inference, 7m58s) both completed with exit code zero. Each used one
+A100 GPU, eight CPUs, and 80 GB RAM under `bjjg-delta-gpu`; the jobs ran
+sequentially. Combined use was 20m36s, or 0.343 GPU-hours, within the
+eight-GPU-hour cap. The checkpoint and full outputs stay at
+`/work/hdd/bjjg/gs-fuse/nicole/c1-nov10/`. Only derived public artifacts are
+published in [the smoke results](C1_SMOKE_RESULTS.md).

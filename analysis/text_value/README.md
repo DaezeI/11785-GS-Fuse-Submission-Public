@@ -1,8 +1,9 @@
 # Text value: code, results, and meeting handoff
 
-**C1 implementation update:** [C1 protocol, Delta audit, and running
-smoke job](C1_PROTOCOL.md) records the new opt-in C1 training/evaluation
-path and its actual emitted windows. The aggregate numbers below remain
+**C1 implementation update:** [C1 protocol and Delta audit](C1_PROTOCOL.md)
+records the new opt-in path and its actual emitted windows.
+[Paired GPU smoke results](C1_SMOKE_RESULTS.md) now include eight fixed C1
+test events and public derived artifacts. The aggregate numbers below remain
 Adaeze's earlier experiment; they are not C1 full-model results.
 
 **Current team plan:** [TEAM_WORKFLOW.md](../../TEAM_WORKFLOW.md) records the
@@ -96,7 +97,9 @@ an earlier split remains an earlier-split model even when evaluated on C1.
 
 The output has paired predictions and common event IDs, prices, dates, types, training-only volatility reference, checkpoint/code hashes, and intervention definitions. The analyzer reports gains by type, past-only volatility, and horizon, with date-block bootstrap intervals when enough blocks exist. Intervals are conditional on the checkpoint and supplied shuffle draws.
 
-**Full-backbone inference has not been run for this contribution.** The helper has been tested with real CPU PyTorch tensors and a small model fixture. New cohort/volatility performance claims await per-event predictions.
+The full-backbone helper has now also run on a 16-training-event C1 smoke
+checkpoint, with [paired per-event results](C1_SMOKE_RESULTS.md). Those eight
+test events do not support new cohort or volatility performance claims.
 
 ## Independently executed price-data checks
 
