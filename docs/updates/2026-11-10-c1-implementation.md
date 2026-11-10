@@ -68,6 +68,6 @@ counts as evidence for each diagnostic stream.
    explicitly.
 4. **Adaeze/Joye:** continue the separately owned gate and MoE diagnostics.
    **Jessica:** her padding-mask fix and CPU tests are already merged in
-   `main`. Ask for any post-fix Q-Former results she has already produced
+   `main`. Ask her to link any relevant Q-Former results missing from GitHub
    before deciding whether she should extend that diagnosis or take another
    team task. PR #4 does not change those model functions.
