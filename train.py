@@ -7,6 +7,8 @@ import sys
 import argparse
 import os
 import warnings
+import json
+from pathlib import Path
 
 # Auto-resolve nested repository directory
 repo_dir = os.path.dirname(os.path.abspath(__file__))
@@ -46,6 +48,14 @@ def parse_args():
     p.add_argument("--event-dir", type=str, default="data/event")
     p.add_argument("--series-dir", type=str, default="data/series")
     p.add_argument("--output-path", type=str, required=True)
+    p.add_argument("--c1-manifest", type=str, default=None,
+                   help="Use the committed C1 manifest for every training stage")
+    p.add_argument("--c1-timing-policy", choices=["legacy_all0830_floor",
+                   "category4_1400_strict_before"], default="category4_1400_strict_before")
+    p.add_argument("--c1-skip-missing", action="store_true",
+                   help="Exclude and report incomplete C1 inputs instead of failing")
+    p.add_argument("--c1-allow-resume", action="store_true",
+                   help="Resume only after independently verifying existing checkpoints used C1")
 
     p.add_argument("--series-id", type=str, default="SP500")
     p.add_argument("--event-id", type=int, default=0)
@@ -109,26 +119,31 @@ def main():
     torch.backends.cuda.matmul.allow_tf32 = args.tf32
     torch.backends.cudnn.allow_tf32 = args.tf32
 
-    events = event_set(
-        args.seq_len,
-        args.pred_len,
-        event_id=args.event_id,
-        series_id=args.series_id,
-        shuffle=False,
-        batch_size=args.batch_size,
-        scale=True,
-        event_dir=args.event_dir,
-        series_dir=args.series_dir,
-    )
-
-    sw_data = sliding_window_set(
-        seq_len=args.seq_len,
-        pred_len=args.pred_len,
-        series_id=args.series_id,
-        series_dir=args.series_dir,
-        stride=args.sw_stride,
-        batch_size=args.batch_size,
-    )
+    if args.c1_manifest:
+        from data.c1_protocol import build_c1_dataloaders
+        output = Path(args.output_path)
+        if not args.c1_allow_resume and any((output / name).exists() for name in
+               ("stage1_best_model.pth", "stage2_best_model.pth", "best_model.pth")):
+            raise ValueError("C1 output has checkpoints; verify provenance before --c1-allow-resume")
+        events = build_c1_dataloaders(
+            args.c1_manifest, args.event_dir,
+            Path(args.series_dir) / f"{args.series_id}.csv",
+            seq_len=args.seq_len, pred_len=args.pred_len,
+            batch_size=args.batch_size, sw_stride=args.sw_stride,
+            timing_policy=args.c1_timing_policy, skip_missing=args.c1_skip_missing)
+        output.mkdir(parents=True, exist_ok=True)
+        (output / "c1_data_audit.json").write_text(json.dumps(events.audit, indent=2) + "\n")
+        sw_train_loader, sw_vali_loader = events.sw_train_loader, events.sw_vali_loader
+    else:
+        events = event_set(
+            args.seq_len, args.pred_len, event_id=args.event_id,
+            series_id=args.series_id, shuffle=False, batch_size=args.batch_size,
+            scale=True, event_dir=args.event_dir, series_dir=args.series_dir)
+        sw_data = sliding_window_set(
+            seq_len=args.seq_len, pred_len=args.pred_len, series_id=args.series_id,
+            series_dir=args.series_dir, stride=args.sw_stride,
+            batch_size=args.batch_size)
+        sw_train_loader, sw_vali_loader = sw_data.train_loader, sw_data.vali_loader
 
     train_loader = events.train_loader
     test_loader = events.test_loader
@@ -167,8 +182,8 @@ def main():
             train_loader,
             test_loader,
             vali_loader,
-            sw_train_loader=sw_data.train_loader,
-            sw_vali_loader=sw_data.vali_loader,
+            sw_train_loader=sw_train_loader,
+            sw_vali_loader=sw_vali_loader,
             stage1_epochs=args.stage1_epochs,
             stage2_epochs=args.stage2_epochs,
             num_epochs=args.num_epochs,
