@@ -4,6 +4,15 @@
 It records the confirmed C1 decision and TA work split, then makes the working
 plan and pending handoffs explicit. Coding agents should also read [AGENTS.md](AGENTS.md).
 
+**November 10 status update:** Nicole's tested C1 integration, real-input
+audit, three-stage 16-event smoke checkpoint, and paired eight-test-event
+controls are in [PR #4](https://github.com/DaezeI/11785-GS-Fuse-Submission-Public/pull/4),
+open for review. See the [current technical handoff](analysis/text_value/C1_PROTOCOL.md),
+[smoke results](analysis/text_value/C1_SMOKE_RESULTS.md), and
+[dated team update](docs/updates/2026-11-10-c1-implementation.md). The smoke
+checkpoint is not a full C1 baseline. The historical state recorded below is
+identified where it predates this update.
+
 ## 1. Agreed decisions and actual status
 
 | Item | Status | What this means |
@@ -13,11 +22,11 @@ plan and pending handoffs explicit. Coding agents should also read [AGENTS.md](A
 | C3 | Outside the immediate plan. | Preserve its existing manifest; no new C3 experiment is required by this agreement. |
 | Work ownership | The TA-meeting split in Section 4. | Four diagnostic streams, with shared dependencies below. |
 | Nicole's initial contribution | [PR 1](https://github.com/DaezeI/11785-GS-Fuse-Submission-Public/pull/1) merged into `main`. | The audit, analysis, inference tools, tests, and results are available to everyone. |
-| C1 training integration | **Pending in inspected main, commit `47bb1da29046d8781fec1d4f6284b83f257e4397`.** | A split JSON is not yet connected to training or the paired evaluation runner. |
-| Nicole's full-model text-control evaluation | **Not run.** | Small helper tests and aggregate calculations are not a full checkpoint evaluation. |
+| C1 training integration | **Implemented and tested in open PR #4; pending review/merge.** | Normal training, smoke training, and paired evaluation now use the same opt-in C1 loader. Pull the PR branch to inspect before merge. |
+| Nicole's full-model text-control evaluation | **Eight-event smoke completed on a new 16-training-event checkpoint.** | Correct, three shuffled seeds, and two separate article-free modes ran; these are execution checks, not a C1 benchmark. |
 | Shared GPU resource | **NCSA Delta GPU** allocation confirmed in the team portal. | Joye coordinates the working setup; it is not confirmed ready by this document. |
-| Individual Delta access | Nicole's resource username showed **Pending**. Other users' login readiness is unverified here. | Membership and an active allocation are not a successful login test. |
-| Delta paths, environment, launch example | **Pending confirmation by Joye.** | Agents must not invent working paths, job-account names, or successful runs. |
+| Individual Delta access | **Nicole's noninteractive SSH access verified November 10.** Other users' login readiness is unverified here. | Each teammate still verifies their own access. |
+| Delta paths, environment, launch example | **Nicole verified shared inputs/environment and completed two separate Slurm jobs.** Joye's common setup handoff remains separately owned. | Exact commands, job IDs, and output locations are in PR #4; do not infer that every teammate's setup is ready. |
 
 **Adopting C1 addresses the known split-design problem. It does not verify every
 possible source of leakage.** Publication times, preprocessing, training-stage
@@ -89,7 +98,7 @@ What this does not establish:
 - Rerun the window audit on the exact emitted windows after changing timing,
   filtering, or price cleanup. Unknown release times stay documented as unknown.
 
-At the recorded code baseline:
+At the November 4 code baseline, before PR #4:
 
 - [train.py](train.py) still constructs the original `event_set` and a separate
   Stage-1 `sliding_window_set`. It has no C1 manifest option.
@@ -117,7 +126,9 @@ reproducible analysis of Adaeze's aggregate results; an article-free inference
 helper, paired runner/analyzer, and a published record of 25 focused passing tests.
 See [the existing handoff](analysis/text_value/README.md).
 
-**Next deliverable: shared C1 loading for training and evaluation.**
+**Completed in PR #4: shared C1 loading for training and evaluation.** The
+requirements below are the implementation/review checklist; the executed
+audit and tests are in the [technical handoff](analysis/text_value/C1_PROTOCOL.md).
 
 1. Consume the committed manifest rather than redesigning Adaeze's split.
    Normalize Windows-style paths and preserve stable event IDs.
@@ -144,8 +155,10 @@ Analyze event types, past-only volatility, and horizons 35/70/140, accounting fo
 shared dates and overlapping forecasts when estimating uncertainty. Use saved
 per-example predictions if available to avoid unnecessary GPU inference.
 
-Done means tested shared loading, a small end-to-end job with verified inputs,
-and paired outputs plus a reproducible summary when full inference is available.
+The loader, small end-to-end job, paired outputs, and reproducible summary now
+exist in PR #4. Next: resolve per-event article timing and the price CSV
+timezone/bar-label convention, then run paired controls on a separately
+trained **full C1 baseline**. The smoke checkpoint cannot fill that role.
 
 ### Adaeze: original gate
 
@@ -220,7 +233,7 @@ results once compute and common inputs are available.
 | Checkpoint | Owner | Evidence it is finished | Enables |
 |---|---|---|---|
 | A. Delta inputs and example | Joye; file owners supply existing assets | Login works; shared inputs verified; small job finishes; W&B/output links recorded | Everyone can execute jobs. |
-| B. C1 data integration | Nicole; Adaeze supplies exact existing split/filter code if needed | Loader checks and emitted-window audit pass; timing assumptions recorded | Corrected training/evaluation. |
+| B. C1 data integration | Nicole; Adaeze supplies exact existing split/filter code if needed | **Completed in open PR #4:** loader checks and emitted-window audit pass; timing assumptions recorded | Review/merge and plan corrected full training after timing decision. |
 | C. Shared C1 baseline | Joye coordinates; Nicole verifies data side | Recorded configuration, training history, checkpoint, predictions, metrics, and run link | Common reference and final C1 text controls. |
 | D. Per-stream diagnosis | Each owner above | Diagnostic scripts/results and controlled comparisons | Supported improvements and final-report conclusions. |
 
@@ -268,7 +281,10 @@ formatting or unrelated architecture changes inside a shared setup change.
 
 ### New C1 baseline
 
-**Pending.** No completed full GS-Fuse C1 training run is established here.
+**Full baseline pending.** PR #4 contains a completed 16-training-event
+three-stage smoke checkpoint and eight-event paired inference, not a full
+baseline. See [the actual results](analysis/text_value/C1_SMOKE_RESULTS.md).
+No completed full GS-Fuse C1 training run is established here.
 Use fresh output directories: current training can automatically resume Stage-1/2
 checkpoints found there. Older checkpoints may have seen C1 validation/test data.
 Reuse stages only after verifying both training provenance and architecture
@@ -343,22 +359,27 @@ python scripts/run_text_controls.py --help
 
 Full execution needs CUDA, complete inputs, matching checkpoint/backbones and
 precision/cache settings. Its default is 64 smoke events and 4-bit text loading.
-Its loader is still the original protocol. **This document does not supply a
-validated C1 launch command or Delta job script.** Add those after implementation
-and testing. The [text-value handoff](analysis/text_value/README.md) describes the
+The original protocol remains the default; C1 requires `--c1-manifest` and an
+explicit `--c1-timing-policy`. The validated smoke batch scripts are
+[`nicole_c1_smoke.sbatch`](scripts/delta/nicole_c1_smoke.sbatch) and
+[`nicole_c1_paired_smoke.sbatch`](scripts/delta/nicole_c1_paired_smoke.sbatch).
+The [text-value handoff](analysis/text_value/README.md) describes the
 two no-text interventions: keep normal-fusion zero-token and fusion-bypass results
 separate, and distinguish both from a separately trained price-only model.
 
 ## 9. Immediate next actions
 
-1. **Nicole:** implement/test C1 training and evaluation loading; continue release-
-   time/source verification. Reuse the agreed manifest.
-2. **Joye:** finish the small Delta example, verify shared input locations and
-   the matching reference checkpoint, then record environment/job instructions.
-3. **Adaeze:** point to existing control/audit scripts and predictions if available;
-   continue gate diagnosis. Request repackaging only if complete files cannot
-   otherwise be accessed.
-4. **Jessica:** begin padding/query checks; label historical versus C1 outputs.
-5. **All:** update handoff status and provenance as work lands. Pending access,
-   publication-time checks, training integration, or GPU runs stay pending until
-   verified; another agent must not infer completion from this plan.
+1. **Nicole:** address PR #4 review and continue release-time/source checks;
+   preserve the two distinct no-text controls in later paired evaluation.
+2. **Joye:** coordinate a separately trained common full C1 baseline after
+   the timing decision, record its configuration/checkpoint/run link, and
+   continue MoE diagnostics. The 16-event smoke checkpoint is not that baseline.
+3. **Adaeze:** continue original-gate targets, gradients, and learned-versus-
+   constant controls. Coordinate the exact no-text definition with Nicole.
+4. **Jessica:** continue padding-mask and query diagnostics; label historical
+   versus C1 outputs and record controlled ablations.
+5. **Team/TA:** name an owner to verify article release times, the price CSV
+   timezone, and whether bar timestamps denote starts or ends. Agree on the
+   resulting timing policy before interpreting a full C1 result.
+6. **All:** review PR #4, bring a code/result link and blocker to the Wednesday
+   meeting, and keep experiment provenance current as work lands.

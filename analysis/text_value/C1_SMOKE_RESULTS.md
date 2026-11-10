@@ -19,6 +19,9 @@ Its SHA-256 is
 `97e88fa0d9e4c4d4ed70e37de138d716e28714c51078856839d9d6464f3c8328`.
 The full paired NPZ files, which contain price inputs and targets, remain in
 `/work/hdd/bjjg/gs-fuse/nicole/c1-nov10/paired/run1/` on Delta.
+The training run's offline W&B record is at
+`/work/hdd/bjjg/gs-fuse/nicole/c1-nov10/smoke/run1/wandb/offline-run-20261110_003549-lnv62w9v`.
+It has not been synced to a shared W&B page, so no public run link is claimed.
 
 The explicit timing sensitivity was `category4_1400_strict_before`. Manifest
 SHA-256: `7da0d5666ccf54fa41f99f2b947c83344acc1fd4c40c4017127e3a5bb87276fa`.
