@@ -56,6 +56,14 @@ the November 5 meeting guidance recorded in the update.
   another teammate's login or checkpoint readiness from Nicole's jobs.
 - Use separate checkouts/output directories with common versioned inputs.
   Coordinate shared-function edits; preserve other contributors' work.
+- For every Delta run, follow the permanent team-readable handoff rule in
+  `TEAM_WORKFLOW.md`: commit the reusable Slurm script/configuration to the task
+  branch; use a named owner/run directory under `/work/hdd/bjjg/gs-fuse/runs/`
+  or verify group access to a personal project directory; set `umask 007` in
+  the batch script; and check that another teammate can read the run record.
+  Record the code commit, job ID, split, checkpoint, command, and output path
+  in a GitHub result note. Keep large outputs on Delta. Do not move a checkout
+  while its submitted jobs depend on its paths.
 - Follow repository rules and user authorization for publication. Do not invent
   extra approval requirements, impersonate reviewers, or bypass required checks.
 - Never commit credentials, tokens, private account records, raw data, or large
