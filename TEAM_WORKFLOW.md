@@ -66,6 +66,18 @@ GPU work goes through its scheduler. Follow the official
 and [job](https://docs.ncsa.illinois.edu/systems/delta/en/latest/user_guide/running_jobs.html)
 guides. Important outputs also need a backup; Delta is not the sole archive.
 
+**Permanent team-readable run handoff:** commit reusable Slurm scripts and
+configuration to GitHub on a task branch. Put each run's logs, small result
+records, and checkpoint paths under a named owner/run directory in
+`/work/hdd/bjjg/gs-fuse/runs/`; keep large checkpoints and raw predictions
+on Delta. The shared `/projects/bjjg/gs-fuse` and `/work/hdd/bjjg/gs-fuse`
+roots already have the `delta_bjjg` group, setgid directories, and default
+group ACLs, so new team folders inherit access. Set `umask 007` in batch
+scripts and verify a teammate can read the chosen script/log before linking it.
+Personal directories such as `/projects/bjjg/<username>` may block traversal
+even when an individual file is readable. Copy selected shareable files into
+the shared tree; do not open an entire personal directory just to expose a run.
+
 ## 3. The C1 protocol and remaining code gap
 
 Canonical list: [purged_split_c1_macro_eras.json](splits/manifests/purged_split_c1_macro_eras.json).
