@@ -1,6 +1,7 @@
 # Full C1 paired comparison under an explicit timing assumption
 
-**Status:** prepared November 11, 2026. This is a full-split *sensitivity*
+**Status:** Slurm jobs submitted November 11, 2026; pending at the last check.
+This is a full-split *sensitivity*
 experiment using `category4_1400_strict_before`, not a claim that every
 article was public before its assigned price window. Publication times for
 many categories and the price CSV timezone/bar-label convention remain
@@ -22,6 +23,17 @@ seeded shuffled assignments (23, 24, 25); one uses `zeroed_article_tokens`
 and the other `fusion_bypass_ts_inst`. The jobs may run in parallel after
 training succeeds. These article-free interventions must remain distinct.
 
+| Job | Purpose | Dependency | State at submission |
+|---|---|---|---|
+| `23812725` | Full C1 three-stage sensitivity training | none | Pending (priority) |
+| `23812735` | All-test paired control, zeroed article tokens | afterok:`23812725` | Pending (dependency) |
+| `23812734` | All-test paired control, fusion bypass | afterok:`23812725` | Pending (dependency) |
+| `23812736` | 256-test-event diagnostic using the older 16-training-event smoke checkpoint | none | Pending (priority) |
+
+The 256-event diagnostic is only an evaluator check. It cannot establish text
+value because its checkpoint learned from 16 events. The two full paired jobs
+are the planned substantive comparison, conditional on a complete checkpoint.
+
 ## Reproduction and data handling
 
 - Training script: [`nicole_c1_full_sensitivity.sbatch`](../../scripts/delta/nicole_c1_full_sensitivity.sbatch).
@@ -33,6 +45,8 @@ training succeeds. These article-free interventions must remain distinct.
   The run will record actual emitted counts and checkpoint hash; stop if the
   loaded inputs differ unexpectedly.
 - Remote working root: `/work/hdd/bjjg/gs-fuse/nicole/c1-nov11/`.
+  The staged source commit is `3b71415`; its identifier is recorded beside
+  the remote outputs.
   Full NPZ files contain prices and targets and stay on Delta. Publish only
   derived metrics, per-event losses, and prediction-only arrays after review.
 - W&B is configured offline; the actual run folder and any shared link will

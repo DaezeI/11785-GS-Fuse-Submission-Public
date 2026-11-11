@@ -5,6 +5,9 @@ records the new opt-in path and its actual emitted windows.
 [Paired GPU smoke results](C1_SMOKE_RESULTS.md) now include eight fixed C1
 test events and public derived artifacts. The aggregate numbers below remain
 Adaeze's earlier experiment; they are not C1 full-model results.
+[Full-split C1 timing-sensitivity jobs](C1_FULL_SENSITIVITY_PLAN.md) were
+submitted November 11; the paired comparison remains pending until training
+and inference finish.
 
 **Current team plan:** [TEAM_WORKFLOW.md](../../TEAM_WORKFLOW.md) records the
 November 4 C1 decision and ownership. These calculations describe Adaeze's
