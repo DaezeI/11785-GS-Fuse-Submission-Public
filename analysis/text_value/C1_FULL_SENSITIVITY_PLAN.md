@@ -38,8 +38,10 @@ training succeeds. These article-free interventions must remain distinct.
 - W&B is configured offline; the actual run folder and any shared link will
   be recorded after execution.
 
-The training job has a 24-hour Slurm limit. Each paired mode has an eight-hour
-limit. Actual GPU usage and job states will be recorded from Slurm. No claim
+The training job requests one preemptible A100 for up to 16 hours and permits
+requeue into the same fresh output directory; the code can restore completed
+Stage-1/2 checkpoints from that run. Each paired mode has an eight-hour limit.
+Actual GPU usage and job states will be recorded from Slurm. No claim
 about article value should be made until the checkpoint is complete and both
 paired jobs have passed alignment/provenance checks. Even then, the timing
 assumption limits the conclusion.

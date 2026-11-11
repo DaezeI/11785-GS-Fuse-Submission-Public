@@ -1,7 +1,7 @@
 #!/bin/bash
 #SBATCH --job-name=nicole-c1-full-paired
 #SBATCH --account=bjjg-delta-gpu
-#SBATCH --partition=gpuA100x4
+#SBATCH --partition=gpuA100x4-preempt
 #SBATCH --nodes=1
 #SBATCH --ntasks=1
 #SBATCH --cpus-per-task=8
@@ -24,8 +24,10 @@ export HF_HOME=/work/hdd/bjjg/gs-fuse/nicole/c1-nov11/hf-cache
 export TRANSFORMERS_OFFLINE=1
 export TOKENIZERS_PARALLELISM=false
 
-CHECKPOINT=/work/hdd/bjjg/gs-fuse/nicole/c1-nov11/full_sensitivity_v1/best_model.pth
-OUTPUT=/work/hdd/bjjg/gs-fuse/nicole/c1-nov11/paired_sensitivity_v1
+CHECKPOINT=${CHECKPOINT:-/work/hdd/bjjg/gs-fuse/nicole/c1-nov11/full_sensitivity_v1/best_model.pth}
+OUTPUT=${OUTPUT:-/work/hdd/bjjg/gs-fuse/nicole/c1-nov11/paired_sensitivity_v1}
+TRAINING_SPLIT=${TRAINING_SPLIT:-c1_full_sensitivity_category4_1400}
+MAX_EVENTS=${MAX_EVENTS:-0}
 MANIFEST=splits/manifests/purged_split_c1_macro_eras.json
 PRICE=/work/hdd/bjjg/gs-fuse/data/series/SP500.csv
 test "$(sha256sum "$MANIFEST" | cut -d' ' -f1)" = 7da0d5666ccf54fa41f99f2b947c83344acc1fd4c40c4017127e3a5bb87276fa
@@ -43,8 +45,8 @@ python -u scripts/run_text_controls.py \
   --series-dir /work/hdd/bjjg/gs-fuse/data/series \
   --c1-manifest "$MANIFEST" \
   --c1-timing-policy category4_1400_strict_before \
-  --checkpoint-training-split c1_full_sensitivity_category4_1400 \
-  --max-events 0 --shuffles 3 --seed 23 --batch-size 8 \
+  --checkpoint-training-split "$TRAINING_SPLIT" \
+  --max-events "$MAX_EVENTS" --shuffles 3 --seed 23 --batch-size 8 \
   --no-4bit --tf32 --no-text-mode "$MODE" \
   --out "$OUTPUT/$MODE.npz"
 
