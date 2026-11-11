@@ -4,10 +4,9 @@ Read [TEAM_WORKFLOW.md](TEAM_WORKFLOW.md) first. It records the November 4 team
 decision, ownership, implementation gaps, and experiment handoff requirements.
 Follow current user instructions when they update this plan.
 
-Then read [PROJECT_STATUS.md](PROJECT_STATUS.md) and its latest dated update.
-They track progress after the original workflow, including reported Delta account
-access, feature-branch setup, and the merged padding correction. Preserve the
-distinction between verified code/results, teammate reports, and proposed work.
+Then read [PROJECT_STATUS.md](PROJECT_STATUS.md) for current progress and any
+relevant dated update for historical context. Preserve the distinction between
+verified code/results, teammate reports, queued jobs, and proposed work.
 Develop on personal/task branches and open focused PRs for ready changes, following
 the November 5 meeting guidance recorded in the update.
 
@@ -24,9 +23,10 @@ the November 5 meeting guidance recorded in the update.
 
 ## Verify actual implementation and provenance
 
-- At the workflow document's baseline, `train.py` and `scripts/run_text_controls.py`
-  still use original loaders. The documented `build_purged_dataloaders` factory
-  is absent. C1 integration is not complete merely because a manifest exists.
+- At the workflow document's November 4 baseline, `train.py` and
+  `scripts/run_text_controls.py` still used original loaders. Merged PR #4 adds
+  opt-in C1 integration through the normal entrypoints; review the actual
+  loader and emitted-window audit rather than inferring provenance from a name.
 - All training stages, preprocessing fits, and training negative-report pools
   must respect C1. Check Stage-1 sliding-window boundaries explicitly.
 - Old output directories can trigger automatic Stage-1/2 checkpoint resume.
@@ -36,8 +36,10 @@ the November 5 meeting guidance recorded in the update.
 - The built-in TS-only comparison uses text-conditioned price features.
   `model/no_text_control.py` supplies inference controls; it does not itself fix
   gate training supervision.
-- Nicole's CPU analysis and 25 focused tests ran. Full-model evaluation of the
-  new helper has not; see `analysis/text_value/VALIDATION.md`.
+- Nicole's CPU analysis and 25 focused tests ran. Merged PR #4 adds five C1 tests,
+  a completed three-stage 16-event GPU smoke checkpoint, and paired controls
+  on eight test events. See `analysis/text_value/C1_SMOKE_RESULTS.md`; the
+  smoke result is not a full C1 benchmark.
 - Adaeze's text-control scores and Joye's baseline are separate experiments.
   Do not combine scores across different checkpoints, samples, scalers, or metrics.
 
@@ -48,8 +50,10 @@ the November 5 meeting guidance recorded in the update.
   allocation/membership. None automatically synchronizes the others.
 - Locate existing files before asking teammates to recreate/upload them. Ask for
   unresolved access, exact run identity, or missing inputs only.
-- Delta paths, working environment, and launch example remain pending until
-  Joye verifies them. Do not guess local allocation codes, paths, or readiness.
+- Nicole verified her Delta login, shared inputs/environment, and two completed
+  one-A100 Slurm jobs; exact paths and jobs are in the PR #4 handoff. Joye's
+  common setup and full-baseline handoff remain separately owned. Do not infer
+  another teammate's login or checkpoint readiness from Nicole's jobs.
 - Use separate checkouts/output directories with common versioned inputs.
   Coordinate shared-function edits; preserve other contributors' work.
 - Follow repository rules and user authorization for publication. Do not invent

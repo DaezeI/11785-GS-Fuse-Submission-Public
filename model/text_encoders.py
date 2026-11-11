@@ -189,10 +189,13 @@ class HuggingFaceTextEncoder(BaseTextEncoder):
                 tok_h = data["tok_h"].to(device)
                 mask = self._window_pad_mask(text, window, stride, max_text_tokens, device)
                 if mask.size(1) != tok_h.size(1):
-                    mask = data["mask"].to(device).bool()
+                    raise ValueError(
+                        f"Cached tokens ({tok_h.size(1)}) and rebuilt mask ({mask.size(1)}) "
+                        "have different lengths; the cache may be stale."
+                    )
                 return tok_h, mask
-            except Exception:
-                pass
+            except Exception as e:
+                print(f"[text cache] Ignoring cached tokens for {h_key}: {e}")
 
         # 2. Compute via LLM
         ids = self._tokenizer(

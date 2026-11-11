@@ -1,9 +1,9 @@
 # GS-Fuse (Customized for CMU 11-785 Intro to Deep Learning)
 ## Event-Driven S&P 500 Market Forecasting via Multimodal Gated Fusion
 
-> **Latest team progress:** [PROJECT_STATUS.md](PROJECT_STATUS.md) and the
-> [November 10 update](docs/updates/2026-11-10.md) record completed work, current
-> blockers, branch status, owners, and next handoffs.
+> **Current team progress:** [PROJECT_STATUS.md](PROJECT_STATUS.md) records
+> completed work, queued C1 comparisons, blockers, owners, and next handoffs.
+> The [November 10 update](docs/updates/2026-11-10.md) is an earlier snapshot.
 
 > **Team: start with [TEAM_WORKFLOW.md](TEAM_WORKFLOW.md).** It records the
 > November 4 agreement to use **C1 as the main split**, ownership, service setup,

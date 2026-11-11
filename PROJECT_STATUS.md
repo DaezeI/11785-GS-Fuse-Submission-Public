@@ -1,81 +1,58 @@
 # Project status
 
-Updated November 10, 2026. Maintained by Nicole for team coordination.
+Updated November 11, 2026, after the merge of C1 implementation PR #4.
+This page is the current team overview. [TEAM_WORKFLOW.md](TEAM_WORKFLOW.md)
+has the owner-by-owner handoff and experiment checklist; dated updates preserve
+earlier status without rewriting it.
 
-Read this page for current progress and handoffs. Read
-[TEAM_WORKFLOW.md](TEAM_WORKFLOW.md) for the shared experiment protocol and
-ownership. Dated updates preserve the history of what changed.
+## Where we stand
 
-## Current position
+**C1 is the agreed main split, and its training/evaluation code is in `main`.**
+Nicole's [PR #4](https://github.com/DaezeI/11785-GS-Fuse-Submission-Public/pull/4)
+connected the manifest to all three training stages and paired text controls.
+The real-input audit emitted 6,167 train, 2,500 validation, and 2,921 test
+events with no exclusions or shared input-plus-target bars across partitions.
+Five new C1 regression tests and 25 existing focused text-control tests passed
+in the tested Delta environment. See the [protocol and exact audit](analysis/text_value/C1_PROTOCOL.md).
 
-**C1 is the agreed main split.** The latest inspected code still needs to connect
-that manifest to every training stage and to evaluation. The immediate research
-goal is to run the corrected article-free comparison on an agreed full-model
-checkpoint, then produce comparable C1 results.
+Nicole completed a 16-training-event, three-stage GPU smoke run and paired
+correct/shuffled/two article-free controls on eight test events. Those
+[derived results](analysis/text_value/C1_SMOKE_RESULTS.md) validate execution
+only. They do **not** answer whether correctly matched articles improve a
+properly trained model.
 
-| Work | Status and evidence | Next handoff |
+| Work | Current evidence | Next step |
 |---|---|---|
-| C1 selection and window audit | C1 agreed. Independent bar-overlap checks passed under two timing assumptions. Actual publication times still need verification. | Nicole implements/tests shared C1 loading. |
-| Nicole's initial analysis and controls | Merged into `main` in [PR 1](https://github.com/DaezeI/11785-GS-Fuse-Submission-Public/pull/1). CPU analysis and 25 focused tests documented. | Evaluate the new controls with complete inputs and a verified checkpoint. |
-| Q-Former/shared text padding | Jessica's correction is included in `main` at [the November 9 merge](https://github.com/DaezeI/11785-GS-Fuse-Submission-Public/commit/96cc6d7900dedd8b867b39a951045fe3804aa778). Full-model performance effects remain to be measured. | Jessica measures padding attention, query similarity, and matched forecast changes. |
-| Delta accounts | Team chat reports account details delivered. Jessica reports successful SSH access. Nicole reports receiving her username and entering the identity portal. | Nicole verifies her Delta shell access and shared-file access. |
-| Delta environment and inputs | Joye reports an A100/PyTorch/CUDA test and uploaded data/models. Setup and job scripts are on `feat/moe-qformer-wandb-cache`. Complete GS-Fuse execution and current file inventory still need verification. | Joye records a working small job, exact inputs/checkpoint, and outputs. |
-| Reference checkpoint | The feature-branch guide says original midterm trained weights were never copied off the old host and describes recreating them. Later chat reports uploaded models without identifying a matching trained checkpoint. | Inspect shared files and training logs to identify a completed usable checkpoint. |
-| Delta jobs | Adaeze reports pending jobs. Joye's November 6 commit records an earlier cache-job timeout. Current queue and completion state have not been inspected in this update. | Job owners inspect queue reasons and accounting/logs. |
-| Original gate / MoE | Ownership remains Adaeze / Joye. Latest reviewed changes contain setup work and padding fixes. Further diagnostics may exist locally or on Delta. | Owners publish scripts/results with run identity when available. |
+| C1 implementation | Merged in PR #4; loader audit and focused tests passed. | Use `main` for new work and keep explicit timing/data provenance. |
+| Full C1 text comparison | [Sensitivity run plan](analysis/text_value/C1_FULL_SENSITIVITY_PLAN.md) records training job `23812725`, two `afterok` full-test paired jobs `23812735` and `23812734`, and a 256-event smoke-checkpoint diagnostic `23812736`. They were pending at the last November 11 check. | Check Slurm state/logs; if training and both paired jobs complete, publish safe derived results with checkpoint hash and uncertainty. |
+| Publication-time validity | The manifest has 12 categories but no per-article release timestamps. The price CSV timezone and bar-label convention remain unverified. The new run explicitly uses `category4_1400_strict_before` as a sensitivity assumption. | Team/TA name a timing owner and record sources, unknowns, and an agreed policy before calling any full result publication-time-safe. |
+| Jessica's padding fix | Merged to `main` in [commit `96cc6d7`](https://github.com/DaezeI/11785-GS-Fuse-Submission-Public/commit/96cc6d7900dedd8b867b39a951045fe3804aa778) with three CPU tests. | Ask for links to any Q-Former analysis missing from GitHub before assigning further work. |
+| Gate, MoE, Q-Former diagnostics | Adaeze, Joye, and Jessica retain their existing streams. The inspected November 11 team job scripts used the earlier split; their outputs are historical diagnostics, not the C1 baseline. | Keep each checkpoint/split identity explicit; use the [owner handoff](TEAM_WORKFLOW.md#9-immediate-next-actions-agent-handoff-for-wednesday-november-11). |
 
-## Next work, in dependency order
+The full C1 training and paired jobs are queued work, **not completed results**.
+Slurm jobs continue independently of a laptop or SSH session. The shared
+account balance and queue can change; query them before planning more compute.
+Large checkpoints, raw articles/prices, and full prediction NPZ files stay on
+Delta. GitHub holds code, commands, hashes, and shareable derived records.
 
-1. **Establish one runnable checkpoint diagnostic.** Verify shared articles,
-   prices, backbones, trained weights, model configuration, and environment.
-   Record the exact code commit and training history. Run a small evaluation
-   before expanding the sample size.
-2. **Complete C1 loading in parallel.** Nicole connects training and evaluation
-   to the committed manifest, including Stage-1 price windows, training-only
-   preprocessing, auxiliary report pools, and emitted-window checks.
-3. **Run the initial corrected text control when a checkpoint is available.**
-   Keep model and price examples fixed across correct, repeated shuffled, and
-   explicit article-free inputs. Save individual predictions and IDs. Label the
-   checkpoint's actual training protocol.
-4. **Produce the common C1 baseline and matched diagnostics.** Joye coordinates
-   compute, Nicole verifies data, and all owners use the same scoring protocol.
-   Final C1 claims depend on verified C1 training history.
+## Next team decision
 
-Steps 1 and 2 proceed in parallel. Gate, expert, and query code inspection can
-also proceed while compute is queued. See the
-[November 10 update](docs/updates/2026-11-10.md) for recent history, explanations,
-and proposed completion criteria.
+For the Wednesday meeting, review the merged C1 protocol, choose an owner and
+policy for article/price timing, and have each diagnostic owner bring an
+artifact link or concrete blocker. Adaeze can debug gate instrumentation on
+Nicole's 16-event checkpoint, but matched C1 gate claims need a completed full
+C1 checkpoint. Joye's historical jobs should not be relabelled as C1 merely
+because C1 code later merged to `main`.
 
-## Branches and review
+## History and maintenance
 
-- Develop on personal/task branches and open focused PRs. Merge ready changes
-  into `main`, following the November 5 meeting guidance supplied by Nicole.
-- Current `main` contains Nicole's tools, team instructions, C1 lists, and
-  Jessica's padding correction.
-- Joye's Delta scripts and cache-job updates remain on
-  `feat/moe-qformer-wandb-cache`. That branch also needs current shared changes
-  incorporated before it becomes the common corrected execution setup.
-- Coordinate changes to the shared Delta checkout and Python environment. Use
-  separate working directories and outputs for experiments.
+- [November 10 progress snapshot](docs/updates/2026-11-10.md) records what was
+  known before Delta access and C1 integration were verified. It is historical.
+- [November 10 C1 implementation handoff](docs/updates/2026-11-10-c1-implementation.md)
+  records the audit and smoke work completed that day.
+- [November 4 workflow](TEAM_WORKFLOW.md) records the C1 decision, ownership,
+  and detailed reproducibility requirements, with its current status updated.
 
-## How to maintain these notes
-
-Nicole coordinates the summary. Each work owner supplies changes and evidence
-through a small documentation PR or their experiment PR.
-
-- Update this page when a blocker is resolved, an input becomes available, or a
-  result is ready for someone else to use.
-- Add a dated note under `docs/updates/` for a meeting or significant project
-  update. Preserve earlier notes and link corrections in later entries.
-- Record owner, status, next step, dependency, and evidence. Use the run checklist
-  in `TEAM_WORKFLOW.md` for commands, versions, W&B links, and output locations.
-- Identify the source of a status claim. Code inspection, an executed result,
-  a teammate's report, and a proposed action have different evidential scopes.
-- Summarize technical decisions and handoffs. Keep personal contact details,
-  account secrets, private recordings, and raw chat transcripts in their original
-  private locations.
-
-## Update history
-
-- [November 10 — progress since the November 5 TA meeting](docs/updates/2026-11-10.md)
-- [November 4 — C1 decision and shared workflow](TEAM_WORKFLOW.md)
+Nicole coordinates this summary; each owner supplies evidence through their
+own PR or result note. Update this page when a queued run completes, the
+timing policy changes, or a new checkpoint becomes the team's reference.

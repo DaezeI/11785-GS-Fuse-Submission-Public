@@ -1,8 +1,10 @@
 #!/usr/bin/env python3
 """Save paired real/shuffled/no-article predictions for an existing checkpoint.
 
-This runner uses the ORIGINAL event loader/scaler to diagnose an existing
-checkpoint. It does not claim corrected C1 performance. Default 64 events is
+By default this runner uses the original event loader/scaler to diagnose an
+existing checkpoint. --c1-manifest selects the shared C1 loader and scaler,
+but C1 performance also requires a checkpoint trained under that protocol.
+Default 64 events is
 an evenly spaced smoke sample; --max-events 0 evaluates the complete split.
 
 Example (in the team's model environment):
@@ -73,6 +75,11 @@ def parse_args():
     p.add_argument("--moment-path", required=True)
     p.add_argument("--event-dir", default="data/event")
     p.add_argument("--series-dir", default="data/series")
+    p.add_argument("--c1-manifest")
+    p.add_argument("--c1-timing-policy", choices=["legacy_all0830_floor",
+                   "category4_1400_strict_before"], default=None,
+                   help="Required with --c1-manifest; must match checkpoint training")
+    p.add_argument("--c1-skip-missing", action="store_true")
     p.add_argument("--split", choices=["test", "vali"], default="test")
     p.add_argument("--batch-size", type=int, default=2)
     p.add_argument("--max-events", type=int, default=64)
@@ -108,8 +115,15 @@ def main():
     module.USE_4BIT = not args.no_4bit; module.TEXT_CACHE_PATH = args.text_cache
     torch.backends.cuda.matmul.allow_tf32 = args.tf32
     torch.backends.cudnn.allow_tf32 = args.tf32
-    events = event_set(35, 140, event_id=0, series_id="SP500", shuffle=False,
-        batch_size=args.batch_size, event_dir=args.event_dir, series_dir=args.series_dir)
+    if args.c1_manifest:
+        from data.c1_protocol import build_c1_dataloaders
+        events = build_c1_dataloaders(
+            args.c1_manifest, args.event_dir, Path(args.series_dir) / "SP500.csv",
+            batch_size=args.batch_size, timing_policy=args.c1_timing_policy,
+            skip_missing=args.c1_skip_missing)
+    else:
+        events = event_set(35, 140, event_id=0, series_id="SP500", shuffle=False,
+            batch_size=args.batch_size, event_dir=args.event_dir, series_dir=args.series_dir)
     ds = events.test_set if args.split == "test" else events.vali_set
     ids = np.arange(len(ds.list))
     if args.max_events and args.max_events < len(ids):
@@ -158,7 +172,7 @@ def main():
     train_vol = np.array([np.std(np.diff(np.log(it[3].numpy()[:, 3]))) for it in events.train_set.list])
     metadata = {"checkpoint_id": checkpoint_sha,
         "training_split": args.checkpoint_training_split,
-        "evaluation_split": f"original_positional_{args.split}",
+        "evaluation_split": f"c1_{args.split}" if args.c1_manifest else f"original_positional_{args.split}",
         "no_text_definition": args.no_text_mode,
         "shuffle_description": "seeded index derangement over selected evaluation texts; future donors allowed as a diagnostic placebo",
         "shuffle_protocols": protocols, "smoke_subset": len(ids) != len(ds.list),
@@ -171,7 +185,12 @@ def main():
         "token_cache_policy": "isolated by checkpoint SHA, quantization, and TF32 under output directory",
         "price_sha256": file_hash(Path(args.series_dir) / "SP500.csv"),
         "backbone": Path(args.text_model_path).name, "four_bit": not args.no_4bit,
-        "note": "diagnosis of an existing checkpoint; not a leakage-corrected C1 result"}
+        "note": ("C1 evaluation; corrected C1 performance requires verified C1 checkpoint training"
+                 if args.c1_manifest else "diagnosis of an existing checkpoint; not a leakage-corrected C1 result")}
+    if args.c1_manifest:
+        metadata["c1_manifest_sha256"] = file_hash(args.c1_manifest)
+        metadata["c1_data_audit"] = events.audit
+        metadata["c1_selected_windows"] = [ds.windows[int(i)] for i in ids]
     args.out.parent.mkdir(parents=True, exist_ok=True)
     np.savez_compressed(args.out, real_text=np.concatenate(predictions[0]),
         shuffled_text=np.stack([np.concatenate(p) for p in predictions[1:]]), zero_text=np.concatenate(zero),
