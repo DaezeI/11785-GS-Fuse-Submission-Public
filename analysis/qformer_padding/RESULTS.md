@@ -17,7 +17,10 @@ text gate differently?
 |---|---|
 | Code | `main` at `10edc1e` (merge of PR #5; includes PR #2 and PR #5) |
 | Where | Delta, `/projects/bjjg/zchen58/gsfuse`, account `bjjg-delta-gpu`, 1x A100 (`gpuA100x4`) |
-| Slurm jobs | Q-Former `23739926` (completed); baseline `23739927` (queued) |
+| Slurm jobs | Smoke `23739724` (completed); Q-Former `23739926` (completed); baseline `23739927` (queued) |
+| Scripts | [`scripts/delta/jessica_fixedmask_full.sbatch`](../../scripts/delta/jessica_fixedmask_full.sbatch), [`scripts/delta/jessica_fixedmask_smoke.sbatch`](../../scripts/delta/jessica_fixedmask_smoke.sbatch). The submitted copies had no `umask 007` line; it was added afterwards. |
+| Outputs on Delta | Q-Former checkpoint `/projects/bjjg/zchen58/gsfuse/outputs/fixedmask/qformer/best_model.pth`; log `/projects/bjjg/zchen58/gsfuse/logs/full-jessica-qformer-23739926.out`; W&B offline run `outputs/fixedmask/qformer/wandb/offline-run-20261111_052313-ujs10xwq` |
+| Checkpoint history | Trained from scratch in a fresh output directory (no Stage-1/2 resume) |
 | Split | Original positional 60/20/20 split (TRAIN 6,988 / VALI 2,330 / TEST 2,329) |
 | Backbones | `pretrained/Llama-3.2-1B` (fp32, `--no-4bit`), `pretrained/MOMENT-1-large`, TF32 on |
 | Text cache | `cache/text_inst_llama1b_tf32.pt` (26,917 embeddings) and `data/cache_llama_emb/` |
@@ -77,4 +80,4 @@ gate target (sigma(0) = 0.5 when text does not help), evaluated on C1.
 - W&B link after `wandb sync` of `outputs/fixedmask/qformer/wandb/offline-run-20261111_052313-ujs10xwq`.
 - corr(gate, text benefit) and text gain from the full log.
 
-Checkpoints and full logs stay on Delta under `/projects/bjjg/zchen58/gsfuse/`.
+Checkpoints and full logs stay on Delta under `/projects/bjjg/zchen58/gsfuse/` (group `delta_bjjg`; team read access: PENDING verification by a teammate).
