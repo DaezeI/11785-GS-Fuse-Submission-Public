@@ -67,16 +67,17 @@ and [job](https://docs.ncsa.illinois.edu/systems/delta/en/latest/user_guide/runn
 guides. Important outputs also need a backup; Delta is not the sole archive.
 
 **Permanent team-readable run handoff:** commit reusable Slurm scripts and
-configuration to GitHub on a task branch. Put each run's logs, small result
-records, and checkpoint paths under a named owner/run directory in
-`/work/hdd/bjjg/gs-fuse/runs/`; keep large checkpoints and raw predictions
-on Delta. The shared `/projects/bjjg/gs-fuse` and `/work/hdd/bjjg/gs-fuse`
-roots already have the `delta_bjjg` group, setgid directories, and default
-group ACLs, so new team folders inherit access. Set `umask 007` in batch
-scripts and verify a teammate can read the chosen script/log before linking it.
-Personal directories such as `/projects/bjjg/<username>` may block traversal
-even when an individual file is readable. Copy selected shareable files into
-the shared tree; do not open an entire personal directory just to expose a run.
+configuration to GitHub on a task branch. Keep large checkpoints and raw
+predictions on Delta, and record each run's script, job ID, split, checkpoint,
+and output path in a GitHub result note. Store logs and outputs either in a
+named owner/run directory under `/work/hdd/bjjg/gs-fuse/runs/` **or** in a
+personal project directory whose parent directories and new files permit
+`delta_bjjg` access. The shared `/projects/bjjg/gs-fuse` and
+`/work/hdd/bjjg/gs-fuse` roots already have setgid and default group ACLs;
+personal directories need their own permissions checked. Set `umask 007` in
+batch scripts and verify access from another teammate's Delta account.
+Do not move an active checkout solely to share it: submitted Slurm jobs keep
+the original script, working-directory, and log paths.
 
 ## 3. The C1 protocol and remaining code gap
 
