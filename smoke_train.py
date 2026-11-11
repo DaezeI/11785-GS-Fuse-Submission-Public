@@ -12,6 +12,7 @@ import argparse
 import json
 import os
 import warnings
+from pathlib import Path
 
 import torch
 from torch.utils.data import DataLoader, Subset
@@ -36,6 +37,11 @@ def parse_args():
     p.add_argument("--text-model-path", type=str, required=True)
     p.add_argument("--event-dir", type=str, default="data/event")
     p.add_argument("--series-dir", type=str, default="data/series")
+    p.add_argument("--c1-manifest")
+    p.add_argument("--c1-timing-policy", choices=["legacy_all0830_floor",
+                   "category4_1400_strict_before"], default=None,
+                   help="Required with --c1-manifest; publication times are unverified")
+    p.add_argument("--c1-skip-missing", action="store_true")
     p.add_argument("--output-path", type=str, required=True)
     p.add_argument("--series-id", type=str, default="SP500")
     p.add_argument("--seq-len", type=int, default=35)
@@ -78,22 +84,36 @@ def main():
     torch.backends.cuda.matmul.allow_tf32 = args.tf32
     torch.backends.cudnn.allow_tf32 = args.tf32
 
-    events = event_set(
-        args.seq_len, args.pred_len, event_id=0, series_id=args.series_id,
-        shuffle=False, batch_size=args.batch_size, scale=True,
-        event_dir=args.event_dir, series_dir=args.series_dir,
-    )
-    sw_data = sliding_window_set(
-        seq_len=args.seq_len, pred_len=args.pred_len, series_id=args.series_id,
-        series_dir=args.series_dir, stride=1, batch_size=args.batch_size, num_workers=0,
-    )
+    if args.c1_manifest:
+        from data.c1_protocol import build_c1_dataloaders
+        output = Path(args.output_path)
+        if any((output / name).exists() for name in
+               ("stage1_best_model.pth", "stage2_best_model.pth", "best_model.pth")):
+            raise ValueError("Smoke C1 output already contains checkpoints; use a fresh output path")
+        events = build_c1_dataloaders(
+            args.c1_manifest, args.event_dir, Path(args.series_dir) / f"{args.series_id}.csv",
+            seq_len=args.seq_len, pred_len=args.pred_len, batch_size=args.batch_size,
+            sw_stride=1, timing_policy=args.c1_timing_policy,
+            skip_missing=args.c1_skip_missing)
+        output.mkdir(parents=True, exist_ok=True)
+        (output / "c1_data_audit.json").write_text(json.dumps(events.audit, indent=2) + "\n")
+        sw_train_set, sw_vali_set = events.sw_train_set, events.sw_vali_set
+    else:
+        events = event_set(
+            args.seq_len, args.pred_len, event_id=0, series_id=args.series_id,
+            shuffle=False, batch_size=args.batch_size, scale=True,
+            event_dir=args.event_dir, series_dir=args.series_dir)
+        sw_data = sliding_window_set(
+            seq_len=args.seq_len, pred_len=args.pred_len, series_id=args.series_id,
+            series_dir=args.series_dir, stride=1, batch_size=args.batch_size, num_workers=0)
+        sw_train_set, sw_vali_set = sw_data.train_set, sw_data.vali_set
 
     bs = args.batch_size
     train_loader = subset_loader(events.train_set, args.n_event_train, bs)
     vali_loader = subset_loader(events.vali_set, args.n_event_eval, bs)
     test_loader = subset_loader(events.test_set, args.n_event_eval, bs)
-    sw_train_loader = subset_loader(sw_data.train_set, args.n_sw_train, bs, shuffle=True)
-    sw_vali_loader = subset_loader(sw_data.vali_set, args.n_sw_eval, bs)
+    sw_train_loader = subset_loader(sw_train_set, args.n_sw_train, bs, shuffle=True)
+    sw_vali_loader = subset_loader(sw_vali_set, args.n_sw_eval, bs)
 
     model = GSFuse(
         text_model_path=args.text_model_path,

@@ -1,0 +1,45 @@
+{
+  "manifest_counts": {
+    "train": 6167,
+    "vali": 2500,
+    "test": 2921
+  },
+  "emitted_counts": {
+    "train": 6167,
+    "vali": 2500,
+    "test": 2921
+  },
+  "excluded_counts": {},
+  "excluded_examples": {},
+  "price": {
+    "raw_rows": 331256,
+    "clean_rows": 331094,
+    "exact_duplicate_rows": 162
+  },
+  "timing_policy": "category4_1400_strict_before",
+  "release_time_verified": false,
+  "scaler_fit_unique_bars": 180151,
+  "scaler_mean": [
+    1634.7712424155693,
+    1635.4727791723944,
+    1634.0645639745958,
+    1634.7730946428844
+  ],
+  "scaler_scale": [
+    452.97733794393235,
+    452.9240416692208,
+    453.0318219190244,
+    452.98225921444066
+  ],
+  "covered_bars": {
+    "train": 180151,
+    "vali": 65573,
+    "test": 63768
+  },
+  "stage1_train_windows": 15945,
+  "stage1_vali_windows": 6523,
+  "manifest_sha256": "7da0d5666ccf54fa41f99f2b947c83344acc1fd4c40c4017127e3a5bb87276fa",
+  "price_sha256": "6a873b1d72d27f9188c6bf12acb756775916be8ed9ff42d9e9dd98028f68de2a",
+  "stage1_train_window_count": 15945,
+  "stage1_vali_window_count": 6523
+}
