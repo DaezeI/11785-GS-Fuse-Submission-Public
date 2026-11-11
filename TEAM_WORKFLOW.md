@@ -401,6 +401,10 @@ separate, and distinguish both from a separately trained price-only model.
    one blocker or decision. A completed new GPU experiment is **not** required
    for this meeting. Put substantive code/results in a focused PR and record
    provenance with the [handoff fields in Section 7](#7-what-every-experiment-handoff-should-contain).
+4. Check the submitted command and emitted split before calling a run "C1."
+   The team jobs inspected on November 11 still used the earlier loader. The
+   new full C1 timing-sensitivity training and paired jobs are identified in
+   [their run plan](analysis/text_value/C1_FULL_SENSITIVITY_PLAN.md).
 
 ### Shared timing decision — team and TA, coordinated by Nicole
 
@@ -454,6 +458,19 @@ plots/scores. Read [Nicole's text-control explanation](analysis/text_value/READM
 the built-in named TS-only comparison can contain article-conditioned price
 features; Nicole's clean no-text helper is **inference-only** and does not
 replace a differentiable training target.
+
+**Checkpoint for this task:** no completed full C1 checkpoint has been verified
+yet. The 16-event C1 smoke checkpoint at
+`/work/hdd/bjjg/gs-fuse/nicole/c1-nov10/smoke/run1/best_model.pth` is suitable
+only for debugging gate instrumentation, not a reportable comparison. Full C1
+timing-sensitivity training is queued as Slurm job `23812725`; if it finishes,
+its checkpoint will be
+`/work/hdd/bjjg/gs-fuse/nicole/c1-nov11/full_sensitivity_v1/best_model.pth`.
+Check its [run plan and provenance](analysis/text_value/C1_FULL_SENSITIVITY_PLAN.md)
+before using it. For matched gate results, use this same cross-attention
+checkpoint and C1 examples for learned/constant controls; choose constants on
+validation and evaluate on test. Historical split checkpoints can support
+separate exploratory diagnosis but must be labelled with their own protocol.
 
 **Diagnose:** save distributions of gate supervision targets, learned gate
 weights, and per-event text benefit with the exact benefit formula. Check
