@@ -27,6 +27,7 @@ outputs/
 
 # Python / runtime
 __pycache__/
+.venv/
 *.py[cod]
 .pytest_cache/
 .ipynb_checkpoints/

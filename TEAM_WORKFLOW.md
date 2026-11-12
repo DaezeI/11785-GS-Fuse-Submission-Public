@@ -354,6 +354,13 @@ With PyTorch installed, require the tensor checks too:
 python scripts/check_text_value.py --require-torch
 ```
 
+Executed locally: **13/13 gate and C1 tests passed; 25/25 focused text-value
+regression checks passed with no skips.** Python compilation and runner
+`--help` also passed. CPU environment: Python 3.12.10, torch 2.15.0+cpu,
+NumPy 2.5.4, pytest 9.2.0, pandas 3.1.1, scikit-learn 1.9.1. Delta's documented
+torch 2.8/CUDA/backbone environment is different and has not been exercised
+for this new runner. Slurm template has not been executed or submitted.
+
 Without PyTorch, four helper checks are explicitly skipped. The published
 [validation record](analysis/text_value/VALIDATION.md) documents 25 passing focused
 tests with no skips in the tested CPU environment, not a full backbone/Delta test.
@@ -521,3 +528,113 @@ uncertainty by distinct event dates; publish small derived results and exact
 commands, leaving raw articles/prices and weights off GitHub. Bring Wednesday
 the PR link, smoke limitation, and timing questions; do not present the smoke
 MSE as the team's final score.
+
+## Adaeze: C1 gate-analysis preparation (November 11)
+
+**User direction:** take recovery of the historical midterm checkpoint off the
+critical path. Use Nicole's completed full C1 sensitivity checkpoint when
+available. Historical W&B observations remain a separate record. Do not use
+Adaeze's laptop checkpoint for new runs.
+
+**Status: code prepared locally; CPU checks executed; full-backbone/GPU smoke
+and all new experimental results PENDING.** No Delta job has been submitted
+by this preparation. This branch is based on Nicole's published C1 integration
+at `2d868326`; it does not replace her staged checkout or loader.
+
+### The first question and actual changes
+
+Compare the learned softmax gate with a pre-specified 50/50 gate on exactly the
+same checkpoint, event IDs, targets, and aligned features. This is an
+inference intervention, not a separately trained constant-gate model.
+The constant is fixed in advance; there is no search over test results.
+
+- `model/gate_analysis.py`: obtain actual per-channel gates and predictions;
+  keep encoded/aligned features fixed while replacing only the fusion weights.
+  Reconstruct the current supervision formula using the original,
+  text-conditioned TS reference. Record it as a diagnostic, not clean causal
+  text benefit or a recovered historical training target.
+- `scripts/run_gate_analysis.py`: consume Nicole's shared C1 loader, verify
+  manifest/price/scaler/counts against the training audit, check architecture
+  and saved module states, require a completed training log, and write paired
+  predictions plus configuration/source/checkpoint hashes. It compares the
+  first learned-prediction batch with the standard prediction entrypoint.
+- `scripts/analyze_gate_analysis.py`: derive MSE at 35/70/140, event-level
+  gate statistics, and observed gate/zero-token-benefit correlation from saved
+  arrays. No simulated observations or hard-coded performance numbers.
+- `configs/adaeze_gate_c1.json`: known planned checkpoint and shared input paths.
+  Existence/read access to the finished checkpoint is still PENDING.
+- `scripts/delta/adaeze_gate_analysis.sbatch`: one template with `smoke` and
+  `full` phases, a unique job output directory, and no training/optimizer step.
+- `tests/test_gate_analysis.py`: actual replacement semantics, unchanged model
+  parameters, gradient-state restoration, invalid values, audit mismatch, and
+  saved-prediction analysis checks on tiny CPU fixtures.
+
+The optional gradient probe uses the first C1 **training** batch, in evaluation
+mode with detached encoded features. It reports gate-parameter derivatives for
+forecast MSE and gate-supervision MSE separately. It is not the complete
+training objective, does not reproduce past training batches/dropout, and does
+not establish the cause of gate behavior. No optimizer is constructed.
+
+A zero fusion text weight would still leave text-conditioned aligned price
+features. This preparation therefore keeps Nicole's `zeroed_article_tokens`
+control separately named, and does not call the fixed-gate intervention
+"price-only." Her full paired shuffled/bypass jobs remain separate.
+
+### Local checks and Delta handoff
+
+Use a dedicated checkout in Antigravity; do not edit the inspection copy or
+Nicole's live Delta checkout. The test environment is CPU-only and does not
+contain the pretrained backbones. It is not a replacement for Delta's model
+environment. On a Python environment with torch/numpy/pandas/scikit-learn/pytest:
+
+```bash
+python -m pytest tests/test_gate_analysis.py tests/test_c1_protocol.py -q
+python scripts/check_text_value.py --require-torch
+```
+
+After this code is reviewed and transferred to **Adaeze's own** Delta checkout,
+activate the already documented shared environment and set its actual location
+and a new output root in a directory you own. Do not paste placeholder paths
+without replacing them:
+
+```bash
+export REPO_DIR=/replace/with/adaezes/actual/checkout
+export OUT_ROOT=/replace/with/adaezes/new/gate-output-directory
+export PHASE=smoke
+sbatch --export=ALL scripts/delta/adaeze_gate_analysis.sbatch
+```
+
+The smoke phase evaluates 16 validation events and includes one training-batch
+gradient probe. Inspect `run_record.json`, `gradient_probe.json`, and the
+analysis summary. This verifies execution, not forecast quality. Check that
+the learned prediction matches the standard entrypoint and that all gates and
+predictions are finite. Only after it passes, submit the same template with
+`PHASE=full` for all validation and test events, using the same pre-specified
+50/50 constant. Each job uses a new job-ID directory and refuses to overwrite
+existing prediction/analysis outputs. Failed/preempted analyses do not resume;
+resubmit into a new job directory.
+
+The template requests one preemptible A100 for up to eight hours, matching the
+known partition/environment conventions; this is a requested cap, not a
+measured runtime guarantee. No automatic submission/dependency is configured.
+
+Full prediction NPZ files include targets and stay on Delta. Small derived
+summaries may be shared after review; do not upload raw articles, prices,
+checkpoint weights, token caches, or credentials. The analyzer currently
+produces descriptive metrics and CSVs, without significance claims or
+confidence intervals. Plotting and date-block uncertainty analysis are later
+extensions, not completed deliverables.
+
+### Interpretation and outstanding inputs
+
+The old local gate-plot script mixes actual gate observations with simulated
+benefit samples and hard-coded benchmark/correlation values. Those outputs
+must not be treated as measured constant-gate evidence or gradient diagnoses.
+They are preserved; this branch supplies a separate measured workflow.
+
+Pending before reporting a new result: completed C1 checkpoint and matching
+audit/log; verified read permissions; actual deployed code/version; successful
+small GPU job; full paired outputs; environment record; analysis interpretation;
+W&B link if subsequently logged (this runner does not log a new W&B run).
+The current C1 release-time and price timezone/bar-label limitations still
+apply. A small gate spread or a close 50/50 comparison alone proves no cause.

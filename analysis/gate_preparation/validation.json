@@ -1,0 +1,26 @@
+{
+  "owner": "Adaeze",
+  "purpose": "Prepare measured C1 gate comparison, no new forecasting results",
+  "base_commit": "2d868326e0ffd51a2cde84269b5a16e6998f1243",
+  "local_branch": "adaeze/c1-gate-analysis",
+  "validation_recorded_before_commit": true,
+  "checks": {
+    "gate_and_c1_pytest": {"passed": 13, "failed": 0},
+    "focused_text_value_regression": {"passed": 25, "failed": 0, "skipped": 0},
+    "python_compile": "passed",
+    "runner_help": "passed"
+  },
+  "environment": {
+    "python": "3.12.10",
+    "torch": "2.15.0+cpu",
+    "numpy": "2.5.4",
+    "pytest": "9.2.0",
+    "pandas": "3.1.1",
+    "scikit_learn": "1.9.1"
+  },
+  "gpu_runtime": "PENDING",
+  "slurm_submission": "NOT SUBMITTED",
+  "checkpoint_access_and_completion": "PENDING",
+  "new_forecasting_findings": "NONE",
+  "next_action": "Transfer prepared code to Adaeze's Delta checkout; after a verified completed C1 checkpoint exists, run the 16-validation-event smoke phase before full evaluation."
+}

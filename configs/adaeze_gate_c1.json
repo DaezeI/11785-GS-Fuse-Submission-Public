@@ -1,0 +1,18 @@
+{
+  "checkpoint": "/work/hdd/bjjg/gs-fuse/nicole/c1-nov11/full_sensitivity_v1/best_model.pth",
+  "manifest": "splits/manifests/purged_split_c1_macro_eras.json",
+  "event_dir": "/work/hdd/bjjg/gs-fuse/data/event",
+  "price": "/work/hdd/bjjg/gs-fuse/data/series/SP500.csv",
+  "moment_path": "/work/hdd/bjjg/gs-fuse/pretrained/MOMENT-1-large",
+  "text_model_path": "/work/hdd/bjjg/gs-fuse/pretrained/Llama-3.2-1B",
+  "text_cache": "/work/hdd/bjjg/gs-fuse/cache/text_inst_llama1b_tf32.pt",
+  "timing_policy": "category4_1400_strict_before",
+  "batch_size": 8,
+  "seed": 23,
+  "tf32": true,
+  "expected_data": {
+    "manifest_sha256": "7da0d5666ccf54fa41f99f2b947c83344acc1fd4c40c4017127e3a5bb87276fa",
+    "price_sha256": "6a873b1d72d27f9188c6bf12acb756775916be8ed9ff42d9e9dd98028f68de2a",
+    "emitted_counts": {"train": 6167, "vali": 2500, "test": 2921}
+  }
+}
