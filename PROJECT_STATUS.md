@@ -1,6 +1,6 @@
 # Project status
 
-Updated November 11, 2026, after the merge of C1 implementation PR #4.
+Updated November 12, 2026, after checking the submitted C1 jobs on Delta.
 This page is the current team overview. [TEAM_WORKFLOW.md](TEAM_WORKFLOW.md)
 has the owner-by-owner handoff and experiment checklist; dated updates preserve
 earlier status without rewriting it.
@@ -24,7 +24,7 @@ properly trained model.
 | Work | Current evidence | Next step |
 |---|---|---|
 | C1 implementation | Merged in PR #4; loader audit and focused tests passed. | Use `main` for new work and keep explicit timing/data provenance. |
-| Full C1 text comparison | [Sensitivity run plan](analysis/text_value/C1_FULL_SENSITIVITY_PLAN.md) records training job `23812725`, two `afterok` full-test paired jobs `23812735` and `23812734`, and a 256-event smoke-checkpoint diagnostic `23812736`. They were pending at the last November 11 check. | Check Slurm state/logs; if training and both paired jobs complete, publish safe derived results with checkpoint hash and uncertainty. |
+| Full C1 text comparison | [Sensitivity run plan](analysis/text_value/C1_FULL_SENSITIVITY_PLAN.md) records training job `23812725` and two `afterok` full-test paired jobs `23812735` and `23812734`; all remained pending on November 12. The separate 256-event smoke-checkpoint diagnostic `23812736` completed with exit 0. | Check Slurm state/logs; if training and both paired jobs complete, publish safe derived results with checkpoint hash and uncertainty. A larger evaluation on the 16-event checkpoint is not the next scientific test. |
 | Publication-time validity | The manifest has 12 categories but no per-article release timestamps. The price CSV timezone and bar-label convention remain unverified. The new run explicitly uses `category4_1400_strict_before` as a sensitivity assumption. | Team/TA name a timing owner and record sources, unknowns, and an agreed policy before calling any full result publication-time-safe. |
 | Jessica's padding fix | Merged to `main` in [commit `96cc6d7`](https://github.com/DaezeI/11785-GS-Fuse-Submission-Public/commit/96cc6d7900dedd8b867b39a951045fe3804aa778) with three CPU tests. | Ask for links to any Q-Former analysis missing from GitHub before assigning further work. |
 | Gate, MoE, Q-Former diagnostics | Adaeze, Joye, and Jessica retain their existing streams. The inspected November 11 team job scripts used the earlier split; their outputs are historical diagnostics, not the C1 baseline. | Keep each checkpoint/split identity explicit; use the [owner handoff](TEAM_WORKFLOW.md#9-immediate-next-actions-agent-handoff-for-wednesday-november-11). |
