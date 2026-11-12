@@ -45,7 +45,9 @@ stores these five IDs, source links, dates, and file hashes without article text
 
 On November 12, training job `23812725` was still pending and was put on a
 reversible Slurm user hold (`JobHeldUser`). Its dependent paired-evaluation
-jobs `23812735` and `23812734` remain pending. No full C1 model result exists.
+jobs `23812735` and `23812734` were pending. All three superseded jobs were
+subsequently canceled to prevent the old manifest from running and to free
+Slurm submission slots. No full C1 model result exists.
 The five source-checked December records are test-only, so **those five alone
 would call for test correction, not retraining**. The wider scan found affected
 validation records, so the original queued job must not be released against
@@ -77,6 +79,36 @@ For 541 of the 882 candidates, replacing the original date in the event ID
 with the inferred dateline date would collide with an existing C1 event ID in
 the same category. Preserve source IDs and files; record any verified
 publication date and usable forecast anchor as separate, versioned metadata.
+
+The [v1 exclusion ledger](c1_article_date_policy_v1.csv) gives each affected
+original ID its evidence level and decision; its
+[summary](c1_article_date_policy_v1_summary.json) checks the exact manifest
+hashes and IDs. Five records have externally checked **calendar dates only**,
+878 have only a Reuters-dateline candidate, and none has a verified release
+time or replacement forecast anchor. The 10,705 retained C1 records also have
+unknown release times. No raw folder or forecast window has been renamed or
+reanchored; this is a screen, not a date-corrected baseline.
+
+The [upstream CAMEF README](https://github.com/lakebodhi/CAMEF) calls the
+folder an event date and describes generated summaries/counterfactual reports,
+but supplies no per-article publication timestamp. Its
+[loader](https://github.com/lakebodhi/CAMEF/blob/publish-camef-code/CAMEF/data/dataloader.py)
+reads the summary filename date and appends a fixed clock time. A direct check
+of the shared Delta article folders found generated report filename stems that
+do not reliably match either the folder or the source date: for example,
+`9/20231216.txt` has report stems `20231221` although the source-checked Reuters
+date is Dec 19; `8/20231216.txt` has report stems `20240105` although the
+source-checked Zacks date is Dec 21. Those stems cannot repair publication
+times. The shared Drive data directory exposes event and series folders but no
+date index at its top level; an original source archive with article metadata
+has not been established.
+
+All ten earlier/anomalous Reuters candidates were spot-checked in the Delta
+summary openings. Nine are one or two days before weekend folder labels
+(mostly Friday Reuters datelines); `12/20200803.txt` says `Feb 25 (Reuters)`
+while discussing July activity, so even its dateline is suspect. The wider
+candidate distribution includes +1 through +5 and negative offsets. There is
+no justified global date shift. These ten remain excluded under v1.
 
 The conservative [date-screened C1 manifest](../../splits/manifests/purged_split_c1_date_screen_v1.json)
 excludes all 882 Reuters candidates and the one additional source-verified
