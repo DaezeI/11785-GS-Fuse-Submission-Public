@@ -76,7 +76,14 @@ Zacks record. It retains 6,167 train, 2,302 validation, and 2,236 test
 events. This is a **sensitivity subset**, not a fully publication-time-safe
 replacement for the agreed C1 benchmark. The original manifest and raw
 dataset remain unchanged. The screened manifest still needs an emitted-window
-audit on Delta before a new full run is submitted.
+audit on Delta before a new full run is submitted. That real-input check was
+submitted as Slurm job `23835057` using
+[`nicole_c1_date_screen_audit.sbatch`](../../scripts/delta/nicole_c1_date_screen_audit.sbatch);
+it was pending at the last check. Replacement
+[training](../../scripts/delta/nicole_c1_date_screen_full.sbatch) and
+[paired-control](../../scripts/delta/nicole_c1_date_screen_paired.sbatch)
+scripts point to this manifest and fresh output directories. Submit them only
+after the audit passes.
 
 Screened manifest SHA-256:
 `1b04373a4361238b09c0b1d952163973403d2d7839dbb9e7215c429af14b23d1`.
