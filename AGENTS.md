@@ -7,6 +7,11 @@ Follow current user instructions when they update this plan.
 Then read [PROJECT_STATUS.md](PROJECT_STATUS.md) for current progress and any
 relevant dated update for historical context. Preserve the distinction between
 verified code/results, teammate reports, queued jobs, and proposed work.
+Before any full C1 run, read the [November 12 article-date audit](analysis/text_value/ARTICLE_DATE_AUDIT.md).
+The original full-run jobs were held after widespread validation/test date
+conflicts were found. Use the versioned date-screened manifest only after its
+real-input window audit passes; do not release the old jobs or describe the
+screened subset as publication-time certified.
 Develop on personal/task branches and open focused PRs for ready changes, following
 the November 5 meeting guidance recorded in the update.
 

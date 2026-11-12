@@ -13,6 +13,14 @@ See the [C1 protocol](analysis/text_value/C1_PROTOCOL.md),
 The [November 10 update](docs/updates/2026-11-10.md) is a historical snapshot;
 use the current status page for present-tense claims.
 
+**November 12 data alert:** A [Delta article-date scan](analysis/text_value/ARTICLE_DATE_AUDIT.md)
+found 198 C1 validation and 684 test Reuters-dateline conflicts, plus one
+source-verified non-Reuters test conflict. The original full C1 training job is
+held. A separate date-screened sensitivity manifest and replacement scripts
+are in [draft PR #7](https://github.com/DaezeI/11785-GS-Fuse-Submission-Public/pull/7).
+Check its real-input audit before submitting a new full run. The original C1
+manifest remains the historical split definition, not a timing-safe run input.
+
 ## 1. Agreed decisions and actual status
 
 | Item | Status | What this means |
