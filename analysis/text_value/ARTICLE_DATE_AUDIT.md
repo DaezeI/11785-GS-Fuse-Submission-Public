@@ -120,9 +120,22 @@ article requires recomputing its price window, C1 role/boundary checks,
 training-only scaler coverage, Stage-1 coverage, and evaluation IDs. Do not
 rename a directory in place or silently change the existing manifest.
 
-After the scope and correction are reviewed, create a versioned corrected
-manifest, rerun the emitted-window audit, and then replace the held jobs with
-commands pointing to that version. The resulting comparison must record the
+After the Delta emitted-window audit passes, submit the prepared replacement
+training and paired jobs from the isolated checkout:
+
+```sh
+cd /work/hdd/bjjg/gs-fuse/nicole/c1-date-screen-v1/repo
+training_job=$(sbatch --parsable scripts/delta/nicole_c1_date_screen_full.sbatch)
+sbatch --dependency=afterok:"$training_job" \
+  --export=ALL,MODE=zeroed_article_tokens \
+  scripts/delta/nicole_c1_date_screen_paired.sbatch
+sbatch --dependency=afterok:"$training_job" \
+  --export=ALL,MODE=fusion_bypass_ts_inst \
+  scripts/delta/nicole_c1_date_screen_paired.sbatch
+```
+
+Record the actual job IDs and source commit in this note; do not treat the
+old unscreened jobs as equivalent. The resulting comparison must record the
 screened manifest hash and exact included IDs. The prepared v1 screen is a
 conservative exclusion policy; any later source-verified reanchoring needs a
 new version.
