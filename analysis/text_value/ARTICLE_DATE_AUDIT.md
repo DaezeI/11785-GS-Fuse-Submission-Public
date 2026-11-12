@@ -70,6 +70,14 @@ Zacks December 21 story is one example the rule misses. See the
 [candidate IDs](c1_article_dateline_candidates_2026-11-12.csv). The scan
 records IDs and dates only, not article text.
 
+The scan does not produce 882 safe replacement folder names. The Reuters
+opening usually supplies a calendar date without a release time or timezone,
+and the summary may not establish when the complete event text was available.
+For 541 of the 882 candidates, replacing the original date in the event ID
+with the inferred dateline date would collide with an existing C1 event ID in
+the same category. Preserve source IDs and files; record any verified
+publication date and usable forecast anchor as separate, versioned metadata.
+
 The conservative [date-screened C1 manifest](../../splits/manifests/purged_split_c1_date_screen_v1.json)
 excludes all 882 Reuters candidates and the one additional source-verified
 Zacks record. It retains 6,167 train, 2,302 validation, and 2,236 test
@@ -144,10 +152,10 @@ new version.
 
 Adaeze's October 29 [Google Doc notes](https://docs.google.com/document/d/1FIIKD5c7RfsOzfk5lfy0GKHgZAddM-3slggN4DYq1j0/edit?tab=t.0)
 raise the original split overlap and propose log returns, directional loss,
-and operational metrics. The November 11 notes propose A–E gate/MoE tests.
-Those are useful **separate modeling experiments**. C1 already addresses the
-known cross-split overlap. Neither section supplies a verified publication
-date for these article files, so the date audit is the immediate data repair.
-Adaeze can send two specific additional data corrections for this record;
-proposed architecture or target changes should be assessed after the corrected
-baseline and should not silently change its definition.
+operational metrics, and volatility-conditioned gating. A later November 11
+section proposes A–E gate/MoE tests; do not assume that section is Adaeze's
+work. These are **modeling and evaluation experiments**, not requests for
+article-date corrections. C1 already addresses the known cross-split overlap.
+The date audit is a separate data-integrity task owned by Nicole. Discuss
+which one or two of Adaeze's proposed experiments to prioritize; keep each
+variant separate from the corrected C1 baseline.
