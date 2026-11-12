@@ -1,5 +1,12 @@
 # Team workflow, decisions, and work ownership
 
+**November 12 return-task decision:** Adaeze accepted cumulative log-return
+forecasting and complete magnitude-plus-direction gate supervision. Read the
+[return design and Nicole handoff](docs/updates/2026-11-12-return-design-handoff.md)
+before preparing a new baseline. It incorporates Nicole's separate article-date
+screen and lists implementation/smoke conditions. Existing C1 price-training
+scripts do not implement this new task.
+
 **Recorded November 4, 2026.** This is the starting point for post-midterm work.
 It records the confirmed C1 decision and TA work split, then makes the working
 plan and pending handoffs explicit. Coding agents should also read [AGENTS.md](AGENTS.md).
