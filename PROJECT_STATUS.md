@@ -35,13 +35,31 @@ account balance and queue can change; query them before planning more compute.
 Large checkpoints, raw articles/prices, and full prediction NPZ files stay on
 Delta. GitHub holds code, commands, hashes, and shareable derived records.
 
-## Next team decision
+## Alternative GPU resource
 
-For the Wednesday meeting, review the merged C1 protocol, choose an owner and
-policy for article/price timing, and have each diagnostic owner bring an
-artifact link or concrete blocker. Adaeze can debug gate instrumentation on
-Nicole's 16-event checkpoint, but matched C1 gate claims need a completed full
-C1 checkpoint. Joye's historical jobs should not be relabelled as C1 merely
+On November 12, Nicole submitted an ACCESS exchange request for **100 SDSC
+Expanse GPU-hours and 200 GB of Expanse Projects Storage** (5,585 ACCESS
+credits). The portal showed the request **Under Review**. It is a single pool
+for the team project, not a per-person allocation; the existing 972 remaining
+Delta GPU-hours were left unchanged. The [course migration note](https://piazza.com/class/mo4ko44arnc3sg/post/659)
+allows other ACCESS resources, and the [ACCESS exchange guide](https://allocations.access-ci.org/how-to)
+explains provider approval.
+
+Do not treat the request as Expanse access yet. After approval, check each
+teammate's Expanse access in ACCESS Users + Roles and complete any account
+provisioning. Transfer only authorized inputs and model files through Globus,
+verify hashes and permissions, then run a short Expanse Slurm memory/environment
+check before submitting full C1 training and dependent paired controls. Standard
+Expanse GPUs are 32 GB V100s, so the A100-tested configuration may need an
+adjustment. Keep the Delta jobs queued until an alternative run is ready.
+
+## Next team actions
+
+Check the Delta queue and Expanse exchange status, choose an owner and policy
+for article/price timing, and have each diagnostic owner link an artifact or
+record a concrete blocker. Adaeze can debug gate instrumentation on Nicole's
+16-event checkpoint, but matched C1 gate claims need a completed full C1
+checkpoint. Joye's historical jobs should not be relabelled as C1 merely
 because C1 code later merged to `main`.
 
 ## History and maintenance
