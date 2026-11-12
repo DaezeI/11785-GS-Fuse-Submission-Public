@@ -1,0 +1,38 @@
+{
+  "status": "verified_date_conflict",
+  "folder_date": "2023-12-16",
+  "c1_role": "test",
+  "decision": "quarantine_from_date_corrected_c1_until_reanchored_or_excluded_in_versioned_manifest",
+  "records": [
+    {
+      "event_id": "8/20231216.txt",
+      "source_date": "2023-12-21",
+      "source_url": "https://www.zacks.com/stock/news/2201083/bring-on-santa-economic-prints-mostly-favorable?art_rec=blog-ahead_of_wall_street-up_next-ID01-img-2201083",
+      "summary_sha256": "ea708915c2c55e6b7830610e10d4f58dcf95113c94bdc145961515637a4fd34d"
+    },
+    {
+      "event_id": "9/20231216.txt",
+      "source_date": "2023-12-19",
+      "source_url": "https://www.investing.com/news/economy/futures-inch-up-as-investors-pin-hopes-on-fed-rate-cuts-3259697",
+      "summary_sha256": "a64929ee3f067dad286360ea44cdf0a25ef4511eadbe2796118f7ad72e76a6cc"
+    },
+    {
+      "event_id": "10/20231216.txt",
+      "source_date": "2023-12-20",
+      "source_url": "https://www.investing.com/news/economy/futures-take-a-breather-after-rally-fedex-slides-3260613",
+      "summary_sha256": "874eff8987dde9bcc61d3289bbce390e6587a50b54aadfd79b5d0a73ae31f4de"
+    },
+    {
+      "event_id": "11/20231216.txt",
+      "source_date": "2023-12-19",
+      "source_url": "https://wtvbam.com/2023/12/19/futures-inch-up-as-investors-pin-hopes-on-fed-rate-cuts/",
+      "summary_sha256": "9f6377c2aad46e95a1d037c6bab36ca767e4bea96792b2723e20beaf14ffa4e7"
+    },
+    {
+      "event_id": "12/20231216.txt",
+      "source_date": "2023-12-19",
+      "source_url": "https://finance.yahoo.com/news/us-natgas-prices-ease-record-153026461.html",
+      "summary_sha256": "25d37bbb277767ffa4e834180c9e7d9bc1e0dbb3faa90bad6971b8217d346d7e"
+    }
+  ]
+}
