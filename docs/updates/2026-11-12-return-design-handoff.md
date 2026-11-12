@@ -1,9 +1,8 @@
 # C1 return forecasting decisions and implementation handoff
 
-Adaeze's handoff to Nicole, November 12, 2026. Status: design accepted;
-return training implementation and GPU validation pending. This change supplies
-the implementation contract; it does not make the existing launch scripts run
-the new task.
+Adaeze's handoff to Nicole, November 12, 2026. Status: design accepted; initial
+return-task implementation prepared; project-environment and GPU validation
+pending. The existing date-screened launch scripts still do not run the new task.
 
 ## Submission decision
 
@@ -23,6 +22,12 @@ The remote was fetched for this review. Shared `main` at `2bb71c1` already
 contains C1 integration, all-stage loader coverage, paired text controls, and
 Jessica's padding fixes. The older local checkout was 26 commits behind it.
 Do not rebuild C1 loading from that stale checkout.
+
+A fresh follow-up fetch on November 12 found the same remote heads:
+`origin/main` at `2bb71c1` and Nicole's audit branch at `316455d`. The latter
+still records screened real-input audit job `23835057` as pending and contains
+no committed pass result or emitted-window artifact for the screened subset.
+The screened audit therefore remains unverified from repository evidence.
 
 Nicole's branch `nicole/c1-article-date-audit` at `316455d` adds the
 [article-date audit](https://github.com/DaezeI/11785-GS-Fuse/blob/316455d/analysis/text_value/ARTICLE_DATE_AUDIT.md),
@@ -124,6 +129,19 @@ gain/clamp for the first pilot and record its adaptive scale distribution.
 | Checkpoint loader/saver | Save task metadata plus resolved loss settings/scale, shortcut flags, code/data versions | Reject price-space or incompatible-anchor stage checkpoint resume in a return run |
 | Return launch config | Fresh output; disable unverified resume; use audited screened manifest; explicit task mode | Loading the launch configuration fails if return support is absent, rather than falling back to the price default |
 
+The first focused implementation slice on this branch now adds the pure return
+transform/loss/metric helpers, C1 event and Stage-1 return mode, training-only
+loss-scale resolution and population hash, explicit task options and resolved
+configuration, all-stage return task loss, strict pre-cross-attention TS gate
+reference, and checkpoint task compatibility checks. Focused tensor tests were
+added, and Python syntax compilation passed. They have not run in this Windows
+checkout because its available interpreter lacks PyTorch and pytest.
+
+This is not yet the full submission-ready package. The screened real-input audit,
+focused tensor tests in the project environment, independent shortcut flags,
+saved aligned evaluation artifacts/DHR aggregation, a real three-stage GPU smoke,
+checkpoint reload, and paired learned/fixed-gate execution remain required.
+
 Strict TS training must not reuse the text-conditioned `s_vec_residual`. Reuse
 untouched TS encoder outputs and permitted raw historical shortcut inputs. Keep
 the gate-target construction detached; use a separate differentiable TS forecast
@@ -152,9 +170,15 @@ for the return task. Start fresh trainable projections/decoder stages unless a
 separate compatible initialization experiment is explicitly recorded. Frozen
 pretrained encoders and a provenance-matched frozen text cache may be reused.
 
-Evaluate return MSE/MAE, endpoint close DHR at 35/70/140 with eligible counts,
-reconstructed price errors, zero-return and training-majority-direction
-references. Estimate uncertainty by event date because events share windows.
+Train on return targets with Huber magnitude plus the directional penalty, and
+use that complete forecasting task loss for gate supervision. Primary evaluation
+reports return error, endpoint close DHR at 35/70/140 with eligible counts, and
+paired text/gate comparisons. Return MAE/MSE are reporting metrics; they do not
+replace the chosen training objective. Compare with zero-return and
+training-majority-direction references on the same eligible events. Reconstructed
+price errors are optional historical comparisons, not the primary objective or
+model-selection criterion. Estimate uncertainty by event date because events
+share windows.
 Learned versus fixed 50/50 at inference tests dependence on the learned mixture;
 it does not replace a separately trained fixed-gate architecture comparison.
 

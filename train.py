@@ -8,6 +8,7 @@ import argparse
 import os
 import warnings
 import json
+import random
 from pathlib import Path
 
 # Auto-resolve nested repository directory
@@ -19,11 +20,13 @@ sys.path.insert(0, repo_dir)
 os.chdir(repo_dir)
 
 import torch
+import numpy as np
 
 from data.dataloader import event_set
 from data.sliding_window_dataloader import sliding_window_set
 from model import tracking
 from model.gs_fuse import GSFuse, train_three_stage
+from data.forecast_task import ForecastTaskConfig
 
 warnings.simplefilter("ignore")
 warnings.filterwarnings(
@@ -57,6 +60,17 @@ def parse_args():
                    help="Exclude and report incomplete C1 inputs instead of failing")
     p.add_argument("--c1-allow-resume", action="store_true",
                    help="Resume only after independently verifying existing checkpoints used C1")
+    p.add_argument("--forecast-task", choices=["price", "return_bp"], default="price")
+    p.add_argument("--return-scale-bp", type=float, default=None,
+                   help="Reuse a previously frozen training scale; otherwise compute it from C1 train")
+    p.add_argument("--huber-delta-bp", type=float, default=None,
+                   help="Return Huber threshold; defaults to the resolved return scale")
+    p.add_argument("--direction-tau-bp", type=float, default=None,
+                   help="Directional softplus temperature; defaults to the resolved return scale")
+    p.add_argument("--direction-deadband-bp", type=float, default=0.0)
+    p.add_argument("--direction-weight", type=float, default=1.0)
+    p.add_argument("--direction-horizons", type=int, nargs="+", default=[35, 70, 140])
+    p.add_argument("--seed", type=int, default=0)
 
     p.add_argument("--series-id", type=str, default="SP500")
     p.add_argument("--event-id", type=int, default=0)
@@ -100,6 +114,14 @@ def parse_args():
 
 def main():
     args = parse_args()
+    random.seed(args.seed)
+    np.random.seed(args.seed)
+    torch.manual_seed(args.seed)
+    if torch.cuda.is_available():
+        torch.cuda.manual_seed_all(args.seed)
+
+    if args.forecast_task == "return_bp" and not args.c1_manifest:
+        raise ValueError("--forecast-task return_bp requires --c1-manifest")
 
     if args.ts_backbone == "moment" and not args.moment_path:
         raise ValueError("--moment-path is required when --ts-backbone moment")
@@ -131,9 +153,17 @@ def main():
             Path(args.series_dir) / f"{args.series_id}.csv",
             seq_len=args.seq_len, pred_len=args.pred_len,
             batch_size=args.batch_size, sw_stride=args.sw_stride,
-            timing_policy=args.c1_timing_policy, skip_missing=args.c1_skip_missing)
+            timing_policy=args.c1_timing_policy, skip_missing=args.c1_skip_missing,
+            task_mode=args.forecast_task, return_scale_bp=args.return_scale_bp,
+            huber_delta_bp=args.huber_delta_bp, direction_tau_bp=args.direction_tau_bp,
+            direction_deadband_bp=args.direction_deadband_bp,
+            direction_weight=args.direction_weight,
+            direction_horizons=tuple(args.direction_horizons), seed=args.seed)
         output.mkdir(parents=True, exist_ok=True)
         (output / "c1_data_audit.json").write_text(json.dumps(events.audit, indent=2) + "\n")
+        resolved = vars(args).copy()
+        resolved["forecast_task_config"] = events.task_config.to_dict()
+        (output / "resolved_config.json").write_text(json.dumps(resolved, indent=2) + "\n")
         sw_train_loader, sw_vali_loader = events.sw_train_loader, events.sw_vali_loader
     else:
         events = event_set(
@@ -173,6 +203,7 @@ def main():
         moe_top_k=args.moe_top_k,
         num_queries=args.num_queries,
         qformer_layers=args.qformer_layers,
+        forecast_task_config=(events.task_config if args.c1_manifest else ForecastTaskConfig()),
     )
 
     variant_name = f"fusion={args.fusion_type}, gate={args.gate_type}"

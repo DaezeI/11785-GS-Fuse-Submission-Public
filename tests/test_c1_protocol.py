@@ -6,6 +6,7 @@ from pathlib import Path
 import numpy as np
 import pandas as pd
 import pytest
+import torch
 
 from data.c1_protocol import build_c1_dataloaders, event_key, load_price_timeline
 
@@ -105,3 +106,31 @@ def test_c1_requires_explicit_timing(tmp_path):
     manifest, event_dir, series = fixture_inputs(tmp_path)
     with pytest.raises(ValueError, match="explicit timing_policy"):
         build_c1_dataloaders(manifest, event_dir, series, seq_len=2, pred_len=2)
+
+
+def test_c1_return_mode_transforms_every_stage_and_records_anchors(tmp_path):
+    manifest, event_dir, series = fixture_inputs(tmp_path)
+    data = build_c1_dataloaders(
+        manifest, event_dir, series, seq_len=2, pred_len=2, batch_size=3,
+        sw_stride=1, timing_policy="category4_1400_strict_before",
+        task_mode="return_bp", direction_horizons=(1, 2),
+    )
+    assert data.scaler is None
+    assert data.task_config.task == "return_bp"
+    assert data.audit["forecast_task"]["units"] == "basis_point_log_return"
+    assert data.audit["return_scale_population_events"] == 12
+
+    raw_seq, raw_target = data.train_set[0][3:5]
+    return_seq, return_target = data.train_set[0][5:7]
+    anchor = data.train_set.windows[0]["anchor_close"]
+    assert return_seq[3, -1].item() == pytest.approx(0.0)
+    assert torch.allclose(
+        torch.exp(return_target / 10_000) * anchor, raw_target, rtol=1e-5, atol=1e-5
+    )
+    sw_raw_seq, sw_raw_target, sw_return_seq, sw_return_target = data.sw_train_set[0]
+    sw_anchor = sw_raw_seq[3, -1]
+    assert sw_return_seq[3, -1].item() == pytest.approx(0.0)
+    assert torch.allclose(
+        torch.exp(sw_return_target / 10_000) * sw_anchor,
+        sw_raw_target, rtol=1e-5, atol=1e-5,
+    )

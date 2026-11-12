@@ -28,6 +28,12 @@ from model.text_encoders import build_text_encoder
 from model.variants import MoEModalityGate, QFormerFusion
 from model import tracking
 from model.text_cache import TextEmbeddingCache, cache_signature
+from data.forecast_task import (
+    ForecastTaskConfig,
+    RETURN_TASK,
+    forecast_training_loss,
+    gate_supervision_target,
+)
 
 
 
@@ -618,6 +624,7 @@ class GSFuse(nn.Module):
             moe_top_k=2,
             num_queries=16,
             qformer_layers=2,
+            forecast_task_config=None,
             # legacy aliases
             llama_name=None,
     ):
@@ -642,6 +649,11 @@ class GSFuse(nn.Module):
         self.max_text_tokens = max_token_num
         self.ts_backbone = ts_backbone
         self.text_backbone = text_backbone
+        if forecast_task_config is None:
+            forecast_task_config = ForecastTaskConfig()
+        elif isinstance(forecast_task_config, dict):
+            forecast_task_config = ForecastTaskConfig(**forecast_task_config)
+        self.forecast_task_config = forecast_task_config
 
         # -------- Text encoder (LLaMA or Phi) --------
         self.text_encoder = build_text_encoder(text_backbone, text_model_path, use_4bit=USE_4BIT)
@@ -1033,6 +1045,10 @@ class GSFuse(nn.Module):
             output = core
         return output
 
+    def predict_strict_ts_only(self, ts_inst: torch.Tensor, x_cf: torch.Tensor) -> torch.Tensor:
+        """Decode from pre-cross-attention TS features only."""
+        return self.predict_ts_only_full_decoder(None, None, ts_inst, x_cf)
+
     def predict_text_only_full_decoder(self, text_tok: torch.Tensor, text_mask: torch.Tensor,
                                        t_vec_residual: torch.Tensor, x_cf: torch.Tensor) -> torch.Tensor:
         t_vec_norm = F.normalize(t_vec_residual, p=2, dim=-1)
@@ -1274,6 +1290,7 @@ class GSFuse(nn.Module):
             "gate_tau": float(getattr(self, "gate_tau", 1.0)),
             "num_heads_cross": int(NUM_HEADS),
             "device": str(self.device),
+            "forecast_task": self.forecast_task_config.to_dict(),
         }
 
     def save_model_combined(self, save_path="model_checkpoint.pth", **kwargs):
@@ -1328,6 +1345,15 @@ class GSFuse(nn.Module):
         ckpt = torch.load(save_path, map_location="cpu")
         sd = ckpt["state_dicts"]
         meta = ckpt.get("metadata", {})
+        saved_task = meta.get("forecast_task")
+        current_task = self.forecast_task_config.task
+        saved_task_name = saved_task.get("task") if isinstance(saved_task, dict) else None
+        if current_task == RETURN_TASK and saved_task_name != RETURN_TASK:
+            raise ValueError(
+                "Cannot resume a return run from a price-space or unlabelled checkpoint"
+            )
+        if saved_task_name == RETURN_TASK and saved_task != self.forecast_task_config.to_dict():
+            raise ValueError("Return checkpoint task metadata does not match this run")
 
         if "ts_encoder" in sd and sd["ts_encoder"] is not None:
             try:
@@ -1479,6 +1505,15 @@ def weighted_mse_mae(y_hat, y_true, h_w):
     se = (se * h_w).sum(dim=-1).mean()
     l1 = (l1 * h_w).sum(dim=-1).mean()
     return se, l1
+
+
+def gate_task_loss_per_event(model, prediction, target):
+    """Complete return task for the redesigned gate; legacy MSE for price runs."""
+    if model.forecast_task_config.task == RETURN_TASK:
+        return forecast_training_loss(
+            prediction, target, model.forecast_task_config, reduction="none"
+        )
+    return (prediction - target).square().mean(dim=(1, 2))
 
 
 # ============================= Train / Eval ==================================
@@ -1961,7 +1996,11 @@ def train(model, train_loader, test_loader, vali_loader, num_epochs, output_path
             )
 
             target = batch_pred_scale.float().to(device)
-            if h_w is not None:
+            if model.forecast_task_config.task == RETURN_TASK:
+                core_reg = forecast_training_loss(
+                    output.float(), target, model.forecast_task_config
+                )
+            elif h_w is not None:
                 mse_w, mae_w = weighted_mse_mae(output.float(), target, h_w)
                 core_reg = 0.7 * mse_w + 0.3 * mae_w
             else:
@@ -1994,28 +2033,21 @@ def train(model, train_loader, test_loader, vali_loader, num_epochs, output_path
                 gate = analysis["gate_softmax"]
                 gate_text_scalar = gate[:, 0, :].mean(dim=-1)
 
-                s_vec_residual = analysis.get("s_vec_residual")
-                if s_vec_residual is not None:
+                ts_inst = analysis.get("ts_inst")
+                if ts_inst is not None:
                     with torch.no_grad():
-                        ts_only_pred = model.predict_ts_only_full_decoder(
-                            analysis["ts_tokens"], analysis["ts_mask"], s_vec_residual, analysis["x_cf"]
-                        )
-                    err_ts = ((ts_only_pred - target) ** 2).mean(dim=(1, 2))
-                    err_full = ((output - target) ** 2).mean(dim=(1, 2))
+                        ts_only_pred = model.predict_strict_ts_only(ts_inst, analysis["x_cf"])
+                    err_ts = gate_task_loss_per_event(model, ts_only_pred, target)
+                    err_full = gate_task_loss_per_event(model, output, target)
 
-                    diff = (err_ts - err_full)
-
-                    if TrainingConfig.GC_USE_ADAPTIVE_SCALE:
-                        s = torch.clamp(diff.detach().abs().mean(), min=TrainingConfig.GC_MIN_SCALE)
-                    else:
-                        s = torch.tensor(TrainingConfig.GC_SIGMOID_SCALE, device=diff.device, dtype=diff.dtype)
-
-                    logit = TrainingConfig.GC_GAIN * diff / s
-                    logit = torch.clamp(logit, -TrainingConfig.GC_LOGIT_CLAMP, TrainingConfig.GC_LOGIT_CLAMP)
-
-                    gc_score = torch.sigmoid(logit).detach()
-
-                    # gc_score = torch.sigmoid(err_ts - err_full).detach()
+                    gc_score, diff = gate_supervision_target(
+                        err_ts, err_full,
+                        adaptive=TrainingConfig.GC_USE_ADAPTIVE_SCALE,
+                        fixed_scale=TrainingConfig.GC_SIGMOID_SCALE,
+                        min_scale=TrainingConfig.GC_MIN_SCALE,
+                        gain=TrainingConfig.GC_GAIN,
+                        logit_clamp=TrainingConfig.GC_LOGIT_CLAMP,
+                    )
 
                     gate_gc_loss = F.mse_loss(gate_text_scalar, gc_score)
                     combined_loss = combined_loss + gate_causal_lambda * gate_gc_loss
@@ -2047,15 +2079,18 @@ def train(model, train_loader, test_loader, vali_loader, num_epochs, output_path
 
             ts_only_lambda = TrainingConfig.TS_ONLY_LAMBDA if not simplified_mode else 0.0
             if ts_only_lambda > 0 and analysis is not None:
-                s_vec_residual = analysis.get("s_vec_residual")
                 ts_tokens = analysis.get("ts_tokens")
                 ts_mask = analysis.get("ts_mask")
+                ts_inst = analysis.get("ts_inst")
                 x_cf = analysis.get("x_cf")
-                if s_vec_residual is not None and ts_tokens is not None and x_cf is not None:
-                    ts_only_pred = model.predict_ts_only_full_decoder(
-                        ts_tokens, ts_mask, s_vec_residual, x_cf
-                    )
-                    ts_only_loss = F.mse_loss(ts_only_pred.float(), target)
+                if ts_inst is not None and ts_tokens is not None and x_cf is not None:
+                    ts_only_pred = model.predict_strict_ts_only(ts_inst, x_cf)
+                    if model.forecast_task_config.task == RETURN_TASK:
+                        ts_only_loss = forecast_training_loss(
+                            ts_only_pred.float(), target, model.forecast_task_config
+                        )
+                    else:
+                        ts_only_loss = F.mse_loss(ts_only_pred.float(), target)
                     combined_loss = combined_loss + ts_only_lambda * ts_only_loss
                     loss_ts_only = float(ts_only_loss.detach().cpu()) * ts_only_lambda
 
@@ -2119,15 +2154,15 @@ def train(model, train_loader, test_loader, vali_loader, num_epochs, output_path
                 ts_tokens = analysis.get("ts_tokens")
                 text_mask = analysis.get("text_mask")
                 ts_mask = analysis.get("ts_mask")
+                ts_inst = analysis.get("ts_inst")
                 x_cf = analysis.get("x_cf")
 
                 if (t_vec_residual is not None and s_vec_residual is not None and
                         text_tokens is not None and ts_tokens is not None and
-                        text_mask is not None and ts_mask is not None and x_cf is not None):
+                        text_mask is not None and ts_mask is not None and ts_inst is not None and
+                        x_cf is not None):
                     with torch.no_grad():
-                        ts_only_pred_eval = model.predict_ts_only_full_decoder(
-                            ts_tokens, ts_mask, s_vec_residual, x_cf
-                        )
+                        ts_only_pred_eval = model.predict_strict_ts_only(ts_inst, x_cf)
                         text_only_pred_eval = model.predict_text_only_full_decoder(
                             text_tokens, text_mask, t_vec_residual, x_cf
                         )
@@ -2139,9 +2174,9 @@ def train(model, train_loader, test_loader, vali_loader, num_epochs, output_path
                         ts_only_sm = smape(ts_only_pred_eval.float(), target.float())
                         text_only_sm = smape(text_only_pred_eval.float(), target.float())
 
-                        err_full = ((output.float() - target.float()) ** 2).mean(dim=(1, 2))
-                        err_ts = ((ts_only_pred_eval.float() - target.float()) ** 2).mean(dim=(1, 2))
-                        err_text = ((text_only_pred_eval.float() - target.float()) ** 2).mean(dim=(1, 2))
+                        err_full = gate_task_loss_per_event(model, output.float(), target.float())
+                        err_ts = gate_task_loss_per_event(model, ts_only_pred_eval.float(), target.float())
+                        err_text = gate_task_loss_per_event(model, text_only_pred_eval.float(), target.float())
 
                         err_ts_safe = torch.clamp(err_ts, min=1e-8)
                         err_text_safe = torch.clamp(err_text, min=1e-8)
@@ -2257,7 +2292,11 @@ def train(model, train_loader, test_loader, vali_loader, num_epochs, output_path
         model_output_path = output_path or "./model_output"
         Path(model_output_path).mkdir(parents=True, exist_ok=True)
 
-        lastest_loss = float(vali_mse_loss)
+        # Return MSE is an evaluation metric, not the return training objective.
+        lastest_loss = float(
+            vali_combine_loss if model.forecast_task_config.task == RETURN_TASK
+            else vali_mse_loss
+        )
         if lastest_loss < best_loss:
             best_loss = lastest_loss
             _backup = swap_to_ema()
@@ -2389,7 +2428,9 @@ def test(model, test_loader, return_analysis: bool = False,
         target = batch_pred_scale.to(device)
 
         # ---------------- main horizon loss (UNCHANGED) ----------------
-        if h_w is not None:
+        if model.forecast_task_config.task == RETURN_TASK:
+            core_reg = forecast_training_loss(output, target, model.forecast_task_config)
+        elif h_w is not None:
             mse_w, mae_w = weighted_mse_mae(output, target, h_w)
             core_reg = 0.7 * mse_w + 0.3 * mae_w
         else:
@@ -2440,14 +2481,14 @@ def test(model, test_loader, return_analysis: bool = False,
             ts_tokens = analysis.get("ts_tokens")
             text_mask = analysis.get("text_mask")
             ts_mask = analysis.get("ts_mask")
+            ts_inst = analysis.get("ts_inst")
             x_cf = analysis.get("x_cf")
 
             if (t_vec_residual is not None and s_vec_residual is not None and
-                    text_tokens is not None and ts_tokens is not None and x_cf is not None):
+                    text_tokens is not None and ts_tokens is not None and ts_inst is not None and
+                    x_cf is not None):
 
-                ts_only_pred = model.predict_ts_only_full_decoder(
-                    ts_tokens, ts_mask, s_vec_residual, x_cf
-                )
+                ts_only_pred = model.predict_strict_ts_only(ts_inst, x_cf)
                 ts_only_mse = nn.MSELoss()(ts_only_pred, target)
                 ts_only_mae = nn.L1Loss()(ts_only_pred, target)
                 ts_only_mse_output += float(ts_only_mse.detach().cpu())
@@ -2464,9 +2505,9 @@ def test(model, test_loader, return_analysis: bool = False,
                 text_only_smape_output += float(smape(text_only_pred.float(), target.float()).detach().cpu())
 
                 # ---- main horizon modality scores (UNCHANGED) ----
-                err_full = ((output - target) ** 2).mean(dim=(1, 2))
-                err_ts = ((ts_only_pred - target) ** 2).mean(dim=(1, 2))
-                err_text = ((text_only_pred - target) ** 2).mean(dim=(1, 2))
+                err_full = gate_task_loss_per_event(model, output, target)
+                err_ts = gate_task_loss_per_event(model, ts_only_pred, target)
+                err_text = gate_task_loss_per_event(model, text_only_pred, target)
 
                 diff_ts = (err_ts - err_full)
                 diff_text = (err_text - err_full)
@@ -2956,10 +2997,9 @@ def train_stage1_ts_only(model, sw_train_loader, sw_vali_loader, num_epochs=None
 
             target = batch_pred_scale.float().to(device)
 
-            # Simple regression loss
-            mse_loss = criterion_mse(output, target)
-            mae_loss = criterion_mae(output, target)
-            combined_loss = 0.7 * mse_loss + 0.3 * mae_loss
+            combined_loss = forecast_training_loss(
+                output, target, model.forecast_task_config
+            )
 
             combined_loss.backward()
             clip_grad_norm_(model.parameters(), max_norm=TrainingConfig.GRAD_CLIP_NORM)
@@ -3000,14 +3040,18 @@ def train_stage1_ts_only(model, sw_train_loader, sw_vali_loader, num_epochs=None
                     output = core
 
                 target = batch_pred_scale.float().to(device)
-                vali_loss += float(nn.MSELoss()(output, target).detach().cpu())
+                vali_loss += float(forecast_training_loss(
+                    output, target, model.forecast_task_config
+                ).detach().cpu())
 
         vali_loss /= max(1, len(sw_vali_loader))
 
-        msg = f'[Stage 1] Epoch {epoch + 1}/{num_epochs} | Train Loss: {epoch_avg_loss:.6f} | Train SMAPE: {epoch_avg_smape:.4f} | Vali MSE: {vali_loss:.6f}'
+        vali_label = "Task Loss" if model.forecast_task_config.task == RETURN_TASK else "MSE"
+        vali_key = "vali/task_loss" if model.forecast_task_config.task == RETURN_TASK else "vali/mse"
+        msg = f'[Stage 1] Epoch {epoch + 1}/{num_epochs} | Train Loss: {epoch_avg_loss:.6f} | Train SMAPE: {epoch_avg_smape:.4f} | Vali {vali_label}: {vali_loss:.6f}'
         print(msg)
         tracking.log({"epoch": epoch + 1, "train/loss": epoch_avg_loss, "train/smape": epoch_avg_smape,
-                      "vali/mse": vali_loss},
+                      vali_key: vali_loss},
                      stage="stage1", step=(epoch + 1) * len(sw_train_loader))
         log_file += msg + "\n"
 
@@ -3017,9 +3061,9 @@ def train_stage1_ts_only(model, sw_train_loader, sw_vali_loader, num_epochs=None
                 save_path = os.path.join(output_path, "stage1_best_model.pth")
                 Path(output_path).mkdir(parents=True, exist_ok=True)
                 model.save_model_combined(save_path=save_path)
-                print(f'[Stage 1] Saved best model with Vali MSE: {vali_loss:.6f}')
+                print(f'[Stage 1] Saved best model with Vali {vali_label}: {vali_loss:.6f}')
 
-    print(f"[Stage 1] Completed. Best Vali MSE: {best_loss:.6f}")
+    print(f"[Stage 1] Completed. Best Vali {vali_label}: {best_loss:.6f}")
     return log_file
 
 
@@ -3143,10 +3187,9 @@ def train_stage2_text_only(model, train_loader, vali_loader, num_epochs=None, ou
 
             target = batch_pred_scale.float().to(device)
 
-            # Simple regression loss
-            mse_loss = criterion_mse(output, target)
-            mae_loss = criterion_mae(output, target)
-            combined_loss = 0.7 * mse_loss + 0.3 * mae_loss
+            combined_loss = forecast_training_loss(
+                output, target, model.forecast_task_config
+            )
 
             combined_loss.backward()
             clip_grad_norm_(model.parameters(), max_norm=TrainingConfig.GRAD_CLIP_NORM)
@@ -3196,14 +3239,18 @@ def train_stage2_text_only(model, train_loader, vali_loader, num_epochs=None, ou
                     output = core
 
                 target = batch_pred_scale.float().to(device)
-                vali_loss += float(nn.MSELoss()(output, target).detach().cpu())
+                vali_loss += float(forecast_training_loss(
+                    output, target, model.forecast_task_config
+                ).detach().cpu())
 
         vali_loss /= max(1, len(vali_loader))
 
-        msg = f'[Stage 2] Epoch {epoch + 1}/{num_epochs} | Train Loss: {epoch_avg_loss:.6f} | Train SMAPE: {epoch_avg_smape:.4f} | Vali MSE: {vali_loss:.6f}'
+        vali_label = "Task Loss" if model.forecast_task_config.task == RETURN_TASK else "MSE"
+        vali_key = "vali/task_loss" if model.forecast_task_config.task == RETURN_TASK else "vali/mse"
+        msg = f'[Stage 2] Epoch {epoch + 1}/{num_epochs} | Train Loss: {epoch_avg_loss:.6f} | Train SMAPE: {epoch_avg_smape:.4f} | Vali {vali_label}: {vali_loss:.6f}'
         print(msg)
         tracking.log({"epoch": epoch + 1, "train/loss": epoch_avg_loss, "train/smape": epoch_avg_smape,
-                      "vali/mse": vali_loss},
+                      vali_key: vali_loss},
                      stage="stage2", step=(epoch + 1) * len(train_loader))
         log_file += msg + "\n"
 
@@ -3213,9 +3260,9 @@ def train_stage2_text_only(model, train_loader, vali_loader, num_epochs=None, ou
                 save_path = os.path.join(output_path, "stage2_best_model.pth")
                 Path(output_path).mkdir(parents=True, exist_ok=True)
                 model.save_model_combined(save_path=save_path)
-                print(f'[Stage 2] Saved best model with Vali MSE: {vali_loss:.6f}')
+                print(f'[Stage 2] Saved best model with Vali {vali_label}: {vali_loss:.6f}')
 
-    print(f"[Stage 2] Completed. Best Vali MSE: {best_loss:.6f}")
+    print(f"[Stage 2] Completed. Best Vali {vali_label}: {best_loss:.6f}")
     return log_file
 
 
