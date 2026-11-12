@@ -4,6 +4,12 @@ Read [TEAM_WORKFLOW.md](TEAM_WORKFLOW.md) first. It records the November 4 team
 decision, ownership, implementation gaps, and experiment handoff requirements.
 Follow current user instructions when they update this plan.
 
+Then read [PROJECT_STATUS.md](PROJECT_STATUS.md) for current progress and any
+relevant dated update for historical context. Preserve the distinction between
+verified code/results, teammate reports, queued jobs, and proposed work.
+Develop on personal/task branches and open focused PRs for ready changes, following
+the November 5 meeting guidance recorded in the update.
+
 ## Ownership and agreed protocol
 
 - **C1 is the main split:** `splits/manifests/purged_split_c1_macro_eras.json`.
@@ -18,7 +24,7 @@ Follow current user instructions when they update this plan.
 ## Verify actual implementation and provenance
 
 - At the workflow document's November 4 baseline, `train.py` and
-  `scripts/run_text_controls.py` still used original loaders. PR #4 now adds
+  `scripts/run_text_controls.py` still used original loaders. Merged PR #4 adds
   opt-in C1 integration through the normal entrypoints; review the actual
   loader and emitted-window audit rather than inferring provenance from a name.
 - All training stages, preprocessing fits, and training negative-report pools
@@ -30,7 +36,7 @@ Follow current user instructions when they update this plan.
 - The built-in TS-only comparison uses text-conditioned price features.
   `model/no_text_control.py` supplies inference controls; it does not itself fix
   gate training supervision.
-- Nicole's CPU analysis and 25 focused tests ran. PR #4 adds five C1 tests,
+- Nicole's CPU analysis and 25 focused tests ran. Merged PR #4 adds five C1 tests,
   a completed three-stage 16-event GPU smoke checkpoint, and paired controls
   on eight test events. See `analysis/text_value/C1_SMOKE_RESULTS.md`; the
   smoke result is not a full C1 benchmark.
@@ -50,6 +56,14 @@ Follow current user instructions when they update this plan.
   another teammate's login or checkpoint readiness from Nicole's jobs.
 - Use separate checkouts/output directories with common versioned inputs.
   Coordinate shared-function edits; preserve other contributors' work.
+- For every Delta run, follow the permanent team-readable handoff rule in
+  `TEAM_WORKFLOW.md`: commit the reusable Slurm script/configuration to the task
+  branch; use a named owner/run directory under `/work/hdd/bjjg/gs-fuse/runs/`
+  or verify group access to a personal project directory; set `umask 007` in
+  the batch script; and check that another teammate can read the run record.
+  Record the code commit, job ID, split, checkpoint, command, and output path
+  in a GitHub result note. Keep large outputs on Delta. Do not move a checkout
+  while its submitted jobs depend on its paths.
 - Follow repository rules and user authorization for publication. Do not invent
   extra approval requirements, impersonate reviewers, or bypass required checks.
 - Never commit credentials, tokens, private account records, raw data, or large

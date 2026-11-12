@@ -4,14 +4,14 @@
 It records the confirmed C1 decision and TA work split, then makes the working
 plan and pending handoffs explicit. Coding agents should also read [AGENTS.md](AGENTS.md).
 
-**November 10 status update:** Nicole's tested C1 integration, real-input
-audit, three-stage 16-event smoke checkpoint, and paired eight-test-event
-controls are in [PR #4](https://github.com/DaezeI/11785-GS-Fuse-Submission-Public/pull/4),
-open for review. See the [current technical handoff](analysis/text_value/C1_PROTOCOL.md),
+**Current status:** [PROJECT_STATUS.md](PROJECT_STATUS.md) tracks progress and
+handoffs after this November 4 workflow. Nicole's tested C1 integration and
+smoke controls merged in [PR #4](https://github.com/DaezeI/11785-GS-Fuse-Submission-Public/pull/4).
+See the [C1 protocol](analysis/text_value/C1_PROTOCOL.md),
 [smoke results](analysis/text_value/C1_SMOKE_RESULTS.md), and
-[dated team update](docs/updates/2026-11-10-c1-implementation.md). The smoke
-checkpoint is not a full C1 baseline. The historical state recorded below is
-identified where it predates this update.
+[November 11 run plan](analysis/text_value/C1_FULL_SENSITIVITY_PLAN.md).
+The [November 10 update](docs/updates/2026-11-10.md) is a historical snapshot;
+use the current status page for present-tense claims.
 
 ## 1. Agreed decisions and actual status
 
@@ -22,7 +22,7 @@ identified where it predates this update.
 | C3 | Outside the immediate plan. | Preserve its existing manifest; no new C3 experiment is required by this agreement. |
 | Work ownership | The TA-meeting split in Section 4. | Four diagnostic streams, with shared dependencies below. |
 | Nicole's initial contribution | [PR 1](https://github.com/DaezeI/11785-GS-Fuse-Submission-Public/pull/1) merged into `main`. | The audit, analysis, inference tools, tests, and results are available to everyone. |
-| C1 training integration | **Implemented and tested in open PR #4; pending review/merge.** | Normal training, smoke training, and paired evaluation now use the same opt-in C1 loader. Pull the PR branch to inspect before merge. |
+| C1 training integration | **Implemented, tested, and merged in PR #4 on November 11.** | Normal training, smoke training, and paired evaluation now use the same opt-in C1 loader in `main`. |
 | Nicole's full-model text-control evaluation | **Eight-event smoke completed on a new 16-training-event checkpoint.** | Correct, three shuffled seeds, and two separate article-free modes ran; these are execution checks, not a C1 benchmark. |
 | Jessica's text padding-mask fix | **Merged to `main` in commit `96cc6d7` on November 9.** | Her change propagates the tokenizer padding mask and adds three CPU unit tests. Her PR says full-model validation was not yet run; ask her to link any relevant Q-Former analysis missing from GitHub before assigning more work. |
 | Shared GPU resource | **NCSA Delta GPU** allocation confirmed in the team portal. | Joye coordinates the working setup; it is not confirmed ready by this document. |
@@ -65,6 +65,19 @@ GPU work goes through its scheduler. Follow the official
 [storage](https://docs.ncsa.illinois.edu/systems/delta/en/latest/user_guide/data_mgmt.html),
 and [job](https://docs.ncsa.illinois.edu/systems/delta/en/latest/user_guide/running_jobs.html)
 guides. Important outputs also need a backup; Delta is not the sole archive.
+
+**Permanent team-readable run handoff:** commit reusable Slurm scripts and
+configuration to GitHub on a task branch. Keep large checkpoints and raw
+predictions on Delta, and record each run's script, job ID, split, checkpoint,
+and output path in a GitHub result note. Store logs and outputs either in a
+named owner/run directory under `/work/hdd/bjjg/gs-fuse/runs/` **or** in a
+personal project directory whose parent directories and new files permit
+`delta_bjjg` access. The shared `/projects/bjjg/gs-fuse` and
+`/work/hdd/bjjg/gs-fuse` roots already have setgid and default group ACLs;
+personal directories need their own permissions checked. Set `umask 007` in
+batch scripts and verify access from another teammate's Delta account.
+Do not move an active checkout solely to share it: submitted Slurm jobs keep
+the original script, working-directory, and log paths.
 
 ## 3. The C1 protocol and remaining code gap
 
@@ -239,12 +252,12 @@ results once compute and common inputs are available.
 | Checkpoint | Owner | Evidence it is finished | Enables |
 |---|---|---|---|
 | A. Delta inputs and example | Joye; file owners supply existing assets | Login works; shared inputs verified; small job finishes; W&B/output links recorded | Everyone can execute jobs. |
-| B. C1 data integration | Nicole; Adaeze supplies exact existing split/filter code if needed | **Completed in open PR #4:** loader checks and emitted-window audit pass; timing assumptions recorded | Review/merge and plan corrected full training after timing decision. |
+| B. C1 data integration | Nicole; Adaeze supplies exact existing split/filter code if needed | **Completed and merged in PR #4:** loader checks and emitted-window audit pass; timing assumptions recorded | Plan corrected full training after timing decision. |
 | C. Shared C1 baseline | Joye coordinates; Nicole verifies data side | Recorded configuration, training history, checkpoint, predictions, metrics, and run link | Common reference and final C1 text controls. |
 | D. Per-stream diagnosis | Each owner above | Diagnostic scripts/results and controlled comparisons | Supported improvements and final-report conclusions. |
 
-A and B originally proceeded in parallel; Nicole's B is now implemented in
-open PR #4. Everyone can inspect code and write small tests now.
+A and B originally proceeded in parallel; Nicole's B is now merged in
+`main`. Everyone can inspect code and write small tests now.
 Historical checkpoints/logs support exploratory diagnosis while the common full
 C1 baseline is pending;
 label those results with their historical protocol. Final corrected performance
@@ -379,17 +392,15 @@ separate, and distinguish both from a separately trained price-only model.
 
 ### Start here, regardless of owner
 
-1. Read [PR #4](https://github.com/DaezeI/11785-GS-Fuse-Submission-Public/pull/4),
+1. Read [merged PR #4](https://github.com/DaezeI/11785-GS-Fuse-Submission-Public/pull/4),
    the [C1 protocol](analysis/text_value/C1_PROTOCOL.md), and the
-   [smoke result](analysis/text_value/C1_SMOKE_RESULTS.md). PR #4 is open as
-   of November 10; its branch is `nicole/c1-protocol-controls`. `main` does
-   not contain these changes until the PR merges. In a fresh checkout, fetch
-   the branch and create **your own** work branch from it if you need C1 code.
-   Preserve any existing local edits or separate branches.
+   [smoke result](analysis/text_value/C1_SMOKE_RESULTS.md). The C1 code is now
+   in `main`. In a fresh checkout, fetch `main` and create **your own** work
+   branch from it. Preserve existing local edits or separate branches.
 
    ```sh
    git fetch origin
-   git switch -c YOUR_TASK_BRANCH origin/nicole/c1-protocol-controls
+   git switch -c YOUR_TASK_BRANCH origin/main
    ```
 2. Treat the 16-training-event checkpoint and eight-test-event comparison as
    an execution check. They cannot establish model performance or text value.
@@ -512,7 +523,7 @@ GPU result is required for this meeting.
 
 ### Nicole — C1/text comparison and integration
 
-Review comments on PR #4, keep the audit/manifest hashes and explicit timing
+Keep the audit/manifest hashes and explicit timing
 policy in any revised run, and coordinate the timing decision above. After
 Joye supplies a provenance-checked full C1 checkpoint, run the paired controls
 on the same C1 test events with correct text, multiple seeded shuffles, and

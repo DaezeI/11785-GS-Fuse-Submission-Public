@@ -1,6 +1,8 @@
 # Full C1 paired comparison under an explicit timing assumption
 
-**Status:** Slurm jobs submitted November 11, 2026; pending at the last check.
+**Status:** Slurm jobs submitted November 11, 2026. At the November 12 check,
+full training and its two dependent paired jobs were still pending; the
+256-event diagnostic had completed successfully.
 This is a full-split *sensitivity*
 experiment using `category4_1400_strict_before`, not a claim that every
 article was public before its assigned price window. Publication times for
@@ -28,11 +30,15 @@ training succeeds. These article-free interventions must remain distinct.
 | `23812725` | Full C1 three-stage sensitivity training | none | Pending (priority) |
 | `23812735` | All-test paired control, zeroed article tokens | afterok:`23812725` | Pending (dependency) |
 | `23812734` | All-test paired control, fusion bypass | afterok:`23812725` | Pending (dependency) |
-| `23812736` | 256-test-event diagnostic using the older 16-training-event smoke checkpoint | none | Pending (priority) |
+| `23812736` | 256-test-event diagnostic using the older 16-training-event smoke checkpoint | none | Completed November 12, exit 0; 8m15s |
 
-The 256-event diagnostic is only an evaluator check. It cannot establish text
-value because its checkpoint learned from 16 events. The two full paired jobs
-are the planned substantive comparison, conditional on a complete checkpoint.
+The 256-event diagnostic completed all 256 predictions and an analysis with
+three shuffles, the `zeroed_article_tokens` control, and no missing provenance
+fields. Its log is `/work/hdd/bjjg/gs-fuse/nicole/c1-nov11/logs/c1-paired-nicole-c1-smoke256-zeroed-23812736.out`;
+its output is under `/work/hdd/bjjg/gs-fuse/nicole/c1-nov11/paired_smoke256_v1/`.
+It is only an evaluator check. It cannot establish text value because its
+checkpoint learned from 16 events. The two full paired jobs are the planned
+substantive comparison, conditional on a complete checkpoint.
 
 ## Reproduction and data handling
 
