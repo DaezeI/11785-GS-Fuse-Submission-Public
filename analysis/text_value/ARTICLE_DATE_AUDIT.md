@@ -116,14 +116,25 @@ Zacks record. It retains 6,167 train, 2,302 validation, and 2,236 test
 events. This is a **sensitivity subset**, not a fully publication-time-safe
 replacement for the agreed C1 benchmark. The original manifest and raw
 dataset remain unchanged. The screened manifest still needs an emitted-window
-audit on Delta before a new full run is submitted. That real-input check was
+audit on Delta before training can start. That real-input check was
 submitted as Slurm job `23835057` using
 [`nicole_c1_date_screen_audit.sbatch`](../../scripts/delta/nicole_c1_date_screen_audit.sbatch);
-it was pending at the last check. Replacement
+it was pending at the last check, on `gpuA100x4-preempt` after a partition
+change. Replacement
 [training](../../scripts/delta/nicole_c1_date_screen_full.sbatch) and
 [paired-control](../../scripts/delta/nicole_c1_date_screen_paired.sbatch)
-scripts point to this manifest and fresh output directories. Submit them only
-after the audit passes.
+scripts point to this manifest and fresh output directories. They are queued
+with `afterok` dependencies: training `23840368` waits for audit `23835057`,
+then `23840369` (`zeroed_article_tokens`) and `23840370`
+(`fusion_bypass_ts_inst`) wait for training. **No full run has started at this
+check.** The staged Delta runtime files match the branch's training, loader,
+audit, and evaluator SHA-256 values. The shared staged source record is
+`e89c800`; later PR commits add documentation and the evidence ledger.
+Outputs and logs are under
+`/work/hdd/bjjg/gs-fuse/nicole/c1-date-screen-v1/` with group-readable
+batch-script permissions. If the audit fails, the dependent jobs must be
+reviewed and resubmitted against a fixed audit; an `afterok` dependency alone
+does not establish a passing result.
 
 Screened manifest SHA-256:
 `1b04373a4361238b09c0b1d952163973403d2d7839dbb9e7215c429af14b23d1`.
@@ -160,12 +171,12 @@ article requires recomputing its price window, C1 role/boundary checks,
 training-only scaler coverage, Stage-1 coverage, and evaluation IDs. Do not
 rename a directory in place or silently change the existing manifest.
 
-After the Delta emitted-window audit passes, submit the prepared replacement
-training and paired jobs from the isolated checkout:
+The replacement jobs were submitted with Slurm dependencies from the staged
+checkout. The equivalent command is:
 
 ```sh
 cd /work/hdd/bjjg/gs-fuse/nicole/c1-date-screen-v1/repo
-training_job=$(sbatch --parsable scripts/delta/nicole_c1_date_screen_full.sbatch)
+training_job=$(sbatch --parsable --dependency=afterok:23835057 scripts/delta/nicole_c1_date_screen_full.sbatch)
 sbatch --dependency=afterok:"$training_job" \
   --export=ALL,MODE=zeroed_article_tokens \
   scripts/delta/nicole_c1_date_screen_paired.sbatch
