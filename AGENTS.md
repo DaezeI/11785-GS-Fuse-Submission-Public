@@ -12,6 +12,10 @@ The original full-run jobs were canceled after widespread validation/test date
 conflicts were found. Use the versioned date-screened manifest only after its
 real-input window audit passes; do not release the old jobs or describe the
 screened subset as publication-time certified.
+The screened real-input audit passed on November 13 with all 10,705 events
+emitted and zero cross-split shared price bars. Its [summary](analysis/text_value/c1_date_screen_v1_audit_summary.json)
+has exact counts. The queued full training and paired jobs are now on a Delta
+administrator hold; do not describe them as running.
 **November 13 team decision:** For new course-project C1 training and matched
 real/shuffled/no-text comparisons, use
 `splits/manifests/purged_split_c1_date_screen_v1.json` (6,167 train / 2,302

@@ -1,0 +1,45 @@
+{
+  "manifest_counts": {
+    "train": 6167,
+    "vali": 2302,
+    "test": 2236
+  },
+  "emitted_counts": {
+    "train": 6167,
+    "vali": 2302,
+    "test": 2236
+  },
+  "excluded_counts": {},
+  "excluded_examples": {},
+  "price": {
+    "raw_rows": 331256,
+    "clean_rows": 331094,
+    "exact_duplicate_rows": 162
+  },
+  "timing_policy": "category4_1400_strict_before",
+  "manifest_sha256": "1b04373a4361238b09c0b1d952163973403d2d7839dbb9e7215c429af14b23d1",
+  "price_sha256": "6a873b1d72d27f9188c6bf12acb756775916be8ed9ff42d9e9dd98028f68de2a",
+  "release_time_verified": false,
+  "scaler_fit_unique_bars": 180151,
+  "scaler_mean": [
+    1634.7712424155693,
+    1635.4727791723944,
+    1634.0645639745958,
+    1634.7730946428844
+  ],
+  "scaler_scale": [
+    452.97733794393235,
+    452.9240416692208,
+    453.0318219190244,
+    452.98225921444066
+  ],
+  "covered_bars": {
+    "train": 180151,
+    "vali": 65573,
+    "test": 63577
+  },
+  "stage1_train_windows": 15945,
+  "stage1_vali_windows": 6523,
+  "stage1_train_window_count": 15945,
+  "stage1_vali_window_count": 6523
+}

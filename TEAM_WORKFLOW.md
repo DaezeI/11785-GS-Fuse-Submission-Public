@@ -14,8 +14,8 @@ The [November 10 update](docs/updates/2026-11-10.md) is a historical snapshot;
 use the current status page for present-tense claims.
 
 **November 13 course-project decision:** New C1 training and matched text
-comparisons use the [date-screened manifest](splits/manifests/purged_split_c1_date_screen_v1.json)
-after its prepared-input audit. It excludes 883 suspect articles. Remaining
+comparisons use the [date-screened manifest](splits/manifests/purged_split_c1_date_screen_v1.json).
+Its prepared-input audit passed on November 13. It excludes 883 suspect articles. Remaining
 news publication times are unverified and must be stated as a limitation.
 The separate eight-announcement timing comparison was canceled; continue the
 main model experiments. See [current status](PROJECT_STATUS.md).
@@ -25,7 +25,7 @@ found 198 C1 validation and 684 test Reuters-dateline conflicts, plus one
 source-verified non-Reuters test conflict. The original full C1 training job was
 canceled. A separate date-screened sensitivity manifest and replacement scripts
 are in [draft PR #7](https://github.com/DaezeI/11785-GS-Fuse-Submission-Public/pull/7).
-Check its real-input audit before running the queued full job. The original C1
+Its real-input audit passed; the queued full job is now held by Delta administration. The original C1
 manifest remains the historical split definition, not a timing-safe run input.
 
 ## 1. Agreed decisions and actual status

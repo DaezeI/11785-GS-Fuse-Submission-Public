@@ -115,26 +115,34 @@ excludes all 882 Reuters candidates and the one additional source-verified
 Zacks record. It retains 6,167 train, 2,302 validation, and 2,236 test
 events. This is a **sensitivity subset**, not a fully publication-time-safe
 replacement for the agreed C1 benchmark. The original manifest and raw
-dataset remain unchanged. The screened manifest still needs an emitted-window
-audit on Delta before training can start. That real-input check was
-submitted as Slurm job `23835057` using
+dataset remain unchanged. The screened manifest's emitted-window audit on
+Delta **passed** as Slurm job `23835057` (exit `0:0`, 5m46s) using
 [`nicole_c1_date_screen_audit.sbatch`](../../scripts/delta/nicole_c1_date_screen_audit.sbatch);
-it was pending at the last check, on `gpuA100x4-preempt` after a partition
-change. Replacement
+its [committed summary](c1_date_screen_v1_audit_summary.json) matches the
+screened manifest and shared price-file hashes. It emitted all 6,167 train,
+2,302 validation, and 2,236 test events with no exclusions; the 10,705-row
+window table has zero shared price bars between any two splits. The scaler
+used 180,151 unique training bars and Stage-1 has 15,945 training and 6,523
+validation windows. The full window table remains in the shared Delta audit
+directory (SHA-256 `7c67f28d42e495d69ed6b0395a6df1fad7bb8f24944139172439a81125c5cc90`).
+This check does not establish article publication times.
+
+Replacement
 [training](../../scripts/delta/nicole_c1_date_screen_full.sbatch) and
 [paired-control](../../scripts/delta/nicole_c1_date_screen_paired.sbatch)
 scripts point to this manifest and fresh output directories. They are queued
-with `afterok` dependencies: training `23840368` waits for audit `23835057`,
+with `afterok` dependencies: training `23840368` waited for audit `23835057`,
 then `23840369` (`zeroed_article_tokens`) and `23840370`
-(`fusion_bypass_ts_inst`) wait for training. **No full run has started at this
+(`fusion_bypass_ts_inst`) wait for training. After the audit passed, all three
+model jobs remained pending with `JobHeldAdmin` and priority zero. Slurm showed
+no administrator comment explaining the hold. **No full run has started at this
 check.** The staged Delta runtime files match the branch's training, loader,
 audit, and evaluator SHA-256 values. The shared staged source record is
 `e89c800`; later PR commits add documentation and the evidence ledger.
 Outputs and logs are under
 `/work/hdd/bjjg/gs-fuse/nicole/c1-date-screen-v1/` with group-readable
-batch-script permissions. If the audit fails, the dependent jobs must be
-reviewed and resubmitted against a fixed audit; an `afterok` dependency alone
-does not establish a passing result.
+batch-script permissions. The completed audit establishes input integrity for
+this manifest; Delta's administrator hold must be resolved before training.
 
 Screened manifest SHA-256:
 `1b04373a4361238b09c0b1d952163973403d2d7839dbb9e7215c429af14b23d1`.
