@@ -30,6 +30,9 @@ properly trained model.
 | Gate, MoE, Q-Former diagnostics | Adaeze, Joye, and Jessica retain their existing streams. The inspected November 11 team job scripts used the earlier split; their outputs are historical diagnostics, not the C1 baseline. | Keep each checkpoint/split identity explicit; use the [owner handoff](TEAM_WORKFLOW.md#9-immediate-next-actions-agent-handoff-for-wednesday-november-11). |
 
 The full C1 training and paired jobs are queued work, **not completed results**.
+An [eight-announcement BLS check](analysis/text_value/GOVERNMENT_CHECKED.md)
+has verified release dates/times, summary identity markers, and post-release
+price targets; its paired model comparison is prepared but has no result yet.
 Slurm jobs continue independently of a laptop or SSH session. The shared
 account balance and queue can change; query them before planning more compute.
 Large checkpoints, raw articles/prices, and full prediction NPZ files stay on

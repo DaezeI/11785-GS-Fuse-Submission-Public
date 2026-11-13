@@ -191,6 +191,13 @@ screened manifest hash and exact included IDs. The prepared v1 screen is a
 conservative exclusion policy; any later source-verified reanchoring needs a
 new version.
 
+The large date-screened C1 comparison is **exploratory** because most retained
+article release times remain unknown. For a more controlled held-out check,
+see the [eight official BLS announcements](GOVERNMENT_CHECKED.md): each has a
+source-confirmed 08:30 Eastern release, a text-identity check, and a 09:30
+first target price label. Its paired comparison is prepared for the same C1
+checkpoint and will use exactly the same eight examples in every condition.
+
 ## Relationship to Adaeze's notes
 
 Adaeze's October 29 [Google Doc notes](https://docs.google.com/document/d/1FIIKD5c7RfsOzfk5lfy0GKHgZAddM-3slggN4DYq1j0/edit?tab=t.0)

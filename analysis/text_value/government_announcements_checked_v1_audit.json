@@ -1,0 +1,167 @@
+{
+  "set_name": "government_announcements_checked_v1",
+  "checked_count": 8,
+  "category_counts": {
+    "5": 4,
+    "2": 4
+  },
+  "evidence_sha256": "06f0279ef8c034b44b7128eb16dad0be37d63a75c83d103a79f3fe85f9907e59",
+  "manifest_sha256": "1b04373a4361238b09c0b1d952163973403d2d7839dbb9e7215c429af14b23d1",
+  "price_sha256": "6a873b1d72d27f9188c6bf12acb756775916be8ed9ff42d9e9dd98028f68de2a",
+  "price_timezone_caveat": "SP500.csv labels are interpreted as New York exchange-local wall time; CSV itself has no timezone field",
+  "price_check": "Input ends before official release; first target is same-day 09:30 or later",
+  "records": [
+    {
+      "event_id": "5/20230810.txt",
+      "official_release_et": "2023-08-10T08:30:00-04:00",
+      "official_url": "https://www.bls.gov/news.release/archives/cpi_08102023.htm",
+      "summary_sha256": "ac6a0b549c46f1da215f8c4baeddf90e011e8818e6c88d000feae59e9ad6d875",
+      "matched_headline_markers": [
+        "July 2023",
+        "0.2%",
+        "3.2%"
+      ],
+      "price_input_end_label": "2023-08-09 16:15:00",
+      "price_target_first_label": "2023-08-10 09:30:00",
+      "price_target_end_label": "2023-08-11 14:15:00",
+      "price_window_indices": [
+        316908,
+        316942,
+        317083
+      ]
+    },
+    {
+      "event_id": "5/20231212.txt",
+      "official_release_et": "2023-12-12T08:30:00-05:00",
+      "official_url": "https://www.bls.gov/news.release/archives/cpi_12122023.htm",
+      "summary_sha256": "ccc3827e80f750048bbff469708c39371d2f8e585c261d123f229dda5ee5abe0",
+      "matched_headline_markers": [
+        "November 2023",
+        "0.1%",
+        "3.1%"
+      ],
+      "price_input_end_label": "2023-12-11 16:15:00",
+      "price_target_first_label": "2023-12-12 09:30:00",
+      "price_target_end_label": "2023-12-13 14:15:00",
+      "price_window_indices": [
+        323925,
+        323959,
+        324100
+      ]
+    },
+    {
+      "event_id": "5/20240213.txt",
+      "official_release_et": "2024-02-13T08:30:00-05:00",
+      "official_url": "https://www.bls.gov/news.release/archives/cpi_02132024.htm",
+      "summary_sha256": "fc8f8a4936c9b478ac3ca5b500ca6cb87b7ce0cd06c83a1b8bdf71334f89cfa1",
+      "matched_headline_markers": [
+        "January 2024",
+        "0.3%",
+        "3.1%"
+      ],
+      "price_input_end_label": "2024-02-12 16:15:00",
+      "price_target_first_label": "2024-02-13 09:30:00",
+      "price_target_end_label": "2024-02-14 14:15:00",
+      "price_window_indices": [
+        327369,
+        327403,
+        327544
+      ]
+    },
+    {
+      "event_id": "5/20240312.txt",
+      "official_release_et": "2024-03-12T08:30:00-04:00",
+      "official_url": "https://www.bls.gov/news.release/archives/cpi_03122024.htm",
+      "summary_sha256": "87927d29f1b4d73246c41d3de97fce48cd1d3c92bc35a31f83a2ee4cc9f7fe74",
+      "matched_headline_markers": [
+        "February 2024",
+        "0.4%",
+        "3.2%"
+      ],
+      "price_input_end_label": "2024-03-11 16:15:00",
+      "price_target_first_label": "2024-03-12 09:30:00",
+      "price_target_end_label": "2024-03-13 14:15:00",
+      "price_window_indices": [
+        328927,
+        328961,
+        329102
+      ]
+    },
+    {
+      "event_id": "2/20231208.txt",
+      "official_release_et": "2023-12-08T08:30:00-05:00",
+      "official_url": "https://www.bls.gov/news.release/archives/empsit_12082023.htm",
+      "summary_sha256": "299f396ee4539ad082d101c9beab1527f6503a6b0ebde58a74b4e6c50b5f1d03",
+      "matched_headline_markers": [
+        "November 2023",
+        "199,000",
+        "3.7%"
+      ],
+      "price_input_end_label": "2023-12-07 16:15:00",
+      "price_target_first_label": "2023-12-08 09:30:00",
+      "price_target_end_label": "2023-12-11 14:15:00",
+      "price_window_indices": [
+        323761,
+        323795,
+        323936
+      ]
+    },
+    {
+      "event_id": "2/20240105.txt",
+      "official_release_et": "2024-01-05T08:30:00-05:00",
+      "official_url": "https://www.bls.gov/news.release/archives/empsit_01052024.htm",
+      "summary_sha256": "25d5efabdf5d9737d19f06b34226956507d0e410c41cc54f150193607b0c325f",
+      "matched_headline_markers": [
+        "December",
+        "216,000",
+        "3.7%"
+      ],
+      "price_input_end_label": "2024-01-04 16:15:00",
+      "price_target_first_label": "2024-01-05 09:30:00",
+      "price_target_end_label": "2024-01-08 14:15:00",
+      "price_window_indices": [
+        325237,
+        325271,
+        325412
+      ]
+    },
+    {
+      "event_id": "2/20240202.txt",
+      "official_release_et": "2024-02-02T08:30:00-05:00",
+      "official_url": "https://www.bls.gov/news.release/archives/empsit_02022024.htm",
+      "summary_sha256": "2d5d381e3f145840e5c787a64a0a2db7282b3d490e0e6c9a8a67b556adcefb91",
+      "matched_headline_markers": [
+        "January 2024",
+        "353,000",
+        "3.7%"
+      ],
+      "price_input_end_label": "2024-02-01 16:15:00",
+      "price_target_first_label": "2024-02-02 09:30:00",
+      "price_target_end_label": "2024-02-05 14:15:00",
+      "price_window_indices": [
+        326795,
+        326829,
+        326970
+      ]
+    },
+    {
+      "event_id": "2/20240308.txt",
+      "official_release_et": "2024-03-08T08:30:00-05:00",
+      "official_url": "https://www.bls.gov/news.release/archives/empsit_03082024.htm",
+      "summary_sha256": "f7baaefff792afbfe50e9675cf274b4d887d03ffd63d02d3741c8fb312d4eb08",
+      "matched_headline_markers": [
+        "February",
+        "275,000",
+        "3.9%"
+      ],
+      "price_input_end_label": "2024-03-07 16:15:00",
+      "price_target_first_label": "2024-03-08 09:30:00",
+      "price_target_end_label": "2024-03-11 14:15:00",
+      "price_window_indices": [
+        328763,
+        328797,
+        328938
+      ]
+    }
+  ]
+}
