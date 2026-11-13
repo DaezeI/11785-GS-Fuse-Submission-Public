@@ -17,6 +17,7 @@ Example (in the team's model environment):
 import argparse
 import hashlib
 import json
+import subprocess
 import sys
 from pathlib import Path
 
@@ -81,6 +82,12 @@ def file_hash(path):
     return h.hexdigest()
 
 
+def source_commit():
+    result = subprocess.run(["git", "rev-parse", "HEAD"], cwd=ROOT,
+                            capture_output=True, text=True, check=False)
+    return result.stdout.strip() if result.returncode == 0 else None
+
+
 def parse_args():
     p = argparse.ArgumentParser(description=__doc__)
     p.add_argument("--model-path", required=True)
@@ -95,6 +102,9 @@ def parse_args():
                    "category4_1400_strict_before"], default=None,
                    help="Required with --c1-manifest; must match checkpoint training")
     p.add_argument("--c1-skip-missing", action="store_true")
+    p.add_argument("--forecast-task", choices=["price", "return_bp"], default="price")
+    p.add_argument("--task-config-json", type=Path,
+                   help="Training resolved_config.json; required for return checkpoints")
     p.add_argument("--split", choices=["test", "vali"], default="test")
     p.add_argument("--batch-size", type=int, default=2)
     p.add_argument("--max-events", type=int, default=64)
@@ -114,7 +124,30 @@ def parse_args():
         p.error("batch-size/shuffles must be positive; max-events must be nonnegative")
     if args.event_ids_file and (not args.c1_manifest or args.max_events != 0):
         p.error("--event-ids-file requires --c1-manifest and --max-events 0")
+    if args.forecast_task == "return_bp" and (not args.c1_manifest or not args.task_config_json):
+        p.error("return_bp requires --c1-manifest and --task-config-json")
     return args
+
+
+def resolved_return_run(path):
+    """Read the exact training objective and shortcuts before constructing a model."""
+    from data.forecast_task import ForecastTaskConfig, RETURN_TASK
+    resolved = json.loads(Path(path).read_text())
+    if resolved.get("forecast_task") != RETURN_TASK:
+        raise ValueError("Training configuration is not a return run")
+    config = ForecastTaskConfig(**resolved["forecast_task_config"])
+    if config.task != RETURN_TASK:
+        raise ValueError("Training forecast_task_config is not a return run")
+    if (resolved.get("ts_backbone") != "moment" or
+            resolved.get("text_backbone") != "llama" or
+            resolved.get("seq_len") != 35 or resolved.get("pred_len") != 140):
+        raise ValueError("This paired return evaluator supports the frozen 35/140 MOMENT/Llama setup")
+    for key in ("use_raw_ts_residual", "use_learnable_last_value"):
+        if not isinstance(resolved.get(key), bool):
+            raise ValueError(f"Training configuration needs resolved {key}")
+    if not isinstance(resolved.get("source_commit"), str) or len(resolved["source_commit"]) != 40:
+        raise ValueError("Training configuration needs its source commit")
+    return resolved, config
 
 
 def main():
@@ -125,6 +158,17 @@ def main():
     from model.no_text_control import predict_without_article
     from test_pretrained_model import load_pretrained_model
     import model.gs_fuse as module
+    run_config = task_config = None
+    if args.forecast_task == "return_bp":
+        run_config, task_config = resolved_return_run(args.task_config_json)
+        for key in ("fusion_type", "gate_type", "c1_timing_policy", "c1_skip_missing"):
+            if getattr(args, key) != run_config[key]:
+                raise ValueError(f"Evaluation {key} differs from the training run")
+        if bool(args.no_4bit) != bool(run_config["no_4bit"]) or args.tf32 != run_config["tf32"]:
+            raise ValueError("Evaluation precision settings differ from the training run")
+        if file_hash(args.c1_manifest) != json.loads(
+                (args.task_config_json.parent / "c1_data_audit.json").read_text())["manifest_sha256"]:
+            raise ValueError("Evaluation manifest differs from the training audit")
 
     if not torch.cuda.is_available():
         raise SystemExit("This full-checkpoint runner needs a CUDA GPU; the aggregate analyzer and split audit use CPU.")
@@ -137,7 +181,19 @@ def main():
         events = build_c1_dataloaders(
             args.c1_manifest, args.event_dir, Path(args.series_dir) / "SP500.csv",
             batch_size=args.batch_size, timing_policy=args.c1_timing_policy,
-            skip_missing=args.c1_skip_missing)
+            skip_missing=args.c1_skip_missing, task_mode=args.forecast_task,
+            return_scale_bp=task_config.scale_bp if task_config else None,
+            huber_delta_bp=task_config.huber_delta_bp if task_config else None,
+            direction_tau_bp=task_config.direction_tau_bp if task_config else None,
+            direction_deadband_bp=task_config.direction_deadband_bp if task_config else 0.0,
+            direction_weight=task_config.direction_weight if task_config else 1.0,
+            direction_horizons=task_config.direction_horizons if task_config else (35, 70, 140),
+            seq_len=run_config["seq_len"] if run_config else 35,
+            pred_len=run_config["pred_len"] if run_config else 140,
+            sw_stride=run_config["sw_stride"] if run_config else 10,
+            seed=run_config["seed"] if run_config else 0)
+        if task_config and events.task_config.to_dict() != task_config.to_dict():
+            raise ValueError("Evaluation return task differs from training")
     else:
         events = event_set(35, 140, event_id=0, series_id="SP500", shuffle=False,
             batch_size=args.batch_size, event_dir=args.event_dir, series_dir=args.series_dir)
@@ -165,10 +221,29 @@ def main():
 
     config = SimpleNamespace(model_path=args.model_path, ts_backbone="moment", text_backbone="llama",
         text_model_path=args.text_model_path, moment_path=args.moment_path,
-        kronos_model_path=None, kronos_tokenizer_path=None, seq_len=35, pred_len=140,
-        window=500, stride=400, batch_size=args.batch_size, decoder_layers=3,
-        decoder_heads=8, max_token_num=1024, fusion_type=args.fusion_type, gate_type=args.gate_type,
-        num_experts=4, moe_top_k=2, num_queries=16, qformer_layers=2)
+        kronos_model_path=None, kronos_tokenizer_path=None,
+        seq_len=run_config["seq_len"] if run_config else 35,
+        pred_len=run_config["pred_len"] if run_config else 140,
+        window=run_config["window"] if run_config else 500,
+        stride=run_config["stride"] if run_config else 400,
+        batch_size=args.batch_size,
+        decoder_layers=run_config["decoder_layers"] if run_config else 3,
+        decoder_heads=run_config["decoder_heads"] if run_config else 8,
+        max_token_num=run_config["max_token_num"] if run_config else 1024,
+        use_ts_memory=run_config["use_ts_memory"] if run_config else False,
+        fusion_type=args.fusion_type, gate_type=args.gate_type,
+        num_experts=run_config["num_experts"] if run_config else 4,
+        moe_top_k=run_config["moe_top_k"] if run_config else 2,
+        num_queries=run_config["num_queries"] if run_config else 16,
+        qformer_layers=run_config["qformer_layers"] if run_config else 2,
+        forecast_task_config=task_config,
+        use_raw_ts_residual=run_config["use_raw_ts_residual"] if run_config else None,
+        use_learnable_last_value=run_config["use_learnable_last_value"] if run_config else None,
+        run_provenance=(dict(manifest_sha256=events.audit["manifest_sha256"],
+                             price_sha256=events.audit["price_sha256"],
+                             scale_population_sha256=events.audit["return_scale_population_sha256"],
+                             training_seed=run_config["seed"],
+                             source_commit=run_config["source_commit"]) if run_config else {}))
     checkpoint_sha = file_hash(args.model_path)
     model = load_pretrained_model(config, d=events.d); model.eval()
     # The legacy encoder's disk cache is keyed only by text. Isolate this run
@@ -179,24 +254,48 @@ def main():
     model.text_encoder.cache_dir = str(encoder_cache)
     conditions = [texts] + [[texts[int(j)] for j in donor] for donor in donors]
     predictions = [[] for _ in conditions]; zero = []
+    strict_ts, fixed_gate, gate_text_weight = [], [], []
+    full_task_loss, strict_ts_task_loss, gate_target = [], [], []
     with torch.inference_mode():
         for start in range(0, len(items), args.batch_size):
             batch = items[start:start + args.batch_size]
             seq = torch.stack([it[-2].T for it in batch]).float()
             for c, articles in enumerate(conditions):
-                pred, *_ = model.predict_single_case(articles[start:start + len(batch)], seq)
+                if c == 0 and task_config:
+                    pred, _, ts_inst, _, analysis = model.predict_single_case(
+                        articles[start:start + len(batch)], seq, return_analysis=True)
+                    ts_pred = model.predict_strict_ts_only(ts_inst, model._ensure_cf(seq.to(model.device)))
+                    target_batch = torch.stack([it[-1].T for it in batch]).to(model.device)
+                    from data.forecast_task import return_task_loss, gate_supervision_target
+                    ts_loss = return_task_loss(ts_pred, target_batch, task_config, reduction="none")
+                    full_loss = return_task_loss(pred, target_batch, task_config, reduction="none")
+                    target_gate, _ = gate_supervision_target(ts_loss, full_loss)
+                    strict_ts.append(ts_pred.cpu().numpy().transpose(0, 2, 1))
+                    gate_text_weight.append(analysis["learned_gate_softmax"][:, 0].mean(-1).cpu().numpy())
+                    full_task_loss.append(full_loss.cpu().numpy())
+                    strict_ts_task_loss.append(ts_loss.cpu().numpy())
+                    gate_target.append(target_gate.cpu().numpy())
+                else:
+                    pred, *_ = model.predict_single_case(articles[start:start + len(batch)], seq)
                 predictions[c].append(pred.detach().cpu().numpy().transpose(0, 2, 1))
+            if task_config:
+                model.fixed_text_gate = 0.5
+                try:
+                    fixed_pred, *_ = model.predict_single_case(texts[start:start + len(batch)], seq)
+                finally:
+                    model.fixed_text_gate = None
+                fixed_gate.append(fixed_pred.cpu().numpy().transpose(0, 2, 1))
             pred = predict_without_article(model, seq, args.no_text_mode)
             zero.append(pred.detach().cpu().numpy().transpose(0, 2, 1))
             print(f"Paired predictions: {min(start + len(batch), len(items))}/{len(items)}", flush=True)
     train_vol = np.array([np.std(np.diff(np.log(it[3].numpy()[:, 3]))) for it in events.train_set.list])
     metadata = {"checkpoint_id": checkpoint_sha,
-        "training_split": args.checkpoint_training_split,
+        "training_split": (Path(args.c1_manifest).name if task_config else args.checkpoint_training_split),
         "evaluation_split": f"c1_{args.split}" if args.c1_manifest else f"original_positional_{args.split}",
         "no_text_definition": args.no_text_mode,
         "shuffle_description": "seeded index derangement over selected evaluation texts; future donors allowed as a diagnostic placebo",
         "shuffle_protocols": protocols, "smoke_subset": len(ids) != len(ds.list),
-        "reference_source_commit": "02f2b742960384161a7ea0c79aacabb9eea43d9b",
+        "reference_source_commit": source_commit(),
         "runner_sha256": file_hash(__file__),
         "no_text_control_sha256": file_hash(ROOT / "model/no_text_control.py"),
         "batch_size": args.batch_size, "seed": args.seed, "tf32": args.tf32,
@@ -208,6 +307,27 @@ def main():
         "backbone": Path(args.text_model_path).name, "four_bit": not args.no_4bit,
         "note": ("C1 evaluation; corrected C1 performance requires verified C1 checkpoint training"
                  if args.c1_manifest else "diagnosis of an existing checkpoint; not a leakage-corrected C1 result")}
+    extra = {}
+    if task_config:
+        from data.forecast_task import pre_event_close_volatility_bp
+        train_targets = np.stack([it[-1].numpy() for it in events.train_set.list])
+        majority = {}
+        for horizon in task_config.direction_horizons:
+            actual = train_targets[:, int(horizon) - 1, task_config.close_channel]
+            eligible = np.abs(actual) > task_config.direction_deadband_bp
+            majority[str(horizon)] = (1 if np.sum(actual[eligible] > 0) >=
+                                      np.sum(actual[eligible] < 0) else -1)
+        metadata["forecast_task_config"] = task_config.to_dict()
+        metadata["training_majority_direction"] = majority
+        metadata["task_config_json_sha256"] = file_hash(args.task_config_json)
+        extra = {"strict_ts": np.concatenate(strict_ts), "fixed_gate": np.concatenate(fixed_gate),
+                 "gate_text_weight": np.concatenate(gate_text_weight),
+                 "full_task_loss": np.concatenate(full_task_loss),
+                 "strict_ts_task_loss": np.concatenate(strict_ts_task_loss),
+                 "gate_target": np.concatenate(gate_target),
+                 "anchor_close": np.asarray([ds.windows[int(i)]["anchor_close"] for i in ids]),
+                 "past_volatility_bp": pre_event_close_volatility_bp(
+                     np.stack([it[3].numpy() for it in items])).astype(np.float32)}
     if args.c1_manifest:
         metadata["c1_manifest_sha256"] = file_hash(args.c1_manifest)
         metadata["c1_data_audit"] = events.audit
@@ -219,7 +339,7 @@ def main():
         raw_seqs=np.stack([it[3].numpy() for it in items]), train_volatility=train_vol,
         event_ids=event_ids, event_dates=dates, event_types=types,
         shuffle_donor_ids=np.stack([event_ids[p] for p in donors]),
-        metadata_json=np.array(json.dumps(metadata)))
+        metadata_json=np.array(json.dumps(metadata)), **extra)
     print(f"Saved paired predictions to {args.out}")
 
 

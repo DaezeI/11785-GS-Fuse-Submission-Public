@@ -11,10 +11,13 @@ event data is grouped by event type.
 import argparse
 import json
 import os
+import random
+import subprocess
 import warnings
 from pathlib import Path
 
 import torch
+import numpy as np
 from torch.utils.data import DataLoader, Subset
 
 from data.dataloader import event_set
@@ -23,6 +26,7 @@ from interpret import evenly_spaced, run_and_log
 import model.gs_fuse as gs_fuse_mod
 from model import tracking
 from model.gs_fuse import GSFuse, train_three_stage
+from data.forecast_task import ForecastTaskConfig
 
 warnings.simplefilter("ignore")
 
@@ -42,6 +46,16 @@ def parse_args():
                    "category4_1400_strict_before"], default=None,
                    help="Required with --c1-manifest; publication times are unverified")
     p.add_argument("--c1-skip-missing", action="store_true")
+    p.add_argument("--forecast-task", choices=["price", "return_bp"], default="price")
+    p.add_argument("--return-scale-bp", type=float, default=None)
+    p.add_argument("--huber-delta-bp", type=float, default=None)
+    p.add_argument("--direction-tau-bp", type=float, default=None)
+    p.add_argument("--direction-deadband-bp", type=float, default=0.0)
+    p.add_argument("--direction-weight", type=float, default=1.0)
+    p.add_argument("--direction-horizons", type=int, nargs="+", default=[35, 70, 140])
+    p.add_argument("--raw-ts-residual", action=argparse.BooleanOptionalAction, default=None)
+    p.add_argument("--learnable-last-value", action=argparse.BooleanOptionalAction, default=None)
+    p.add_argument("--seed", type=int, default=0)
     p.add_argument("--output-path", type=str, required=True)
     p.add_argument("--series-id", type=str, default="SP500")
     p.add_argument("--seq-len", type=int, default=35)
@@ -70,14 +84,21 @@ def parse_args():
     return p.parse_args()
 
 
-def subset_loader(dataset, n, batch_size, shuffle=False):
+def subset_loader(dataset, n, batch_size, shuffle=False, seed=0):
     return DataLoader(Subset(dataset, evenly_spaced(len(dataset), n)),
-                      batch_size=batch_size, shuffle=shuffle, num_workers=0)
+                      batch_size=batch_size, shuffle=shuffle, num_workers=0,
+                      generator=torch.Generator().manual_seed(seed))
 
 
 def main():
     args = parse_args()
-    torch.manual_seed(0)
+    random.seed(args.seed)
+    np.random.seed(args.seed)
+    torch.manual_seed(args.seed)
+    if torch.cuda.is_available():
+        torch.cuda.manual_seed_all(args.seed)
+    if args.forecast_task == "return_bp" and not args.c1_manifest:
+        raise ValueError("--forecast-task return_bp requires --c1-manifest")
     gs_fuse_mod.TEXT_CACHE_PATH = args.text_cache
     if args.no_4bit:
         gs_fuse_mod.USE_4BIT = False
@@ -94,9 +115,26 @@ def main():
             args.c1_manifest, args.event_dir, Path(args.series_dir) / f"{args.series_id}.csv",
             seq_len=args.seq_len, pred_len=args.pred_len, batch_size=args.batch_size,
             sw_stride=1, timing_policy=args.c1_timing_policy,
-            skip_missing=args.c1_skip_missing)
+            skip_missing=args.c1_skip_missing, task_mode=args.forecast_task,
+            return_scale_bp=args.return_scale_bp, huber_delta_bp=args.huber_delta_bp,
+            direction_tau_bp=args.direction_tau_bp,
+            direction_deadband_bp=args.direction_deadband_bp,
+            direction_weight=args.direction_weight,
+            direction_horizons=tuple(args.direction_horizons), seed=args.seed)
         output.mkdir(parents=True, exist_ok=True)
         (output / "c1_data_audit.json").write_text(json.dumps(events.audit, indent=2) + "\n")
+        resolved = vars(args).copy()
+        resolved["source_commit"] = subprocess.check_output(
+            ["git", "rev-parse", "HEAD"], cwd=Path(__file__).resolve().parent,
+            text=True).strip()
+        resolved.update({"sw_stride": 1, "window": 500, "stride": 400,
+                         "decoder_layers": 3, "decoder_heads": 8,
+                         "use_ts_memory": False, "run_kind": "smoke_subset"})
+        resolved["forecast_task_config"] = events.task_config.to_dict()
+        resolved["use_raw_ts_residual"] = True if args.raw_ts_residual is None else args.raw_ts_residual
+        resolved["use_learnable_last_value"] = (args.forecast_task == "return_bp" if
+                                               args.learnable_last_value is None else args.learnable_last_value)
+        (output / "resolved_config.json").write_text(json.dumps(resolved, indent=2) + "\n")
         sw_train_set, sw_vali_set = events.sw_train_set, events.sw_vali_set
     else:
         events = event_set(
@@ -109,11 +147,12 @@ def main():
         sw_train_set, sw_vali_set = sw_data.train_set, sw_data.vali_set
 
     bs = args.batch_size
-    train_loader = subset_loader(events.train_set, args.n_event_train, bs)
-    vali_loader = subset_loader(events.vali_set, args.n_event_eval, bs)
-    test_loader = subset_loader(events.test_set, args.n_event_eval, bs)
-    sw_train_loader = subset_loader(sw_train_set, args.n_sw_train, bs, shuffle=True)
-    sw_vali_loader = subset_loader(sw_vali_set, args.n_sw_eval, bs)
+    train_loader = subset_loader(events.train_set, args.n_event_train, bs, seed=args.seed)
+    vali_loader = subset_loader(events.vali_set, args.n_event_eval, bs, seed=args.seed + 1)
+    test_loader = subset_loader(events.test_set, args.n_event_eval, bs, seed=args.seed + 2)
+    sw_train_loader = subset_loader(sw_train_set, args.n_sw_train, bs, shuffle=True,
+                                    seed=args.seed + 3)
+    sw_vali_loader = subset_loader(sw_vali_set, args.n_sw_eval, bs, seed=args.seed + 4)
 
     model = GSFuse(
         text_model_path=args.text_model_path,
@@ -136,7 +175,18 @@ def main():
         moe_top_k=args.moe_top_k,
         num_queries=args.num_queries,
         qformer_layers=args.qformer_layers,
+        forecast_task_config=(events.task_config if args.c1_manifest else ForecastTaskConfig()),
+        use_raw_ts_residual=args.raw_ts_residual,
+        use_learnable_last_value=args.learnable_last_value,
     )
+    if args.forecast_task == "return_bp":
+        model.run_provenance = {
+            "manifest_sha256": events.audit["manifest_sha256"],
+            "price_sha256": events.audit["price_sha256"],
+            "scale_population_sha256": events.audit["return_scale_population_sha256"],
+            "training_seed": args.seed,
+            "source_commit": resolved["source_commit"],
+        }
     if args.skip_checkpoints:
         model.save_model_combined = lambda save_path=None, **kw: print(f"[smoke] checkpoint skipped: {save_path}")
 

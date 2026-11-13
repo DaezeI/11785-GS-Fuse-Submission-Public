@@ -21,6 +21,13 @@ from sklearn.preprocessing import StandardScaler
 from torch.utils.data import DataLoader, Dataset
 
 from data.sliding_window_dataloader import SlidingWindowDataset
+from data.forecast_task import (
+    ForecastTaskConfig,
+    PRICE_TASK,
+    RETURN_TASK,
+    prices_to_log_returns_bp,
+    resolve_scale_bp,
+)
 
 ROLES = ("train", "vali", "test")
 POLICIES = ("legacy_all0830_floor", "category4_1400_strict_before")
@@ -103,6 +110,32 @@ class C1EventDataset(Dataset):
                 seq.T, target.T, scaled_seq.T, scaled_target.T)
 
 
+class ReturnSlidingWindowDataset(Dataset):
+    """Stage-1 windows transformed around each window's last observed close."""
+
+    def __init__(self, data, seq_len, pred_len, indices, close_channel=3):
+        self.data = data
+        self.seq_len = seq_len
+        self.pred_len = pred_len
+        self.indices = indices
+        self.close_channel = close_channel
+
+    def __len__(self):
+        return len(self.indices)
+
+    def __getitem__(self, idx):
+        start = self.indices[idx]
+        seq = self.data[start:start + self.seq_len].astype(np.float32, copy=True)
+        target = self.data[start + self.seq_len:start + self.seq_len + self.pred_len].astype(
+            np.float32, copy=True
+        )
+        anchor = seq[-1, self.close_channel]
+        seq_return = prices_to_log_returns_bp(seq, anchor)
+        target_return = prices_to_log_returns_bp(target, anchor)
+        return (torch.from_numpy(seq).T, torch.from_numpy(target).T,
+                torch.from_numpy(seq_return).T, torch.from_numpy(target_return).T)
+
+
 @dataclass
 class C1Loaders:
     train_set: C1EventDataset
@@ -118,6 +151,7 @@ class C1Loaders:
     scaler: StandardScaler
     d: int
     audit: dict
+    task_config: ForecastTaskConfig
 
 
 def _covered(windows, n):
@@ -138,7 +172,12 @@ def _stage1_indices(coverage, total, stride):
 def build_c1_dataloaders(manifest_path, event_dir, series_path, seq_len=35,
                          pred_len=140, batch_size=8, sw_stride=10,
                          timing_policy=None,
-                         num_workers=0, skip_missing=False):
+                         num_workers=0, skip_missing=False,
+                         task_mode=PRICE_TASK, return_scale_bp=None,
+                         huber_delta_bp=None, direction_tau_bp=None,
+                         direction_deadband_bp=0.0, direction_weight=1.0,
+                         direction_horizons=(35, 70, 140), close_channel=3,
+                         seed=0):
     """Build all three event splits and Stage-1 windows from the same C1 protocol.
 
     Missing summaries, incomplete sentence reports, missing price windows, and
@@ -149,6 +188,10 @@ def build_c1_dataloaders(manifest_path, event_dir, series_path, seq_len=35,
         raise ValueError("sw_stride and batch_size must be positive")
     if timing_policy not in POLICIES:
         raise ValueError(f"C1 requires an explicit timing_policy from {POLICIES}")
+    if task_mode not in (PRICE_TASK, RETURN_TASK):
+        raise ValueError(f"Unknown task_mode: {task_mode}")
+    if task_mode == RETURN_TASK and max(direction_horizons) > pred_len:
+        raise ValueError("Return direction horizon is outside pred_len")
     manifest = json.loads(Path(manifest_path).read_text())
     stamps, values, price_audit = load_price_timeline(series_path)
     event_dir = Path(event_dir)
@@ -212,12 +255,45 @@ def build_c1_dataloaders(manifest_path, event_dir, series_path, seq_len=35,
         shared = int(np.sum(coverage[a] & coverage[b]))
         if shared:
             raise ValueError(f"C1 emitted full windows overlap: {a}/{b} share {shared} bars")
-    scaler = StandardScaler().fit(values[coverage["train"]])
-    scaled = scaler.transform(values).astype(np.float32)
-    audit["scaler_fit_unique_bars"] = int(coverage["train"].sum())
-    audit["scaler_mean"] = scaler.mean_.tolist()
-    audit["scaler_scale"] = scaler.scale_.tolist()
+    if task_mode == PRICE_TASK:
+        scaler = StandardScaler().fit(values[coverage["train"]])
+        scaled = scaler.transform(values).astype(np.float32)
+        task_config = ForecastTaskConfig()
+        audit["scaler_fit_unique_bars"] = int(coverage["train"].sum())
+        audit["scaler_mean"] = scaler.mean_.tolist()
+        audit["scaler_scale"] = scaler.scale_.tolist()
+    else:
+        scaler = None
+        scaled = None
+        train_targets = []
+        for record in records["train"]:
+            start, anchor, stop = record["window"]
+            anchor_close = values[anchor, close_channel]
+            train_targets.append(prices_to_log_returns_bp(values[anchor + 1:stop], anchor_close))
+        computed_scale = resolve_scale_bp(
+            np.stack(train_targets), horizons=direction_horizons, close_channel=close_channel
+        )
+        scale_bp = computed_scale if return_scale_bp is None else float(return_scale_bp)
+        task_config = ForecastTaskConfig(
+            task=RETURN_TASK,
+            units="basis_point_log_return",
+            scale_bp=scale_bp,
+            huber_delta_bp=scale_bp if huber_delta_bp is None else float(huber_delta_bp),
+            direction_tau_bp=scale_bp if direction_tau_bp is None else float(direction_tau_bp),
+            direction_deadband_bp=float(direction_deadband_bp),
+            direction_weight=float(direction_weight),
+            direction_horizons=tuple(int(h) for h in direction_horizons),
+            close_channel=int(close_channel),
+        )
+        audit["return_scale_computed_bp"] = computed_scale
+        audit["return_scale_population_events"] = len(train_targets)
+        audit["return_scale_population_sha256"] = hashlib.sha256(
+            "\n".join(record["id"] for record in records["train"]).encode("utf-8")
+        ).hexdigest()
+        audit["return_scale_overridden"] = return_scale_bp is not None
     audit["covered_bars"] = {r: int(coverage[r].sum()) for r in ROLES}
+    audit["forecast_task"] = task_config.to_dict()
+    audit["seed"] = int(seed)
     datasets = {}
     for role in ROLES:
         items, ids, windows = [], [], []
@@ -225,13 +301,19 @@ def build_c1_dataloaders(manifest_path, event_dir, series_path, seq_len=35,
             start, anchor, stop = r["window"]
             seq = torch.from_numpy(values[start:anchor + 1].copy())
             target = torch.from_numpy(values[anchor + 1:stop].copy())
-            scale_seq = torch.from_numpy(scaled[start:anchor + 1].copy())
-            scale_target = torch.from_numpy(scaled[anchor + 1:stop].copy())
+            anchor_close = float(values[anchor, close_channel])
+            if task_mode == RETURN_TASK:
+                scale_seq = torch.from_numpy(prices_to_log_returns_bp(seq.numpy(), anchor_close))
+                scale_target = torch.from_numpy(prices_to_log_returns_bp(target.numpy(), anchor_close))
+            else:
+                scale_seq = torch.from_numpy(scaled[start:anchor + 1].copy())
+                scale_target = torch.from_numpy(scaled[anchor + 1:stop].copy())
             items.append((str(r["summary"]), [str(p) for p in r["sent"]],
                           [str(p) for p in r["negatives"]], seq, target,
                           r["category"], scale_seq, scale_target))
             ids.append(r["id"])
-            windows.append({"event_id": r["id"], "start": start, "anchor": anchor,
+            windows.append({"event_id": r["id"], "category": r["category"],
+                            "anchor_close": anchor_close, "start": start, "anchor": anchor,
                             "stop": stop, "input_start": int(stamps[start]),
                             "target_end": int(stamps[stop - 1])})
         datasets[role] = C1EventDataset(items, ids, windows)
@@ -241,12 +323,19 @@ def build_c1_dataloaders(manifest_path, event_dir, series_path, seq_len=35,
         indices = _stage1_indices(coverage[role], total, sw_stride)
         if not indices:
             raise ValueError(f"No Stage-1 {role} windows inside C1 event coverage")
-        sw[role] = SlidingWindowDataset(values, scaled, seq_len, pred_len, indices)
+        if task_mode == RETURN_TASK:
+            sw[role] = ReturnSlidingWindowDataset(
+                values, seq_len, pred_len, indices, close_channel=close_channel
+            )
+        else:
+            sw[role] = SlidingWindowDataset(values, scaled, seq_len, pred_len, indices)
         audit[f"stage1_{role}_windows"] = len(indices)
-    loader = lambda ds, shuffle: DataLoader(ds, batch_size=batch_size, shuffle=shuffle,
-                                            num_workers=num_workers)
+    def loader(ds, shuffle, offset):
+        generator = torch.Generator().manual_seed(int(seed) + offset)
+        return DataLoader(ds, batch_size=batch_size, shuffle=shuffle,
+                          num_workers=num_workers, generator=generator)
     return C1Loaders(datasets["train"], datasets["vali"], datasets["test"],
-                     loader(datasets["train"], True), loader(datasets["vali"], False),
-                     loader(datasets["test"], False), sw["train"], sw["vali"],
-                     loader(sw["train"], True), loader(sw["vali"], False),
-                     scaler, values.shape[1], audit)
+                     loader(datasets["train"], True, 0), loader(datasets["vali"], False, 1),
+                     loader(datasets["test"], False, 2), sw["train"], sw["vali"],
+                     loader(sw["train"], True, 3), loader(sw["vali"], False, 4),
+                     scaler, values.shape[1], audit, task_config)
