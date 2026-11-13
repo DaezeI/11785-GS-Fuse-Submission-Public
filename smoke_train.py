@@ -12,6 +12,7 @@ import argparse
 import json
 import os
 import random
+import subprocess
 import warnings
 from pathlib import Path
 
@@ -52,6 +53,8 @@ def parse_args():
     p.add_argument("--direction-deadband-bp", type=float, default=0.0)
     p.add_argument("--direction-weight", type=float, default=1.0)
     p.add_argument("--direction-horizons", type=int, nargs="+", default=[35, 70, 140])
+    p.add_argument("--raw-ts-residual", action=argparse.BooleanOptionalAction, default=None)
+    p.add_argument("--learnable-last-value", action=argparse.BooleanOptionalAction, default=None)
     p.add_argument("--seed", type=int, default=0)
     p.add_argument("--output-path", type=str, required=True)
     p.add_argument("--series-id", type=str, default="SP500")
@@ -121,7 +124,16 @@ def main():
         output.mkdir(parents=True, exist_ok=True)
         (output / "c1_data_audit.json").write_text(json.dumps(events.audit, indent=2) + "\n")
         resolved = vars(args).copy()
+        resolved["source_commit"] = subprocess.check_output(
+            ["git", "rev-parse", "HEAD"], cwd=Path(__file__).resolve().parent,
+            text=True).strip()
+        resolved.update({"sw_stride": 1, "window": 500, "stride": 400,
+                         "decoder_layers": 3, "decoder_heads": 8,
+                         "use_ts_memory": False, "run_kind": "smoke_subset"})
         resolved["forecast_task_config"] = events.task_config.to_dict()
+        resolved["use_raw_ts_residual"] = True if args.raw_ts_residual is None else args.raw_ts_residual
+        resolved["use_learnable_last_value"] = (args.forecast_task == "return_bp" if
+                                               args.learnable_last_value is None else args.learnable_last_value)
         (output / "resolved_config.json").write_text(json.dumps(resolved, indent=2) + "\n")
         sw_train_set, sw_vali_set = events.sw_train_set, events.sw_vali_set
     else:
@@ -164,7 +176,17 @@ def main():
         num_queries=args.num_queries,
         qformer_layers=args.qformer_layers,
         forecast_task_config=(events.task_config if args.c1_manifest else ForecastTaskConfig()),
+        use_raw_ts_residual=args.raw_ts_residual,
+        use_learnable_last_value=args.learnable_last_value,
     )
+    if args.forecast_task == "return_bp":
+        model.run_provenance = {
+            "manifest_sha256": events.audit["manifest_sha256"],
+            "price_sha256": events.audit["price_sha256"],
+            "scale_population_sha256": events.audit["return_scale_population_sha256"],
+            "training_seed": args.seed,
+            "source_commit": resolved["source_commit"],
+        }
     if args.skip_checkpoints:
         model.save_model_combined = lambda save_path=None, **kw: print(f"[smoke] checkpoint skipped: {save_path}")
 

@@ -31,6 +31,9 @@ class ForecastTaskConfig:
     def __post_init__(self):
         if self.task not in (PRICE_TASK, RETURN_TASK):
             raise ValueError(f"Unknown forecast task: {self.task}")
+        if self.task == RETURN_TASK and (self.anchor != "last_observed_close" or
+                                         self.units != "basis_point_log_return"):
+            raise ValueError("Return task requires one last-observed-close anchor and basis-point log returns")
         if self.scale_bp <= 0 or self.huber_delta_bp <= 0 or self.direction_tau_bp <= 0:
             raise ValueError("Return loss scales must be positive")
         if self.direction_deadband_bp < 0 or self.direction_weight < 0:

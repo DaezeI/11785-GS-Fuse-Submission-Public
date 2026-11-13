@@ -33,6 +33,7 @@ from data.forecast_task import (
     RETURN_TASK,
     forecast_training_loss,
     gate_supervision_target,
+    return_task_loss,
 )
 
 
@@ -625,6 +626,8 @@ class GSFuse(nn.Module):
             num_queries=16,
             qformer_layers=2,
             forecast_task_config=None,
+            use_raw_ts_residual=None,
+            use_learnable_last_value=None,
             # legacy aliases
             llama_name=None,
     ):
@@ -654,6 +657,14 @@ class GSFuse(nn.Module):
         elif isinstance(forecast_task_config, dict):
             forecast_task_config = ForecastTaskConfig(**forecast_task_config)
         self.forecast_task_config = forecast_task_config
+        self.run_provenance = {}
+        self.use_raw_ts_residual = (USE_RAW_TS_RESIDUAL if use_raw_ts_residual is None
+                                    else bool(use_raw_ts_residual))
+        self.use_learnable_last_value = (
+            forecast_task_config.task == RETURN_TASK if use_learnable_last_value is None
+            else bool(use_learnable_last_value)
+        )
+        self.fixed_text_gate = None  # inference-only paired control
 
         # -------- Text encoder (LLaMA or Phi) --------
         self.text_encoder = build_text_encoder(text_backbone, text_model_path, use_4bit=USE_4BIT)
@@ -783,7 +794,7 @@ class GSFuse(nn.Module):
         ).to(self.device)
 
         # NEW: Learnable last-value residual module
-        if USE_LEARNABLE_LAST_VALUE:
+        if self.use_learnable_last_value:
             self.last_value_module = LearnableLastValueResidual(
                 context_dim=FUSE_DIM, d_channels=self.d, pred_len=self.pred_len,
                 init_alpha=LAST_VALUE_INIT_WEIGHT
@@ -896,7 +907,7 @@ class GSFuse(nn.Module):
         ts_inst = self.ts_inst_to_fuse(ts_instance)
 
         # Add raw TS residual to TS instance embedding
-        if USE_RAW_TS_RESIDUAL:
+        if self.use_raw_ts_residual:
             raw_ts_residual = self._compute_raw_ts_residual(x_cf)
             ts_inst = ts_inst + RAW_TS_RESIDUAL_WEIGHT * raw_ts_residual
 
@@ -951,7 +962,7 @@ class GSFuse(nn.Module):
         t_vec_residual = F.layer_norm(self._masked_mean(H_text, align_text_mask), (FUSE_DIM,))
 
         s_vec_residual_base = F.layer_norm(self._masked_mean(H_ts, ts_mask), (FUSE_DIM,))
-        if USE_RAW_TS_RESIDUAL and ts_inst is not None:
+        if self.use_raw_ts_residual and ts_inst is not None:
             s_vec_residual = s_vec_residual_base + (ts_inst - self._masked_mean(ts_tokens, ts_mask))
             s_vec_residual = F.layer_norm(s_vec_residual, (FUSE_DIM,))
         else:
@@ -985,12 +996,22 @@ class GSFuse(nn.Module):
             concat_all = torch.cat([t_vec_norm, s_vec_norm], dim=-1)
             gate_logits = self.bi_gate_layer(concat_all).reshape(-1, 2, FUSE_DIM)
             gate = F.softmax(gate_logits / max(self.gate_tau, 1e-6), dim=1)
+        learned_gate = gate
+        if self.fixed_text_gate is not None:
+            if self.training:
+                raise RuntimeError("Fixed text gate is an inference-only control")
+            weight = float(self.fixed_text_gate)
+            if not 0.0 <= weight <= 1.0:
+                raise ValueError("fixed_text_gate must be between zero and one")
+            gate = torch.stack((torch.full_like(gate[:, 0], weight),
+                                torch.full_like(gate[:, 1], 1.0 - weight)), dim=1)
         fused_emb = gate[:, 0] * t_vec_norm + gate[:, 1] * s_vec_norm
 
         if return_analysis:
             return fused_emb, {
                 **variant_info,
                 "gate_softmax": gate,
+                "learned_gate_softmax": learned_gate,
                 "attn_t2s": w_text2ts,
                 "attn_s2t": w_ts2text,
                 "token_align_loss": token_align_loss,
@@ -1038,7 +1059,7 @@ class GSFuse(nn.Module):
         s_vec_norm = F.normalize(s_vec_residual, p=2, dim=-1)
         core = self.decoder(s_vec_norm, x_cf=x_cf)
 
-        if USE_LEARNABLE_LAST_VALUE:
+        if self.use_learnable_last_value:
             last_val = x_cf[:, :, -1:].detach()
             output, _ = self.last_value_module(core, last_val, s_vec_norm)
         else:
@@ -1054,7 +1075,7 @@ class GSFuse(nn.Module):
         t_vec_norm = F.normalize(t_vec_residual, p=2, dim=-1)
         core = self.decoder(t_vec_norm, x_cf=x_cf)
 
-        if USE_LEARNABLE_LAST_VALUE:
+        if self.use_learnable_last_value:
             last_val = x_cf[:, :, -1:].detach()
             output, _ = self.last_value_module(core, last_val, t_vec_norm)
         else:
@@ -1063,7 +1084,7 @@ class GSFuse(nn.Module):
 
     def _apply_output_refinement(self, core_output, fused_emb, x_cf):
         """Apply learnable last-value refinement if enabled."""
-        if USE_LEARNABLE_LAST_VALUE:
+        if self.use_learnable_last_value:
             last_val = x_cf[:, :, -1:].detach()
             output, alpha = self.last_value_module(core_output, last_val, fused_emb)
             return output, alpha
@@ -1164,7 +1185,9 @@ class GSFuse(nn.Module):
             analysis["x_cf"] = x_cf
             analysis["last_value_alpha"] = alpha
 
-        batch_series_embeddings_for_contrastive = analysis.get("s_vec_residual", ts_inst)
+        batch_series_embeddings_for_contrastive = (
+            analysis.get("s_vec_residual", ts_inst) if analysis is not None else ts_inst
+        )
 
         return (
             output,
@@ -1176,7 +1199,7 @@ class GSFuse(nn.Module):
             analysis,
         )
 
-    def predict_single_case(self, batch_text, batch_seq):
+    def predict_single_case(self, batch_text, batch_seq, return_analysis=False):
         tlist, mlist = [], []
         for t in batch_text:
             T, M = self.get_text_tokens_all(t)
@@ -1193,10 +1216,13 @@ class GSFuse(nn.Module):
         x_cf = self._ensure_cf(batch_seq)
         ts_tok, ts_mask, ts_inst = self.get_ts_tokens_full(x_cf)
 
-        fused_emb, _ = self._fuse_from_sequences(text_tok, ts_tok, text_mask, ts_mask,
-                                                 ts_inst=ts_inst, return_analysis=False)
+        fused_emb, analysis = self._fuse_from_sequences(
+            text_tok, ts_tok, text_mask, ts_mask,
+            ts_inst=ts_inst, return_analysis=return_analysis)
         core = self.decoder(fused_emb, x_cf=x_cf)
         output, _ = self._apply_output_refinement(core, fused_emb, x_cf)
+        if return_analysis:
+            return output, fused_emb, ts_inst, batch_text_embeddings, analysis
         return output, fused_emb, ts_inst, batch_text_embeddings
 
     def predict_one(self, text, seq_data):
@@ -1269,8 +1295,8 @@ class GSFuse(nn.Module):
         return {
             "arch": "GS-FUSE",
             "version": "v3-learnable-last-value-llm-last-layer-finetune",
-            "use_raw_ts_residual": USE_RAW_TS_RESIDUAL,
-            "use_learnable_last_value": USE_LEARNABLE_LAST_VALUE,
+            "use_raw_ts_residual": self.use_raw_ts_residual,
+            "use_learnable_last_value": self.use_learnable_last_value,
             "use_multi_scale_ts": USE_MULTI_SCALE_TS,
             "finetune_llm_last_layer": FINETUNE_LLM_LAST_LAYER,
             "llm_finetune_lr": LLM_FINETUNE_LR,
@@ -1321,14 +1347,14 @@ class GSFuse(nn.Module):
 
         if USE_MULTI_SCALE_TS:
             state_dicts["multi_scale_extractor"] = self.multi_scale_extractor.state_dict()
-        if USE_LEARNABLE_LAST_VALUE:
+        if self.use_learnable_last_value:
             state_dicts["last_value_module"] = self.last_value_module.state_dict()
         for name, mod in self.variant_modules().items():
             state_dicts[name] = mod.state_dict()
 
         checkpoint = {
             "state_dicts": state_dicts,
-            "metadata": {**self._arch_metadata(), **kwargs},
+            "metadata": {**self._arch_metadata(), "run_provenance": self.run_provenance, **kwargs},
         }
         torch.save(checkpoint, save_path)
         print(f"[save] Model weights saved to: {save_path}")
@@ -1354,6 +1380,13 @@ class GSFuse(nn.Module):
             )
         if saved_task_name == RETURN_TASK and saved_task != self.forecast_task_config.to_dict():
             raise ValueError("Return checkpoint task metadata does not match this run")
+        if saved_task_name == RETURN_TASK:
+            for name, expected in (("use_raw_ts_residual", self.use_raw_ts_residual),
+                                   ("use_learnable_last_value", self.use_learnable_last_value)):
+                if meta.get(name) is not expected:
+                    raise ValueError(f"Return checkpoint {name} does not match this run")
+            if not self.run_provenance or meta.get("run_provenance") != self.run_provenance:
+                raise ValueError("Return checkpoint data/seed provenance does not match this run")
 
         if "ts_encoder" in sd and sd["ts_encoder"] is not None:
             try:
@@ -1405,7 +1438,7 @@ class GSFuse(nn.Module):
 
         if USE_MULTI_SCALE_TS and "multi_scale_extractor" in sd:
             self.multi_scale_extractor.load_state_dict(sd["multi_scale_extractor"], strict=False)
-        if USE_LEARNABLE_LAST_VALUE and "last_value_module" in sd:
+        if self.use_learnable_last_value and "last_value_module" in sd:
             self.last_value_module.load_state_dict(sd["last_value_module"], strict=False)
 
         self.mem_type_embed.load_state_dict(sd["mem_type_embed"], strict=False)
@@ -1516,6 +1549,40 @@ def gate_task_loss_per_event(model, prediction, target):
     return (prediction - target).square().mean(dim=(1, 2))
 
 
+@torch.no_grad()
+def evaluate_return_loader(model, loader):
+    """Event-weighted validation metrics for the return task; no test inspection."""
+    config = model.forecast_task_config
+    if config.task != RETURN_TASK:
+        raise ValueError("Return evaluator needs a return-task model")
+    model.eval()
+    events = elements = task_sum = abs_sum = square_sum = 0
+    hits = {int(h): 0 for h in config.direction_horizons}
+    eligible_counts = {int(h): 0 for h in config.direction_horizons}
+    for batch in loader:
+        texts, seq, target = batch[0], batch[5], batch[6]
+        prediction, *_ = model.predict_single_case(texts, seq)
+        target = target.float().to(prediction.device)
+        count = target.shape[0]
+        events += count
+        elements += target.numel()
+        task_sum += float(return_task_loss(prediction, target, config, reduction="sum"))
+        abs_sum += float((prediction - target).abs().sum())
+        square_sum += float((prediction - target).square().sum())
+        for h in hits:
+            actual = target[:, config.close_channel, h - 1]
+            predicted = prediction[:, config.close_channel, h - 1]
+            eligible = (actual != 0) & (actual.abs() > config.direction_deadband_bp)
+            eligible_counts[h] += int(eligible.sum())
+            hits[h] += int(((actual.sign() == predicted.sign()) & eligible).sum())
+    if not events:
+        raise ValueError("Return validation loader emitted no events")
+    return {"events": events, "task_loss": task_sum / events,
+            "return_mae_bp": abs_sum / elements, "return_mse_bp2": square_sum / elements,
+            "close_dhr": {str(h): {"rate": hits[h] / eligible_counts[h] if eligible_counts[h] else None,
+                                   "eligible_events": eligible_counts[h]} for h in hits}}
+
+
 # ============================= Train / Eval ==================================
 def train(model, train_loader, test_loader, vali_loader, num_epochs, output_path=None,
           use_horizon_weight=True, horizon_decay=0.00,
@@ -1540,9 +1607,16 @@ def train(model, train_loader, test_loader, vali_loader, num_epochs, output_path
         inv_lambda = 0.0
         model.token_align_loss_w = 0.0
 
-    print(f"[CONFIG] USE_RAW_TS_RESIDUAL: {USE_RAW_TS_RESIDUAL}")
-    print(f"[CONFIG] USE_LEARNABLE_LAST_VALUE: {USE_LEARNABLE_LAST_VALUE}")
+    print(f"[CONFIG] USE_RAW_TS_RESIDUAL: {model.use_raw_ts_residual}")
+    print(f"[CONFIG] USE_LEARNABLE_LAST_VALUE: {model.use_learnable_last_value}")
     print(f"[CONFIG] USE_MULTI_SCALE_TS: {USE_MULTI_SCALE_TS}")
+    print(f"[CONFIG] Loss weights: contrastive={contrastive_lambda}, gate={gate_causal_lambda}, "
+          f"TS-only={TrainingConfig.TS_ONLY_LAMBDA if not simplified_mode else 0.0}, "
+          f"token_align={model.token_align_loss_w}, entropy={TrainingConfig.GATE_ENTROPY_LAMBDA}, "
+          f"MoE={TrainingConfig.MOE_AUX_LAMBDA}")
+    print(f"[CONFIG] Gate target: adaptive={TrainingConfig.GC_USE_ADAPTIVE_SCALE}, "
+          f"fixed_scale={TrainingConfig.GC_SIGMOID_SCALE}, min_scale={TrainingConfig.GC_MIN_SCALE}, "
+          f"gain={TrainingConfig.GC_GAIN}, clamp={TrainingConfig.GC_LOGIT_CLAMP}")
 
     device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
     model.train()
@@ -1607,7 +1681,7 @@ def train(model, train_loader, test_loader, vali_loader, num_epochs, output_path
     if USE_MULTI_SCALE_TS:
         for p in model.multi_scale_extractor.parameters():
             p.requires_grad = True
-    if USE_LEARNABLE_LAST_VALUE:
+    if model.use_learnable_last_value:
         for p in model.last_value_module.parameters():
             p.requires_grad = True
 
@@ -1639,7 +1713,7 @@ def train(model, train_loader, test_loader, vali_loader, num_epochs, output_path
     if USE_MULTI_SCALE_TS:
         trainable_groups.append(
             {'params': model.multi_scale_extractor.parameters(), 'lr': base_lr, 'weight_decay': 0.01})
-    if USE_LEARNABLE_LAST_VALUE:
+    if model.use_learnable_last_value:
         trainable_groups.append({'params': model.last_value_module.parameters(), 'lr': base_lr * 2,
                                  'weight_decay': 0.01})  # Higher LR for last value module
     for name, mod in model.variant_modules().items():
@@ -1720,6 +1794,7 @@ def train(model, train_loader, test_loader, vali_loader, num_epochs, output_path
             "gate_count": 0,
             "gc_scores": [],
             "gc_scores_raw": [],
+            "gc_scales": [],
             "gate_texts": [],
             "train_loss_sum": 0.0,
             "train_smape_sum": 0.0,
@@ -1763,12 +1838,17 @@ def train(model, train_loader, test_loader, vali_loader, num_epochs, output_path
             if len(window_dict["gc_scores_raw"]) > 0:
                 gc_raw_all = torch.cat(window_dict["gc_scores_raw"])
                 gc_raw_mean = gc_raw_all.mean().item()
+            scale_text = ""
+            if window_dict["gc_scales"]:
+                scales = torch.tensor(window_dict["gc_scales"])
+                scale_text = (f", gate scale min/median/max: {scales.min().item():.6f}/"
+                              f"{scales.median().item():.6f}/{scales.max().item():.6f}")
 
             msg_causal = (
                 f"[Causal | last window] mean Granger score: {gc_mean:.4f} (sigmoid), {gc_raw_mean:.6f} (raw), "
                 f"mean text gate: {gate_text_mean:.4f}, "
                 f"frac(text improves TS-only): {gc_improve_ratio:.4f}, "
-                f"corr(gate,text_help): {corr:.4f}"
+                f"corr(gate,text_help): {corr:.4f}{scale_text}"
             )
             msgs.append(msg_causal)
 
@@ -1811,6 +1891,23 @@ def train(model, train_loader, test_loader, vali_loader, num_epochs, output_path
             print(m)
 
         _backup = swap_to_ema()
+        if model.forecast_task_config.task == RETURN_TASK:
+            # Keep test events untouched while selecting a return checkpoint.
+            result = evaluate_return_loader(model, vali_loader)
+            swap_from_backup(_backup)
+            model.train()
+            last_vali_metrics = (result["task_loss"], result["return_mse_bp2"],
+                                 result["return_mae_bp"], float("nan"), float("nan"), float("nan"))
+            last_test_metrics = (float("nan"),) * 6
+            print(f"[{tag}] Step {global_step} | Vali task {result['task_loss']:.6f}, "
+                  f"return MAE {result['return_mae_bp']:.6f} bp, "
+                  f"MSE {result['return_mse_bp2']:.6f} bp², "
+                  f"close DHR {result['close_dhr']}")
+            tracking.log({"vali/task_loss": result["task_loss"],
+                          "vali/return_mae_bp": result["return_mae_bp"],
+                          "vali/return_mse_bp2": result["return_mse_bp2"]},
+                         stage="stage3", step=global_step)
+            return
         vali_result = test(
             model, vali_loader, use_horizon_weight=use_horizon_weight, horizon_decay=horizon_decay,
             contrastive_lambda=contrastive_lambda, compute_modality_scores=True
@@ -1820,6 +1917,7 @@ def train(model, train_loader, test_loader, vali_loader, num_epochs, output_path
             contrastive_lambda=contrastive_lambda, compute_modality_scores=True
         )
         swap_from_backup(_backup)
+        model.train()
 
         (vali_combine_loss, vali_mse_loss, vali_mae_loss, vali_contras_loss, vali_rmse_loss,
          vali_smape_loss, vali_modality) = vali_result
@@ -2055,6 +2153,10 @@ def train(model, train_loader, test_loader, vali_loader, num_epochs, output_path
 
                     window["gc_scores"].append(gc_score.detach().cpu())
                     window["gc_scores_raw"].append(diff.detach().cpu())
+                    scale = (float(diff.abs().mean().clamp_min(TrainingConfig.GC_MIN_SCALE))
+                             if TrainingConfig.GC_USE_ADAPTIVE_SCALE
+                             else float(TrainingConfig.GC_SIGMOID_SCALE))
+                    window["gc_scales"].append(scale)
                     window["gate_texts"].append(gate_text_scalar.detach().cpu())
 
             if inv_lambda > 0:
@@ -2130,7 +2232,7 @@ def train(model, train_loader, test_loader, vali_loader, num_epochs, output_path
             window["ts_only_sum"] += loss_ts_only
 
             # Track alpha if using learnable last value
-            if USE_LEARNABLE_LAST_VALUE and analysis is not None and "last_value_alpha" in analysis:
+            if model.use_learnable_last_value and analysis is not None and "last_value_alpha" in analysis:
                 alpha = analysis["last_value_alpha"]
                 if alpha is not None:
                     window["alpha_sum"] += float(alpha.mean().detach().cpu())
@@ -2303,13 +2405,18 @@ def train(model, train_loader, test_loader, vali_loader, num_epochs, output_path
             save_path = os.path.join(model_output_path, "best_model.pth")
             model.save_model_combined(save_path=save_path)
             swap_from_backup(_backup)
-            print(
-                f'[Save Best] epoch {epoch + 1} | '
-                f'Vali MSE {vali_mse_loss:.6f} | Test MSE {test_mse_loss:.6f}'
-            )
-            tracking.summary({"best/epoch": epoch + 1, "best/vali_mse": vali_mse_loss,
-                              "best/vali_mae": vali_mae_loss, "best/test_mse": test_mse_loss,
-                              "best/test_mae": test_mae_loss})
+            if model.forecast_task_config.task == RETURN_TASK:
+                print(f"[Save Best] epoch {epoch + 1} | "
+                      f"Vali task {vali_combine_loss:.6f}, MAE {vali_mae_loss:.6f} bp")
+                tracking.summary({"best/epoch": epoch + 1,
+                                  "best/vali_task_loss": vali_combine_loss,
+                                  "best/vali_return_mae_bp": vali_mae_loss})
+            else:
+                print(f'[Save Best] epoch {epoch + 1} | '
+                      f'Vali MSE {vali_mse_loss:.6f} | Test MSE {test_mse_loss:.6f}')
+                tracking.summary({"best/epoch": epoch + 1, "best/vali_mse": vali_mse_loss,
+                                  "best/vali_mae": vali_mae_loss, "best/test_mse": test_mse_loss,
+                                  "best/test_mae": test_mae_loss})
 
         save_path = os.path.join(model_output_path, "lastest_model.pth")
         model.save_model_combined(save_path=save_path)
@@ -2916,7 +3023,7 @@ def train_stage1_ts_only(model, sw_train_loader, sw_vali_loader, num_epochs=None
     if USE_MULTI_SCALE_TS:
         for p in model.multi_scale_extractor.parameters():
             p.requires_grad = True
-    if USE_LEARNABLE_LAST_VALUE:
+    if model.use_learnable_last_value:
         for p in model.last_value_module.parameters():
             p.requires_grad = True
 
@@ -2945,7 +3052,7 @@ def train_stage1_ts_only(model, sw_train_loader, sw_vali_loader, num_epochs=None
         trainable_groups.append(
             {'params': model.multi_scale_extractor.parameters(), 'lr': TrainingConfig.STAGE1_LR, 'weight_decay': 0.01}
         )
-    if USE_LEARNABLE_LAST_VALUE:
+    if model.use_learnable_last_value:
         trainable_groups.append(
             {'params': model.last_value_module.parameters(), 'lr': TrainingConfig.STAGE1_LR * 2, 'weight_decay': 0.01}
         )
@@ -2989,7 +3096,7 @@ def train_stage1_ts_only(model, sw_train_loader, sw_vali_loader, num_epochs=None
             # Decode using TS-only pathway
             core = model.decoder(s_vec_norm, x_cf=x_cf)
 
-            if USE_LEARNABLE_LAST_VALUE:
+            if model.use_learnable_last_value:
                 last_val = x_cf[:, :, -1:].detach()
                 output, _ = model.last_value_module(core, last_val, s_vec_norm)
             else:
@@ -3033,7 +3140,7 @@ def train_stage1_ts_only(model, sw_train_loader, sw_vali_loader, num_epochs=None
                 s_vec_norm = F.normalize(ts_inst, p=2, dim=-1)
                 core = model.decoder(s_vec_norm, x_cf=x_cf)
 
-                if USE_LEARNABLE_LAST_VALUE:
+                if model.use_learnable_last_value:
                     last_val = x_cf[:, :, -1:].detach()
                     output, _ = model.last_value_module(core, last_val, s_vec_norm)
                 else:
@@ -3104,7 +3211,7 @@ def train_stage2_text_only(model, train_loader, vali_loader, num_epochs=None, ou
     for p in model.text_only_head.parameters():
         p.requires_grad = True
 
-    if USE_LEARNABLE_LAST_VALUE:
+    if model.use_learnable_last_value:
         for p in model.last_value_module.parameters():
             p.requires_grad = True
 
@@ -3129,7 +3236,7 @@ def train_stage2_text_only(model, train_loader, vali_loader, num_epochs=None, ou
         {'params': model.text_only_head.parameters(), 'lr': TrainingConfig.STAGE2_LR, 'weight_decay': 0.01},
     ]
 
-    if USE_LEARNABLE_LAST_VALUE:
+    if model.use_learnable_last_value:
         trainable_groups.append(
             {'params': model.last_value_module.parameters(), 'lr': TrainingConfig.STAGE2_LR * 2, 'weight_decay': 0.01}
         )
@@ -3179,7 +3286,7 @@ def train_stage2_text_only(model, train_loader, vali_loader, num_epochs=None, ou
             # Decode using text-only pathway
             core = model.decoder(t_vec_norm, x_cf=x_cf)
 
-            if USE_LEARNABLE_LAST_VALUE:
+            if model.use_learnable_last_value:
                 last_val = x_cf[:, :, -1:].detach()
                 output, _ = model.last_value_module(core, last_val, t_vec_norm)
             else:
@@ -3232,7 +3339,7 @@ def train_stage2_text_only(model, train_loader, vali_loader, num_epochs=None, ou
                 x_cf = model._ensure_cf(batch_seq_scale)
                 core = model.decoder(t_vec_norm, x_cf=x_cf)
 
-                if USE_LEARNABLE_LAST_VALUE:
+                if model.use_learnable_last_value:
                     last_val = x_cf[:, :, -1:].detach()
                     output, _ = model.last_value_module(core, last_val, t_vec_norm)
                 else:

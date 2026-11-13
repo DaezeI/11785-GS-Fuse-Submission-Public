@@ -434,7 +434,7 @@ def load_pretrained_model(args, d: int):
         batch_size=args.batch_size,
         decoder_layers=args.decoder_layers,
         decoder_heads=args.decoder_heads,
-        use_ts_memory=False,
+        use_ts_memory=getattr(args, "use_ts_memory", False),
         max_token_num=args.max_token_num,
         fusion_type=args.fusion_type,
         gate_type=args.gate_type,
@@ -442,7 +442,11 @@ def load_pretrained_model(args, d: int):
         moe_top_k=args.moe_top_k,
         num_queries=args.num_queries,
         qformer_layers=args.qformer_layers,
+        forecast_task_config=getattr(args, "forecast_task_config", None),
+        use_raw_ts_residual=getattr(args, "use_raw_ts_residual", None),
+        use_learnable_last_value=getattr(args, "use_learnable_last_value", None),
     )
+    model.run_provenance = getattr(args, "run_provenance", {})
     live_print("[load] Model initialized. Loading checkpoint weights ...")
     model.load_model_combined(save_path=args.model_path, strict=False)
     live_print("[load] Checkpoint load complete.")

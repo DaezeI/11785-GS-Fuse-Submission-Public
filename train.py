@@ -9,6 +9,7 @@ import os
 import warnings
 import json
 import random
+import subprocess
 from pathlib import Path
 
 # Auto-resolve nested repository directory
@@ -70,6 +71,8 @@ def parse_args():
     p.add_argument("--direction-deadband-bp", type=float, default=0.0)
     p.add_argument("--direction-weight", type=float, default=1.0)
     p.add_argument("--direction-horizons", type=int, nargs="+", default=[35, 70, 140])
+    p.add_argument("--raw-ts-residual", action=argparse.BooleanOptionalAction, default=None)
+    p.add_argument("--learnable-last-value", action=argparse.BooleanOptionalAction, default=None)
     p.add_argument("--seed", type=int, default=0)
 
     p.add_argument("--series-id", type=str, default="SP500")
@@ -162,7 +165,12 @@ def main():
         output.mkdir(parents=True, exist_ok=True)
         (output / "c1_data_audit.json").write_text(json.dumps(events.audit, indent=2) + "\n")
         resolved = vars(args).copy()
+        resolved["source_commit"] = subprocess.check_output(
+            ["git", "rev-parse", "HEAD"], cwd=repo_dir, text=True).strip()
         resolved["forecast_task_config"] = events.task_config.to_dict()
+        resolved["use_raw_ts_residual"] = True if args.raw_ts_residual is None else args.raw_ts_residual
+        resolved["use_learnable_last_value"] = (args.forecast_task == "return_bp" if
+                                               args.learnable_last_value is None else args.learnable_last_value)
         (output / "resolved_config.json").write_text(json.dumps(resolved, indent=2) + "\n")
         sw_train_loader, sw_vali_loader = events.sw_train_loader, events.sw_vali_loader
     else:
@@ -204,7 +212,17 @@ def main():
         num_queries=args.num_queries,
         qformer_layers=args.qformer_layers,
         forecast_task_config=(events.task_config if args.c1_manifest else ForecastTaskConfig()),
+        use_raw_ts_residual=args.raw_ts_residual,
+        use_learnable_last_value=args.learnable_last_value,
     )
+    if args.forecast_task == "return_bp":
+        model.run_provenance = {
+            "manifest_sha256": events.audit["manifest_sha256"],
+            "price_sha256": events.audit["price_sha256"],
+            "scale_population_sha256": events.audit["return_scale_population_sha256"],
+            "training_seed": args.seed,
+            "source_commit": resolved["source_commit"],
+        }
 
     variant_name = f"fusion={args.fusion_type}, gate={args.gate_type}"
     tracking.init_from_args(args, default_name=f"{args.series_id}_H{args.pred_len}_{args.fusion_type}_{args.gate_type}")
