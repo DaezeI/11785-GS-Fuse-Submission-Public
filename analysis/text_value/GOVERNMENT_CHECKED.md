@@ -1,8 +1,9 @@
 # Checked government-announcement comparison
 
 **Status:** eight held-out test announcements passed source, text-identity, and
-price-order checks. GPU text comparisons wait for the date-screened C1
-checkpoint from Slurm job `23840368`; there are no model results yet.
+price-order checks. Paired comparison job `23841902` is queued with an
+`afterok:23840368` dependency on date-screened C1 training; there are no
+model results yet.
 
 The exact [eight-record evidence set](government_announcements_checked_v1.json)
 contains four BLS CPI and four BLS Employment Situation announcements from
@@ -29,7 +30,8 @@ within-category shuffled texts, and two separately labeled no-text modes.
 Each category has four cases, permitting a complete derangement within type.
 The runner fails if an ID is missing or duplicated and records the evidence
 file hash, selected indices, donor IDs, checkpoint hash, and price/manifest
-hashes. Its `afterok` dependency on training must be recorded when submitted.
+hashes. The submitted Slurm job is `23841902`; the checked-evaluator commit
+is `9e8bd75`, recorded on Delta in `government_checked_v1/EVALUATOR_COMMIT.txt`.
 The checkpoint itself is trained on the larger date-screened *exploratory*
 corpus; the checked-set evaluation is more trustworthy on release timing but
 small and is not a clean-training benchmark.

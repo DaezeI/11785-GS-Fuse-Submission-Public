@@ -196,7 +196,8 @@ article release times remain unknown. For a more controlled held-out check,
 see the [eight official BLS announcements](GOVERNMENT_CHECKED.md): each has a
 source-confirmed 08:30 Eastern release, a text-identity check, and a 09:30
 first target price label. Its paired comparison is prepared for the same C1
-checkpoint and will use exactly the same eight examples in every condition.
+checkpoint as job `23841902` and will use exactly the same eight examples in
+every condition.
 
 ## Relationship to Adaeze's notes
 

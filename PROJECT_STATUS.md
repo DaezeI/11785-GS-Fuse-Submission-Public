@@ -32,7 +32,8 @@ properly trained model.
 The full C1 training and paired jobs are queued work, **not completed results**.
 An [eight-announcement BLS check](analysis/text_value/GOVERNMENT_CHECKED.md)
 has verified release dates/times, summary identity markers, and post-release
-price targets; its paired model comparison is prepared but has no result yet.
+price targets; paired model comparison `23841902` is queued after training
+and has no result yet.
 Slurm jobs continue independently of a laptop or SSH session. The shared
 account balance and queue can change; query them before planning more compute.
 Large checkpoints, raw articles/prices, and full prediction NPZ files stay on
