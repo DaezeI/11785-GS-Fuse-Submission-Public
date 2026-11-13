@@ -134,15 +134,15 @@ scripts point to this manifest and fresh output directories. They are queued
 with `afterok` dependencies: training `23840368` waited for audit `23835057`,
 then `23840369` (`zeroed_article_tokens`) and `23840370`
 (`fusion_bypass_ts_inst`) wait for training. After the audit passed, all three
-model jobs remained pending with `JobHeldAdmin` and priority zero. Slurm showed
-no administrator comment explaining the hold. **No full run has started at this
-check.** The staged Delta runtime files match the branch's training, loader,
+model jobs briefly showed `JobHeldAdmin` and priority zero. The hold then
+cleared: training is pending GPU scheduling, while both paired jobs are pending
+on training. **No full run has started at this check.** The staged Delta runtime files match the branch's training, loader,
 audit, and evaluator SHA-256 values. The shared staged source record is
 `e89c800`; later PR commits add documentation and the evidence ledger.
 Outputs and logs are under
 `/work/hdd/bjjg/gs-fuse/nicole/c1-date-screen-v1/` with group-readable
 batch-script permissions. The completed audit establishes input integrity for
-this manifest; Delta's administrator hold must be resolved before training.
+this manifest; training is eligible and awaits GPU scheduling.
 
 Screened manifest SHA-256:
 `1b04373a4361238b09c0b1d952163973403d2d7839dbb9e7215c429af14b23d1`.
