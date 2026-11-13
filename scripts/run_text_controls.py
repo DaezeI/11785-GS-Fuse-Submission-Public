@@ -26,6 +26,19 @@ ROOT = Path(__file__).resolve().parents[1]
 sys.path.insert(0, str(ROOT))
 
 
+def selected_event_indices(dataset_ids, requested_ids):
+    """Return exact dataset positions in requested order, failing on drift."""
+    if len(requested_ids) != len(set(requested_ids)) or len(requested_ids) < 2:
+        raise ValueError("Selected event IDs must be unique and contain at least two examples")
+    lookup = {event_id: i for i, event_id in enumerate(dataset_ids)}
+    if len(lookup) != len(dataset_ids):
+        raise ValueError("Dataset contains duplicate event IDs")
+    missing = set(requested_ids) - lookup.keys()
+    if missing:
+        raise ValueError(f"Selected event IDs absent from dataset: {sorted(missing)}")
+    return np.asarray([lookup[event_id] for event_id in requested_ids], dtype=int)
+
+
 def shuffle_donors(texts, dates, types, seed, within_type=False):
     """Find an index derangement, then minimize retained date/content matches.
 
@@ -76,6 +89,8 @@ def parse_args():
     p.add_argument("--event-dir", default="data/event")
     p.add_argument("--series-dir", default="data/series")
     p.add_argument("--c1-manifest")
+    p.add_argument("--event-ids-file", type=Path,
+                   help="JSON evidence set with records[].event_id; requires C1 and --max-events 0")
     p.add_argument("--c1-timing-policy", choices=["legacy_all0830_floor",
                    "category4_1400_strict_before"], default=None,
                    help="Required with --c1-manifest; must match checkpoint training")
@@ -97,6 +112,8 @@ def parse_args():
     args = p.parse_args()
     if args.batch_size < 1 or args.max_events < 0 or args.shuffles < 1:
         p.error("batch-size/shuffles must be positive; max-events must be nonnegative")
+    if args.event_ids_file and (not args.c1_manifest or args.max_events != 0):
+        p.error("--event-ids-file requires --c1-manifest and --max-events 0")
     return args
 
 
@@ -126,7 +143,10 @@ def main():
             batch_size=args.batch_size, event_dir=args.event_dir, series_dir=args.series_dir)
     ds = events.test_set if args.split == "test" else events.vali_set
     ids = np.arange(len(ds.list))
-    if args.max_events and args.max_events < len(ids):
+    if args.event_ids_file:
+        evidence = json.loads(args.event_ids_file.read_text())
+        ids = selected_event_indices(ds.event_ids, [r["event_id"] for r in evidence["records"]])
+    elif args.max_events and args.max_events < len(ids):
         ids = np.linspace(0, len(ids) - 1, args.max_events, dtype=int)
     if len(ids) < 2: raise SystemExit("Need at least two selected examples")
     items = [ds.list[i] for i in ids]
@@ -181,6 +201,7 @@ def main():
         "no_text_control_sha256": file_hash(ROOT / "model/no_text_control.py"),
         "batch_size": args.batch_size, "seed": args.seed, "tf32": args.tf32,
         "selected_source_indices": ids.tolist(),
+        "selected_event_ids_file_sha256": file_hash(args.event_ids_file) if args.event_ids_file else None,
         "article_content_sha256": [hashlib.sha256(t.encode()).hexdigest() for t in texts],
         "token_cache_policy": "isolated by checkpoint SHA, quantization, and TF32 under output directory",
         "price_sha256": file_hash(Path(args.series_dir) / "SP500.csv"),

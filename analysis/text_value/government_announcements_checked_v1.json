@@ -1,0 +1,73 @@
+{
+  "set_name": "government_announcements_checked_v1",
+  "purpose": "Held-out paired text comparison on official 08:30 Eastern releases",
+  "release_time_zone": "America/New_York",
+  "price_label_assumption": "SP500.csv labels are interpreted as New York exchange-local wall time; CSV itself has no timezone field",
+  "matching_rule": "Stored generated summary identifies the official report period and two headline figures; this does not certify every sentence of the generated summary",
+  "records": [
+    {
+      "event_id": "5/20230810.txt",
+      "announcement": "Consumer Price Index - July 2023",
+      "release_local": "2023-08-10T08:30:00",
+      "official_url": "https://www.bls.gov/news.release/archives/cpi_08102023.htm",
+      "summary_sha256": "ac6a0b549c46f1da215f8c4baeddf90e011e8818e6c88d000feae59e9ad6d875",
+      "summary_match_markers": ["July 2023", "0.2%", "3.2%"]
+    },
+    {
+      "event_id": "5/20231212.txt",
+      "announcement": "Consumer Price Index - November 2023",
+      "release_local": "2023-12-12T08:30:00",
+      "official_url": "https://www.bls.gov/news.release/archives/cpi_12122023.htm",
+      "summary_sha256": "ccc3827e80f750048bbff469708c39371d2f8e585c261d123f229dda5ee5abe0",
+      "summary_match_markers": ["November 2023", "0.1%", "3.1%"]
+    },
+    {
+      "event_id": "5/20240213.txt",
+      "announcement": "Consumer Price Index - January 2024",
+      "release_local": "2024-02-13T08:30:00",
+      "official_url": "https://www.bls.gov/news.release/archives/cpi_02132024.htm",
+      "summary_sha256": "fc8f8a4936c9b478ac3ca5b500ca6cb87b7ce0cd06c83a1b8bdf71334f89cfa1",
+      "summary_match_markers": ["January 2024", "0.3%", "3.1%"]
+    },
+    {
+      "event_id": "5/20240312.txt",
+      "announcement": "Consumer Price Index - February 2024",
+      "release_local": "2024-03-12T08:30:00",
+      "official_url": "https://www.bls.gov/news.release/archives/cpi_03122024.htm",
+      "summary_sha256": "87927d29f1b4d73246c41d3de97fce48cd1d3c92bc35a31f83a2ee4cc9f7fe74",
+      "summary_match_markers": ["February 2024", "0.4%", "3.2%"]
+    },
+    {
+      "event_id": "2/20231208.txt",
+      "announcement": "Employment Situation - November 2023",
+      "release_local": "2023-12-08T08:30:00",
+      "official_url": "https://www.bls.gov/news.release/archives/empsit_12082023.htm",
+      "summary_sha256": "299f396ee4539ad082d101c9beab1527f6503a6b0ebde58a74b4e6c50b5f1d03",
+      "summary_match_markers": ["November 2023", "199,000", "3.7%"]
+    },
+    {
+      "event_id": "2/20240105.txt",
+      "announcement": "Employment Situation - December 2023",
+      "release_local": "2024-01-05T08:30:00",
+      "official_url": "https://www.bls.gov/news.release/archives/empsit_01052024.htm",
+      "summary_sha256": "25d5efabdf5d9737d19f06b34226956507d0e410c41cc54f150193607b0c325f",
+      "summary_match_markers": ["December", "216,000", "3.7%"]
+    },
+    {
+      "event_id": "2/20240202.txt",
+      "announcement": "Employment Situation - January 2024",
+      "release_local": "2024-02-02T08:30:00",
+      "official_url": "https://www.bls.gov/news.release/archives/empsit_02022024.htm",
+      "summary_sha256": "2d5d381e3f145840e5c787a64a0a2db7282b3d490e0e6c9a8a67b556adcefb91",
+      "summary_match_markers": ["January 2024", "353,000", "3.7%"]
+    },
+    {
+      "event_id": "2/20240308.txt",
+      "announcement": "Employment Situation - February 2024",
+      "release_local": "2024-03-08T08:30:00",
+      "official_url": "https://www.bls.gov/news.release/archives/empsit_03082024.htm",
+      "summary_sha256": "f7baaefff792afbfe50e9675cf274b4d887d03ffd63d02d3741c8fb312d4eb08",
+      "summary_match_markers": ["February", "275,000", "3.9%"]
+    }
+  ]
+}

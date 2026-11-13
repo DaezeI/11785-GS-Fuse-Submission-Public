@@ -5,15 +5,21 @@
 > completed work, queued C1 comparisons, blockers, owners, and next handoffs.
 > The [November 10 update](docs/updates/2026-11-10.md) is an earlier snapshot.
 
+> **New C1 runs:** use the [date-screened C1 manifest](splits/manifests/purged_split_c1_date_screen_v1.json),
+> which excludes 883 suspect articles and retains 6,167 train / 2,302 validation /
+> 2,236 test events. The original C1 manifest is historical. Publication times
+> for most retained news are unverified, so report this limitation with text
+> results. See the [article-date handoff](analysis/text_value/ARTICLE_DATE_AUDIT.md).
+
 > **Team: start with [TEAM_WORKFLOW.md](TEAM_WORKFLOW.md).** It records the
 > November 4 agreement to use **C1 as the main split**, ownership, service setup,
 > dependencies, and next actions. **Agents: read [AGENTS.md](AGENTS.md).**
 >
 > **Current shared code:** [`main`](https://github.com/DaezeI/11785-GS-Fuse-Submission-Public/tree/main).
 > **Shared model runs:** [Joye's W&B project](https://forge.coreweave.com/wandb/zhaohan2-carnegie-mellon-university/11785-GS-Fuse).
-> **C1 integration remains pending:** historical commands/results below do not
-> establish that training or evaluation uses C1. Verify checkpoint training
-> history before treating an old model as a corrected C1 result.
+> **C1 integration is in `main`:** historical commands/results below do not
+> establish that a particular checkpoint used C1. Verify its training history
+> before treating an old model as a C1 result.
 
 > **Course:** CMU 11-785 Intro to Deep Learning (Fall 2026)  
 > **Team GitHub:** [DaezeI/11785-GS-Fuse-Submission-Public](https://github.com/DaezeI/11785-GS-Fuse-Submission-Public)<br>

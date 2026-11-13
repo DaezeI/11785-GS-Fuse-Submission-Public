@@ -1,0 +1,14 @@
+{
+  "policy_version": "c1_article_date_exclusion_v1",
+  "original_manifest_sha256": "7da0d5666ccf54fa41f99f2b947c83344acc1fd4c40c4017127e3a5bb87276fa",
+  "screened_manifest_sha256": "1b04373a4361238b09c0b1d952163973403d2d7839dbb9e7215c429af14b23d1",
+  "candidate_list_sha256": "352fa72a07a3a68cd54275b2dd8d5dbd7b41fcfe5afd19c3875ce3750b1542ec",
+  "confirmed_evidence_sha256": "79f406804fc04a827d34a81ac4d3afa627088af0036b8c5c2771ce2f950a7a41",
+  "original_event_count": 11588,
+  "excluded_count": 883,
+  "source_verified_date_only_count": 5,
+  "verified_publication_time_count": 0,
+  "unverified_reuters_dateline_candidate_count": 878,
+  "retained_unknown_publication_time_count": 10705,
+  "note": "Retained records still use assumed folder-date anchors; this is a sensitivity screen, not a timing-safe baseline."
+}

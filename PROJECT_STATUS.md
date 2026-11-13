@@ -1,9 +1,19 @@
 # Project status
 
-Updated November 12, 2026, after checking the submitted C1 jobs on Delta.
+Updated November 13, 2026, after the screened C1 input audit completed and
+the queued model jobs showed an administrator hold.
 This page is the current team overview. [TEAM_WORKFLOW.md](TEAM_WORKFLOW.md)
 has the owner-by-owner handoff and experiment checklist; dated updates preserve
 earlier status without rewriting it.
+
+**For all new team C1 runs, use
+[`purged_split_c1_date_screen_v1.json`](splits/manifests/purged_split_c1_date_screen_v1.json).**
+It excludes 883 suspect validation/test articles and retains 6,167 train,
+2,302 validation, and 2,236 test events. The original C1 manifest is a
+historical reference. Retained news publication times remain unverified; report
+that limitation when interpreting text gains. The team is proceeding with
+model experiments after the prepared-input audit, without a separate
+announcement-timing comparison.
 
 ## Where we stand
 
@@ -24,12 +34,15 @@ properly trained model.
 | Work | Current evidence | Next step |
 |---|---|---|
 | C1 implementation | Merged in PR #4; loader audit and focused tests passed. | Use `main` for new work and keep explicit timing/data provenance. |
-| Full C1 text comparison | [Sensitivity run plan](analysis/text_value/C1_FULL_SENSITIVITY_PLAN.md) records training job `23812725` and two `afterok` full-test paired jobs `23812735` and `23812734`; all remained pending on November 12. The separate 256-event smoke-checkpoint diagnostic `23812736` completed with exit 0. | Check Slurm state/logs; if training and both paired jobs complete, publish safe derived results with checkpoint hash and uncertainty. A larger evaluation on the 16-event checkpoint is not the next scientific test. |
-| Publication-time validity | The manifest has 12 categories but no per-article release timestamps. The price CSV timezone and bar-label convention remain unverified. The new run explicitly uses `category4_1400_strict_before` as a sensitivity assumption. | Team/TA name a timing owner and record sources, unknowns, and an agreed policy before calling any full result publication-time-safe. |
+| Full C1 text comparison | Old unscreened jobs `23812725`, `23812734`, and `23812735` were canceled. Screened input audit `23835057` **passed** (10,705 events, no exclusions, zero shared bars across splits). Training `23840368` and paired jobs `23840369`/`23840370` are pending with `JobHeldAdmin`; no full run has started. See the [audit result](analysis/text_value/c1_date_screen_v1_audit_summary.json) and [handoff](analysis/text_value/ARTICLE_DATE_AUDIT.md). | Resolve the Delta administrator hold, then monitor training and paired comparisons. |
+| Publication-time validity | Five source-checked test records have corrected calendar dates but no verified release times. The [evidence ledger](analysis/text_value/c1_article_date_policy_v1.csv) excludes those five and 878 more Reuters candidates; 10,705 retained records still have unknown release times. The screen retains 6,167 / 2,302 / 2,236 train/validation/test events. | Label the dependent run a date-screened sensitivity comparison. Do not claim publication-time-safe C1. |
 | Jessica's padding fix | Merged to `main` in [commit `96cc6d7`](https://github.com/DaezeI/11785-GS-Fuse-Submission-Public/commit/96cc6d7900dedd8b867b39a951045fe3804aa778) with three CPU tests. | Ask for links to any Q-Former analysis missing from GitHub before assigning further work. |
 | Gate, MoE, Q-Former diagnostics | Adaeze, Joye, and Jessica retain their existing streams. The inspected November 11 team job scripts used the earlier split; their outputs are historical diagnostics, not the C1 baseline. | Keep each checkpoint/split identity explicit; use the [owner handoff](TEAM_WORKFLOW.md#9-immediate-next-actions-agent-handoff-for-wednesday-november-11). |
 
 The full C1 training and paired jobs are queued work, **not completed results**.
+The prepared [eight-announcement BLS check](analysis/text_value/GOVERNMENT_CHECKED.md)
+has source and price-order evidence, but its paired model comparison `23841902`
+was canceled on November 13 at the user's request. It produced no model result.
 Slurm jobs continue independently of a laptop or SSH session. The shared
 account balance and queue can change; query them before planning more compute.
 Large checkpoints, raw articles/prices, and full prediction NPZ files stay on

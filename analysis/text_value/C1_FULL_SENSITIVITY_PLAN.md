@@ -1,5 +1,12 @@
 # Full C1 paired comparison under an explicit timing assumption
 
+**Superseded for execution on November 12.** Article-date conflicts were
+found in the original validation and test entries. Training job `23812725`
+was put on a user hold; its dependent jobs must not be used as the full C1
+comparison. See the [article-date audit and screened manifest](ARTICLE_DATE_AUDIT.md)
+and [draft PR #7](https://github.com/DaezeI/11785-GS-Fuse-Submission-Public/pull/7).
+This page preserves the November 11 submission record.
+
 **Status:** Slurm jobs submitted November 11, 2026. At the November 12 check,
 full training and its two dependent paired jobs were still pending; the
 256-event diagnostic had completed successfully.
