@@ -191,13 +191,14 @@ screened manifest hash and exact included IDs. The prepared v1 screen is a
 conservative exclusion policy; any later source-verified reanchoring needs a
 new version.
 
-The large date-screened C1 comparison is **exploratory** because most retained
-article release times remain unknown. For a more controlled held-out check,
-see the [eight official BLS announcements](GOVERNMENT_CHECKED.md): each has a
-source-confirmed 08:30 Eastern release, a text-identity check, and a 09:30
-first target price label. Its paired comparison is prepared for the same C1
-checkpoint as job `23841902` and will use exactly the same eight examples in
-every condition.
+The large date-screened C1 comparison can report model metrics on the screened
+dataset, but unknown publication times for retained news limit any claim that
+article text was available before the predicted price moves. The course-project
+decision on November 13 is to finish the screened C1 training and matched
+real/shuffled/no-text comparisons, and state this limitation in the report.
+The separate [eight-announcement BLS check](GOVERNMENT_CHECKED.md) was prepared
+but its paired job `23841902` was canceled at the user's request; no model
+result exists for it.
 
 ## Relationship to Adaeze's notes
 

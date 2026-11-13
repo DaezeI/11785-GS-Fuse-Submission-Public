@@ -8,17 +8,26 @@ Then read [PROJECT_STATUS.md](PROJECT_STATUS.md) for current progress and any
 relevant dated update for historical context. Preserve the distinction between
 verified code/results, teammate reports, queued jobs, and proposed work.
 Before any full C1 run, read the [November 12 article-date audit](analysis/text_value/ARTICLE_DATE_AUDIT.md).
-The original full-run jobs were held after widespread validation/test date
+The original full-run jobs were canceled after widespread validation/test date
 conflicts were found. Use the versioned date-screened manifest only after its
 real-input window audit passes; do not release the old jobs or describe the
 screened subset as publication-time certified.
+**November 13 team decision:** For new course-project C1 training and matched
+real/shuffled/no-text comparisons, use
+`splits/manifests/purged_split_c1_date_screen_v1.json` (6,167 train / 2,302
+validation / 2,236 test). The original C1 manifest is historical; do not use it
+for new full runs. The screened manifest excludes 883 suspect records but does
+not repair or verify publication times for retained news. State this as a
+limitation of model claims. Do not launch the separate eight-announcement
+timing comparison; its queued job was canceled at the user's request.
 Develop on personal/task branches and open focused PRs for ready changes, following
 the November 5 meeting guidance recorded in the update.
 
 ## Ownership and agreed protocol
 
-- **C1 is the main split:** `splits/manifests/purged_split_c1_macro_eras.json`.
-  C2 is an optional additional historical stress test.
+- **C1 is the main split:** use the date-screened C1 manifest named above for
+  new full runs. The original `purged_split_c1_macro_eras.json` defines the
+  historical split; C2 is an optional additional historical stress test.
 - **Nicole:** window/publication-time checks, shared C1 loading for training and
   evaluation, then correct/shuffled/no-text controls.
 - **Adaeze:** original gate, supervision, gradients, constant-gate controls.

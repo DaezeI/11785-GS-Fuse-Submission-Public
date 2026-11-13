@@ -13,12 +13,19 @@ See the [C1 protocol](analysis/text_value/C1_PROTOCOL.md),
 The [November 10 update](docs/updates/2026-11-10.md) is a historical snapshot;
 use the current status page for present-tense claims.
 
+**November 13 course-project decision:** New C1 training and matched text
+comparisons use the [date-screened manifest](splits/manifests/purged_split_c1_date_screen_v1.json)
+after its prepared-input audit. It excludes 883 suspect articles. Remaining
+news publication times are unverified and must be stated as a limitation.
+The separate eight-announcement timing comparison was canceled; continue the
+main model experiments. See [current status](PROJECT_STATUS.md).
+
 **November 12 data alert:** A [Delta article-date scan](analysis/text_value/ARTICLE_DATE_AUDIT.md)
 found 198 C1 validation and 684 test Reuters-dateline conflicts, plus one
-source-verified non-Reuters test conflict. The original full C1 training job is
-held. A separate date-screened sensitivity manifest and replacement scripts
+source-verified non-Reuters test conflict. The original full C1 training job was
+canceled. A separate date-screened sensitivity manifest and replacement scripts
 are in [draft PR #7](https://github.com/DaezeI/11785-GS-Fuse-Submission-Public/pull/7).
-Check its real-input audit before submitting a new full run. The original C1
+Check its real-input audit before running the queued full job. The original C1
 manifest remains the historical split definition, not a timing-safe run input.
 
 ## 1. Agreed decisions and actual status
@@ -89,7 +96,9 @@ the original script, working-directory, and log paths.
 
 ## 3. The C1 protocol and remaining code gap
 
-Canonical list: [purged_split_c1_macro_eras.json](splits/manifests/purged_split_c1_macro_eras.json).
+Historical base list: [purged_split_c1_macro_eras.json](splits/manifests/purged_split_c1_macro_eras.json).
+Use the [date-screened list](splits/manifests/purged_split_c1_date_screen_v1.json)
+for new C1 experiments, as stated above.
 The timeline has five consecutive blocks: three training, one validation, one
 test, with boundary events removed.
 

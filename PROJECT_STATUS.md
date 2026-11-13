@@ -1,9 +1,19 @@
 # Project status
 
-Updated November 12, 2026, after checking the submitted C1 jobs and article dates on Delta.
+Updated November 13, 2026, after checking the submitted C1 jobs and recording
+the course-project data decision.
 This page is the current team overview. [TEAM_WORKFLOW.md](TEAM_WORKFLOW.md)
 has the owner-by-owner handoff and experiment checklist; dated updates preserve
 earlier status without rewriting it.
+
+**For all new team C1 runs, use
+[`purged_split_c1_date_screen_v1.json`](splits/manifests/purged_split_c1_date_screen_v1.json).**
+It excludes 883 suspect validation/test articles and retains 6,167 train,
+2,302 validation, and 2,236 test events. The original C1 manifest is a
+historical reference. Retained news publication times remain unverified; report
+that limitation when interpreting text gains. The team is proceeding with
+model experiments after the prepared-input audit, without a separate
+announcement-timing comparison.
 
 ## Where we stand
 
@@ -30,10 +40,9 @@ properly trained model.
 | Gate, MoE, Q-Former diagnostics | Adaeze, Joye, and Jessica retain their existing streams. The inspected November 11 team job scripts used the earlier split; their outputs are historical diagnostics, not the C1 baseline. | Keep each checkpoint/split identity explicit; use the [owner handoff](TEAM_WORKFLOW.md#9-immediate-next-actions-agent-handoff-for-wednesday-november-11). |
 
 The full C1 training and paired jobs are queued work, **not completed results**.
-An [eight-announcement BLS check](analysis/text_value/GOVERNMENT_CHECKED.md)
-has verified release dates/times, summary identity markers, and post-release
-price targets; paired model comparison `23841902` is queued after training
-and has no result yet.
+The prepared [eight-announcement BLS check](analysis/text_value/GOVERNMENT_CHECKED.md)
+has source and price-order evidence, but its paired model comparison `23841902`
+was canceled on November 13 at the user's request. It produced no model result.
 Slurm jobs continue independently of a laptop or SSH session. The shared
 account balance and queue can change; query them before planning more compute.
 Large checkpoints, raw articles/prices, and full prediction NPZ files stay on
