@@ -5,6 +5,11 @@
 > completed work, queued C1 comparisons, blockers, owners, and next handoffs.
 > The [November 10 update](docs/updates/2026-11-10.md) is an earlier snapshot.
 
+> **Planning or reporting a run?** Use the [experiment register and reporting rule](EXPERIMENTS.md)
+> to state its question, comparison, one intended change (or named package),
+> fixed settings, provenance, and actual finding. Planned and queued runs are
+> recorded separately from completed results.
+
 > **New C1 runs:** use the [date-screened C1 manifest](splits/manifests/purged_split_c1_date_screen_v1.json),
 > which excludes 883 suspect articles and retains 6,167 train / 2,302 validation /
 > 2,236 test events. The original C1 manifest is historical. Publication times
