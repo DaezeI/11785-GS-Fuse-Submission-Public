@@ -28,6 +28,13 @@ timing comparison; its queued job was canceled at the user's request.
 Develop on personal/task branches and open focused PRs for ready changes, following
 the November 5 meeting guidance recorded in the update.
 
+For every proposed or executed experiment, follow [EXPERIMENTS.md](EXPERIMENTS.md).
+Record its question, comparison, intended change, fixed settings, status,
+provenance, result, and limitations. Prefer one changed factor when attributing
+an effect. Label multi-change comparisons as packages, and never infer a
+component's effect from them. Update the register and link a result note even
+when a run fails or finds no improvement; do not turn queued work into a result.
+
 ## Ownership and agreed protocol
 
 - **C1 is the main split:** use the date-screened C1 manifest named above for
