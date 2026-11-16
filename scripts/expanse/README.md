@@ -1,16 +1,16 @@
 # Expanse migration plan
 
-These scripts prepare the screened-C1 price baseline for SDSC Expanse. They do
-not establish that the November 12 exchange is approved. As of November 15,
-2026, ACCESS still reports it **Under Review**, and no Expanse account, project
-code, remote path, environment, or model result is claimed.
+**Dormant contingency only.** ACCESS declined the November 12 Expanse exchange
+on November 16, 2026. The reviewer said a move based on long waits elsewhere
+could not be accepted while all ACCESS resources were in high demand. No
+Expanse account, project, storage, transfer, or model result exists. Do not use
+or submit these scripts unless a future approved award makes them relevant.
 
 For a plain-language teammate handoff, start with
 [`docs/EXPANSE_APPROVAL_CHECKLIST.md`](../../docs/EXPANSE_APPROVAL_CHECKLIST.md).
 
-Do not submit or transfer data until approval and individual provisioning are
-verified. The existing Delta job states must also be queried before they are
-described or canceled.
+The existing Delta jobs remain separate. Do not alter or cancel them without
+their owner's confirmation.
 
 ## Required configuration
 

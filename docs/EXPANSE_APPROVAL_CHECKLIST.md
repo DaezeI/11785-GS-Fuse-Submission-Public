@@ -1,11 +1,13 @@
 # Expanse approval checklist for teammates
 
-**Purpose:** This is the plain-language handoff for moving the screened-C1
-GS-Fuse experiment to SDSC Expanse. Follow it only after ACCESS changes the
-November 12 exchange request from **Under Review** to **Approved**.
+**Status: dormant contingency only.** ACCESS declined the November 12 Expanse
+exchange on November 16, 2026. No Expanse account, storage, file copy, or job
+resulted. Do not follow this checklist unless the team later receives a real
+approved award and confirms that this plan is relevant to it.
 
-As of November 15, 2026, the request was still under review. No Expanse files
-had been copied and no Expanse jobs had been started.
+The reviewer said a move based on long waits elsewhere could not be accepted
+while all ACCESS resources were in high demand. Do not resubmit the same request
+without a materially different, provider-appropriate reason and team agreement.
 
 ## What not to change
 
@@ -140,9 +142,8 @@ After the practice run is approved:
 4. Keep the return redesign, gate, MoE, and Q-Former experiments separate until
    this reference result is complete, unless the team records a new priority.
 
-The current request is for 100 GPU-hours. That is a starting request, not a
-known permanent maximum; more may be requested. Record the amount actually
-approved and used.
+The declined request was for 100 GPU-hours. A future request or award may be
+different; record only the amount actually approved and used.
 
 ## Required handoff after every run
 
