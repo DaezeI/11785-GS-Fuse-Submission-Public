@@ -28,7 +28,7 @@ one component and is not a model-quality comparison.
 
 ## Status and provenance
 
-Status: **SUBMITTED — not yet a result**.
+Status: **RUNNING — not yet a result**.
 
 - Owner: Adaeze
 - Branch: `adaeze/pr8-speed-smoke`
@@ -43,7 +43,8 @@ Status: **SUBMITTED — not yet a result**.
   request was schedulable on `gpuA100x4-interactive` with a 30-minute limit.
   Replacement job ID: `24045929`, submitted from commit
   `15566fbd0208e96c642b7105d9e10f5b6966a198` on
-  `gpuA100x4-interactive` with a 30-minute limit.
+  `gpuA100x4-interactive` with a 30-minute limit. Slurm reported it running
+  on `gpua064` with start time `2026-11-16T13:30:15`.
 - Preflight checks: 17 focused return/checkpoint tests passed; 25 focused
   text-value tests passed with `--require-torch`; Slurm `--test-only` accepted
   the request.
