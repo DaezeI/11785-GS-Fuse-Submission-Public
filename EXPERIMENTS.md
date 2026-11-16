@@ -33,13 +33,27 @@ population into another run's row.
 
 | Run or comparison | Purpose | Intended change | Status and evidence |
 |---|---|---|---|
-| Screened C1 price baseline | Establish the price-task reference and matched text controls | Uses the November 13 screened C1 manifest | Training and paired jobs queued; see [project status](PROJECT_STATUS.md). No full result yet. |
+| Screened C1 price baseline | Establish the price-task reference and matched text controls | Uses the November 13 screened C1 manifest | No full result. On November 15, Nicole's three Delta model jobs were verified as pending with zero run time; leave them unchanged pending owner confirmation. Expanse preparation is unexecuted because the November 12 exchange remains under review. See [project status](PROJECT_STATUS.md). |
 | Screened C1 return redesign | Test Adaeze's return design as a package on the same screened population | Return target, Huber/direction task loss, gate target, and last-value shortcut change together | Code in [draft return PR](https://github.com/DaezeI/11785-GS-Fuse-Submission-Public/pull/8); GPU smoke and full run pending. Do not attribute a future difference to one component. |
 | Return component ablations | Identify which return-design choices matter | Change direction penalty, gate target, and last-value shortcut separately while holding screened data and budget fixed | Run setup pending on the return branch; no result yet. |
 
 The original unscreened C1 manifest and historical outputs remain preserved for
 audit context. The screened subset excludes 883 suspect articles; publication
 times for retained articles are still unverified.
+
+## Execution migration is not an experiment
+
+Moving the same screened-C1 baseline from Delta A100 to Expanse V100 is an
+execution change that must be recorded, not silently folded into a result.
+Before comparison, record the Expanse project, code commit, environment, GPU,
+precision/quantization, cache signature, batch size, seed, manifest and price
+hashes, and resolved training budget. A V100 memory-driven configuration change
+creates a different run configuration. Do not attribute a metric difference to
+the data screen, text, gate, or return task if hardware and precision also
+changed. The prepared scripts in [`scripts/expanse`](scripts/expanse/README.md)
+are plans only: the exchange is under review and no Expanse job has been run.
+The current request is for 100 GPU-hours, but more may be requested; record the
+hours actually approved and used rather than treating 100 as a permanent cap.
 
 ## Entry template for future work
 
