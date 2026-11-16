@@ -4,7 +4,6 @@ GS-FUSE unified multimodal forecasting model and training utilities.
 """
 
 import os
-import gc
 import sys
 import warnings
 from pathlib import Path
@@ -1322,8 +1321,9 @@ class GSFuse(nn.Module):
     def save_model_combined(self, save_path="model_checkpoint.pth", **kwargs):
         state_dicts = {
             "ts_encoder": self.ts_encoder.state_dict(),
+            # This includes the registered language-model backbone. Keep the
+            # legacy "llm" loader below, but do not save the same tensors twice.
             "text_encoder": self.text_encoder.state_dict(),
-            "llm": self.text_encoder.llm.state_dict(),
             "llm_proj": self.llm_proj.state_dict(),
             "embed_project": self.embed_project.state_dict(),
             "ts_feat_to_fuse": self.ts_feat_to_fuse.state_dict(),
@@ -2322,9 +2322,6 @@ def train(model, train_loader, test_loader, vali_loader, num_epochs, output_path
 
             del output, batch_fusion_embeddings, batch_series_embeddings, batch_text_embeddings
             del batch_sent_report_embeddings, batch_negative_type_report_embeddings, analysis
-            gc.collect()
-            if torch.cuda.is_available():
-                torch.cuda.empty_cache()
 
             if eval_every_steps is not None and eval_every_steps > 0 and (global_step % eval_every_steps == 0):
                 _do_eval_and_log(tag=f"Eval@{eval_every_steps}steps")

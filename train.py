@@ -36,9 +36,6 @@ warnings.filterwarnings(
     message="torch.utils._pytree._register_pytree_node is deprecated",
 )
 
-torch.autograd.set_detect_anomaly(True)
-
-
 def parse_args():
     p = argparse.ArgumentParser(description="Train GS-FUSE with selectable TS and text backbones")
 
@@ -105,6 +102,8 @@ def parse_args():
                    help="Precomputed text embeddings from scripts/precompute_text_cache.py")
     p.add_argument("--tf32", action="store_true", help="Allow TF32 matmuls (must match the text cache)")
     p.add_argument("--no-4bit", action="store_true", help="Load the text backbone in full precision instead of 4-bit")
+    p.add_argument("--detect-anomaly", action="store_true",
+                   help="Enable slow autograd anomaly tracing for debugging")
     p.add_argument("--interpret-samples", type=int, default=0,
                    help="After training, dump interpretability plots for this many test events (0 = skip)")
     tracking.add_cli_args(p)
@@ -117,6 +116,7 @@ def parse_args():
 
 def main():
     args = parse_args()
+    torch.autograd.set_detect_anomaly(args.detect_anomaly)
     random.seed(args.seed)
     np.random.seed(args.seed)
     torch.manual_seed(args.seed)
