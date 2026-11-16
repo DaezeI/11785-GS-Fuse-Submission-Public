@@ -15,7 +15,7 @@ last-value behavior together. It cannot identify which component helped.
 The following staged comparison isolates choices **within the return task**.
 All four variants use the exact same frozen screened manifest, price and article
 snapshot, timing rule, training/validation/test events, seed, code commit,
-backbones, architecture, precision, optimizer, training budget, and paired test
+backbones, fusion and gate architecture, precision, optimizer, training budget, and paired test
 protocol. `scripts/delta/nicole_c1_return_full.sbatch` selects the variant.
 
 | Run | Direction weight in forecast task | Gate target loss | Learnable last value | Compare with | Question |
@@ -47,6 +47,36 @@ selects each checkpoint using its configured training objective. Before a
 price-versus-return comparison, transform each price prediction to a bp return
 using its own last observed close, and verify the event IDs, windows, and
 article content match.
+
+## Frozen dataset verified November 16
+
+Use `/work/hdd/bjjg/gs-fuse/data/snapshots/c1-screened-return-v1`. Its
+[version record](../../analysis/text_value/c1_screened_return_v1_snapshot.json)
+covers 121,156 files with content SHA-256
+`049aa089d2eaa77644be5deba3abad3fa33c0a18b4375553664cafc71370c2bf`.
+The snapshot is readable by `delta_bjjg` and its files are read-only.
+
+Delta job `24050520` completed in 6:59 with exit code 0 using audit commit
+`d90313b0b63d9d2a92784336b0268faa32c588b2`. The earlier copy job
+`24050470` was canceled after slow small-file copies. The replacement used
+parallel copying and independently rechecked the resulting fingerprint.
+
+The [audit](../../analysis/text_value/c1_screened_return_v1_audit.json) emitted
+6,167 training, 2,302 validation, and 2,236 test events with zero exclusions
+and zero price bars shared across splits. Each event ID, split, start, anchor,
+and target end matched the November 13 screened price audit exactly. The
+return transform passed for all 10,705 events and 22,468 Stage 1 windows. The
+training-only scale is 48.34035 bp. The date scan found four matching Reuters
+datelines and zero conflicts among retained articles. Release times remain
+unverified. The 883 prior exclusions are recorded in the
+[date-screen ledger](../../analysis/text_value/c1_article_date_policy_v1.csv).
+
+The full window CSV is at
+`/work/hdd/bjjg/gs-fuse/runs/nicole/return-v1/input-audit-v2/windows.csv`
+with SHA-256 `99b8d5aafc17ac2e32c3fa076819b836cb3b8f7958d6d676b37c1f1e3963d42b`.
+Use the audited snapshot directly for new runs. The already queued price jobs
+use the original paths. Their event windows match this audit, but the prior
+price training job did not record an article-tree fingerprint.
 
 ## Reproducing the input freeze and audit
 
@@ -93,7 +123,7 @@ for training and paired jobs. The scripts check both before loading a model.
 cd /work/hdd/bjjg/gs-fuse/runs/nicole/return-v1/repo
 mkdir -p /work/hdd/bjjg/gs-fuse/runs/nicole/return-v1/logs
 export EXPECTED_CODE_COMMIT=$(git rev-parse HEAD)
-export C1_SNAPSHOT_SHA256=$(python -c 'import json; from pathlib import Path; p=Path("/work/hdd/bjjg/gs-fuse/data/snapshots/c1-screened-return-v1/snapshot.json"); print(json.loads(p.read_text())["content_sha256"])')
+export C1_SNAPSHOT_SHA256=049aa089d2eaa77644be5deba3abad3fa33c0a18b4375553664cafc71370c2bf
 ```
 
 1. Submit `scripts/delta/nicole_c1_return_smoke.sbatch`; inspect all stages,
@@ -103,8 +133,8 @@ export C1_SNAPSHOT_SHA256=$(python -c 'import json; from pathlib import Path; p=
    example `VARIANT=R0 sbatch scripts/delta/nicole_c1_return_full.sbatch`. Repeat
    for R1, R2 and R3. Each has a fresh output path.
    R3 writes to `full-v1` and is the package-comparison return run.
-3. For each run, set `RUN_KIND` to its output directory name and run
-   `scripts/delta/nicole_c1_return_paired.sbatch`. Save job IDs, selected
+3. After each training job completes, submit its paired evaluation. For example,
+   `RUN_KIND=ablation-r0-v1 sbatch scripts/delta/nicole_c1_return_paired.sbatch`. Save job IDs, selected
    checkpoint, config, hashes, paired outputs, metrics, findings, and
    limitations in a linked result note. For each adjacent pair, run the CPU
    analyzer with the new variant as `--predictions` and the preceding variant

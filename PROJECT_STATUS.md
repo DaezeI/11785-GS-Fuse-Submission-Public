@@ -1,7 +1,9 @@
 # Project status
 
 Updated November 16, 2026, after Adaeze's return-task runtime smoke and
-structured-metrics replay completed.
+structured-metrics replay completed and the frozen screened C1 dataset passed its full audit.
+The [dataset and run handoff](docs/updates/2026-11-13-return-ablations.md) lists
+the Delta path, fingerprint, and commands for the controlled return comparisons.
 This page is the current team overview. [TEAM_WORKFLOW.md](TEAM_WORKFLOW.md)
 has the owner-by-owner handoff and experiment checklist; dated updates preserve
 earlier status without rewriting it.
