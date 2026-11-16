@@ -34,7 +34,7 @@ population into another run's row.
 | Run or comparison | Purpose | Intended change | Status and evidence |
 |---|---|---|---|
 | Screened C1 price baseline | Establish the price-task reference and matched text controls | Uses the November 13 screened C1 manifest | Training and paired jobs queued; see [project status](PROJECT_STATUS.md). No full result yet. |
-| Screened C1 return redesign | Test Adaeze's return design as a package on the same screened population | Return target, Huber/direction task loss, gate target, and last-value shortcut change together | Code in [draft return PR](https://github.com/DaezeI/11785-GS-Fuse-Submission-Public/pull/8); GPU smoke and full run pending. Do not attribute a future difference to one component. |
+| Screened C1 return redesign | Test Adaeze's return design as a package on the same screened population | Return target, Huber/direction task loss, gate target, and last-value shortcut change together | The [runtime smoke and metrics replay](analysis/text_value/ADAEZE_RETURN_SPEED_SMOKE.md) completed on 16 training and eight validation/test events. This verifies execution and structured metric capture only; the full run remains pending. Code builds on [draft return PR](https://github.com/DaezeI/11785-GS-Fuse-Submission-Public/pull/8). Do not attribute a future difference to one component. |
 | Return component ablations | Identify which return-design choices matter | Change direction penalty, gate target, and last-value shortcut separately while holding screened data and budget fixed | Run setup pending on the return branch; no result yet. |
 
 The original unscreened C1 manifest and historical outputs remain preserved for
