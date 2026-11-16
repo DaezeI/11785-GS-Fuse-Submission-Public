@@ -9,8 +9,9 @@ and commit only small run records or summaries here.
 
 Record the question the run answers, the comparison run, the one intended
 change, and what stays fixed: manifest and timing policy, event population,
-price file, code version, model/backbones, training budget, seed, metrics, and
-evaluation controls. Save the exact launch command and a fresh output path.
+price and article snapshot hashes, code version, model/backbones, training
+budget, seed, metrics, and evaluation controls. Publish changed data as a new
+version, preserving the prior copy and its audit. Save the exact launch command and a fresh output path.
 Run the same evaluation population and metric definitions for both sides.
 
 One-change comparisons support claims about that change. A bundled redesign is
@@ -22,7 +23,7 @@ an ablation. If the population changes, state that the scores are not paired.
 ## After a run
 
 Add a result note or update the linked handoff with: status, owner, code commit,
-manifest and price hashes, training seed and resolved settings, job ID, exact
+manifest, price, and article snapshot hashes, training seed and resolved settings, job ID, exact
 command, checkpoint, output path, paired evaluation IDs, metrics with counts and
 uncertainty, observed finding, interpretation, limitations, and next action.
 Use `PENDING` for unknown fields. A queued job has no result. A smoke run checks

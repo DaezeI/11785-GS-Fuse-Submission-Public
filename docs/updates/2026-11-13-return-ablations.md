@@ -1,7 +1,8 @@
 # Screened return experiments and frozen-input handoff — November 13, 2026
 
-Status: **code prepared; input snapshot and full CPU audit pending; no return GPU
-smoke or full result exists.** Follow [EXPERIMENTS.md](../../EXPERIMENTS.md)
+Status: **controlled runs prepared.** The [Delta smoke and metrics replay](../../analysis/text_value/ADAEZE_RETURN_SPEED_SMOKE.md)
+passed on Adaeze’s predecessor branch. The combined code and frozen-input
+return experiments have no full training results. Follow [EXPERIMENTS.md](../../EXPERIMENTS.md)
 for result records. The original data, original C1 manifest, queued screened
 price run, and historical outputs are preserved. Do not edit them for this work.
 
@@ -34,17 +35,23 @@ data-validity decision; do not use suspect-date articles as a supposed clean
 baseline. Retained publication times remain unverified.
 
 Interpret a comparison only after full training and paired evaluation on the
-same test event IDs. Report task loss, return MAE/MSE, close directional hit
+same test event IDs. Report return MAE/MSE and close directional hit
 rates with eligible counts, real versus shuffled/no-article controls, and
 paired date-block uncertainty. A smoke run only checks execution and reload.
 If the four-run budget is unavailable, prioritize R3 versus screened price as
 a labeled package comparison and R2 versus R3 as a single-factor check. Do not
-claim effects for unrun comparisons.
+claim effects for unrun comparisons. Report each run’s objective values for
+debugging. For R0 versus R1, the task losses use different direction weights.
+Use the common bp and hit-rate metrics for performance comparisons. Before a
+price-versus-return comparison, transform each price prediction to a bp return
+using its own last observed close, and verify the event IDs, windows, and
+article content match.
 
-## One-time CPU input freeze and audit
+## Reproducing the input freeze and audit
 
-Run these commands on a CPU worker with access to the full article corpus and
-the Delta paths below. The copy operation **fails if the versioned destination
+The Delta batch entrypoint is `scripts/delta/nicole_c1_return_input_audit.sbatch`.
+It uses the CPU on a scheduled compute node. The commands below show the same
+steps for a CPU worker that can read the corpus. The copy operation **fails if the versioned destination
 already exists**. It only reads the source directories. The snapshot contains
 copies of the screened manifest, SP500.csv, and every article folder referenced
 by that manifest, plus `snapshot.json` with SHA-256 fingerprints for all copied
@@ -67,7 +74,8 @@ python scripts/audit_c1_protocol.py \
   --windows-csv /work/hdd/bjjg/gs-fuse/runs/nicole/return-v1/return-input-windows-v1.csv
 ```
 
-The audit verifies all event return transforms against the last observed close,
+The audit reruns the Reuters dateline screen on retained summaries and verifies
+all event transforms against the last observed close,
 price reconstruction, Stage-1 return windows, split coverage, event exclusions,
 training-only loss scale, and direction-eligible counts. It fails on incomplete
 inputs by default. Save its small JSON/CSV and the snapshot's `snapshot.json`
@@ -93,8 +101,8 @@ them before loading the model. Create the run `logs` directory first.
    checkpoint, config, hashes, paired outputs, metrics, findings, and
    limitations in a linked result note. Do not interpret before these exist.
 
-The scripts use the same frozen inputs and code, but changing random-number
-consumption when the last-value module is enabled can affect stochastic
-training. Report that limitation; consider repeated seeds if the result is
-small or unstable. Q-Former and MoE are separate later experiments on the same
-snapshot, each changing one architecture choice against R3.
+The optional last-value module preserves the random state when initialized,
+so shared model weights and starting random draws agree for R2 and R3.
+Consider repeated seeds if a result is small or unstable. Q-Former and MoE
+are follow-up experiments on the same snapshot, each changing one architecture
+choice against R3.

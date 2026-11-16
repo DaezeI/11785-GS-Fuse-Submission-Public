@@ -799,13 +799,6 @@ class GSFuse(nn.Module):
             seq_len=self.seq_len
         ).to(self.device)
 
-        # NEW: Learnable last-value residual module
-        if self.use_learnable_last_value:
-            self.last_value_module = LearnableLastValueResidual(
-                context_dim=FUSE_DIM, d_channels=self.d, pred_len=self.pred_len,
-                init_alpha=LAST_VALUE_INIT_WEIGHT
-            ).to(self.device)
-
         # Memory conditioning
         self.mem_type_embed = nn.Embedding(2, FUSE_DIM).to(self.device)
         enc_layer = nn.TransformerEncoderLayer(
@@ -834,6 +827,14 @@ class GSFuse(nn.Module):
             nn.GELU(),
             nn.Linear(FUSE_DIM, self.d * self.pred_len)
         ).to(self.device)
+
+        # Keep shared initialization and training draws aligned in the ablation.
+        if self.use_learnable_last_value:
+            with torch.random.fork_rng(devices=[]):
+                self.last_value_module = LearnableLastValueResidual(
+                    context_dim=FUSE_DIM, d_channels=self.d, pred_len=self.pred_len,
+                    init_alpha=LAST_VALUE_INIT_WEIGHT
+                ).to(self.device)
 
     # ---------- utilities ----------
     def _ensure_cf(self, x: torch.Tensor) -> torch.Tensor:

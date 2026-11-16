@@ -2,7 +2,9 @@
 
 The [return ablation and frozen-input handoff](2026-11-13-return-ablations.md)
 supersedes the GPU launch order below. It adds a one-time versioned input copy,
-full CPU audit, and R0→R3 single-factor comparisons. No return GPU job has run.
+full CPU audit, and R0→R3 single-factor comparisons. See the
+[November 16 smoke and replay record](../../analysis/text_value/ADAEZE_RETURN_SPEED_SMOKE.md)
+for later verification.
 
 This task branch starts from public `main` at `1db75e7` (including Nicole's
 screened C1 audit/PR #7) and cherry-picks Adaeze's return design and
