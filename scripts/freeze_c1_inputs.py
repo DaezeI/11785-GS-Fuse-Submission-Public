@@ -7,7 +7,9 @@ import json
 import os
 import shutil
 import subprocess
+import sys
 import tempfile
+from concurrent.futures import ThreadPoolExecutor
 from datetime import datetime, timezone
 from pathlib import Path
 
@@ -36,9 +38,10 @@ def content_inventory(root):
     root = Path(root)
     files = sorted(p for p in root.rglob("*") if p.is_file() and p != root / "snapshot.json")
     h = hashlib.sha256()
-    for path in files:
-        relative = path.relative_to(root).as_posix()
-        h.update(f"{relative}\t{sha256_file(path)}\n".encode())
+    with ThreadPoolExecutor(max_workers=16) as workers:
+        for path, digest in zip(files, workers.map(sha256_file, files)):
+            relative = path.relative_to(root).as_posix()
+            h.update(f"{relative}\t{digest}\n".encode())
     return {"file_count": len(files), "content_sha256": h.hexdigest()}
 
 
@@ -68,13 +71,24 @@ def freeze(manifest_path, event_dir, series_path, destination):
         shutil.copy2(manifest_path, temp / "manifest.json")
         (temp / "series").mkdir()
         shutil.copy2(series_path, temp / "series" / "SP500.csv")
-        for category, filename in folders:
+        for category in {category for category, _ in folders}:
+            (temp / "event" / category).mkdir(parents=True)
+
+        def copy_event(folder):
+            category, filename = folder
             source = event_dir / category / filename
-            if not source.is_dir():
-                raise FileNotFoundError(source)
             target = temp / "event" / category / filename
-            target.parent.mkdir(parents=True, exist_ok=True)
-            shutil.copytree(source, target)
+            # Content and relative paths are the snapshot contract. Avoid
+            # copying source ACLs and timestamps onto every small report file.
+            shutil.copytree(source, target, copy_function=shutil.copyfile)
+            for path in target.rglob("*"):
+                if path.is_file():
+                    path.chmod(0o440)
+
+        with ThreadPoolExecutor(max_workers=16) as workers:
+            for count, _ in enumerate(workers.map(copy_event, folders), 1):
+                if count % 1000 == 0:
+                    print(f"Copied {count}/{len(folders)} event folders", file=sys.stderr, flush=True)
         record = {
             "schema": "c1-screened-input-snapshot-v1",
             "created_utc": datetime.now(timezone.utc).isoformat(),
@@ -85,12 +99,8 @@ def freeze(manifest_path, event_dir, series_path, destination):
             **content_inventory(temp),
         }
         (temp / "snapshot.json").write_text(json.dumps(record, indent=2) + "\n")
-        verify(temp)
-        # Keep the copy read-only to regular users and group-readable on Delta.
-        # Directories inherit the project's group through setgid.
-        for path in temp.rglob("*"):
-            if path.is_file():
-                path.chmod(0o440)
+        for path in (temp / "manifest.json", temp / "series" / "SP500.csv", temp / "snapshot.json"):
+            path.chmod(0o440)
         if os.path.lexists(destination):
             raise FileExistsError(f"Snapshot already exists: {destination}")
         os.rename(temp, destination)

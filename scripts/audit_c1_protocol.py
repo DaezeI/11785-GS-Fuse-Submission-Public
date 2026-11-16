@@ -17,6 +17,7 @@ sys.path.insert(0, str(ROOT))
 from data.c1_protocol import build_c1_dataloaders
 from data.forecast_task import reconstruct_prices
 from scripts.freeze_c1_inputs import verify as verify_snapshot
+from scripts.audit_article_datelines import audit as audit_datelines
 
 
 def digest(path):
@@ -76,6 +77,13 @@ def main():
               "stage1_vali_window_count": len(data.sw_vali_set),
               "emitted_windows": {r: getattr(data, r + "_set").windows
                                   for r in ("train", "vali", "test")}}
+    if snapshot:
+        date_audit = audit_datelines(args.manifest, args.event_dir)
+        summary = date_audit["counts"]
+        if date_audit["candidates"] or any(key.endswith(":missing_summary") for key in summary):
+            ids = [row["event_id"] for row in date_audit["candidates"][:10]]
+            raise ValueError(f"Frozen snapshot has new date-screen findings: {summary}, {ids}")
+        report["reuters_dateline_screen"] = summary
     if args.forecast_task == "return_bp":
         max_roundtrip_error = 0.0
         eligible = {role: {str(h): 0 for h in data.task_config.direction_horizons}
