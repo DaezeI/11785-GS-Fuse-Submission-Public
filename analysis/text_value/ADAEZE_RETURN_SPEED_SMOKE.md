@@ -28,7 +28,7 @@ one component and is not a model-quality comparison.
 
 ## Status and provenance
 
-Status: **RUNNING — not yet a result**.
+Status: **COMPLETED — operational smoke result only**.
 
 - Owner: Adaeze
 - Branch: `adaeze/pr8-speed-smoke`
@@ -45,13 +45,31 @@ Status: **RUNNING — not yet a result**.
   `15566fbd0208e96c642b7105d9e10f5b6966a198` on
   `gpuA100x4-interactive` with a 30-minute limit. Slurm reported it running
   on `gpua064` with start time `2026-11-16T13:30:15`.
+- Completion: job `24045929` finished with exit code `0:0` after `00:08:50`.
+  The largest reported step MaxRSS was `12283196K` (about 12 GB of host RAM).
 - Preflight checks: 17 focused return/checkpoint tests passed; 25 focused
   text-value tests passed with `--require-torch`; Slurm `--test-only` accepted
   the request.
-- Result: **PENDING**
+- Result: the three-stage 16-event smoke completed successfully. This verifies
+  that the runtime package executes end to end; it is not a full-C1 quality
+  result and does not isolate either speed change's effect.
 
 ## Limitations
 
 This 16-event smoke test is not a full C1 benchmark. The screened manifest
 removes known date conflicts but does not verify publication times for retained
 news, so it cannot support publication-time-certified claims.
+
+## Structured-metrics replay
+
+Status: **PLANNED — not yet a result**.
+
+The completed selected checkpoint will be replayed without training on the same
+eight evenly spaced validation and eight test events. The replay records task,
+magnitude, raw and weighted direction losses, return MAE/MSE, and close-direction
+hit rate plus eligible counts at each configured horizon. It writes to the new
+directory
+`/work/hdd/bjjg/gs-fuse/runs/adaeze/return-speed-pr8/metrics-replay-v1` and does
+not modify the source run or checkpoint. The reusable batch entrypoint is
+`scripts/delta/adaeze_c1_return_metrics_replay.sbatch`. Job ID, exact replay
+commit, checkpoint hash, outputs, and findings remain **PENDING** until execution.
