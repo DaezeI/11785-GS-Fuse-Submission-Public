@@ -1,13 +1,13 @@
 #!/bin/bash
 #SBATCH --job-name=adaeze-c1-return-speed
 #SBATCH --account=bjjg-delta-gpu
-#SBATCH --partition=gpuA100x4-preempt
+#SBATCH --partition=gpuA100x4-interactive
 #SBATCH --nodes=1
 #SBATCH --ntasks=1
 #SBATCH --cpus-per-task=8
 #SBATCH --gpus-per-node=1
 #SBATCH --mem=80G
-#SBATCH --time=02:00:00
+#SBATCH --time=00:30:00
 #SBATCH --output=/work/hdd/bjjg/gs-fuse/runs/adaeze/return-speed-pr8/logs/return-speed-smoke-%j.out
 
 set -euo pipefail

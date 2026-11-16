@@ -38,6 +38,10 @@ Status: **SUBMITTED — not yet a result**.
 - Commit: `5d25ace3624c029988bd3a5602f8a90442244031`
 - Job ID: `24045381`
 - Submission command: `sbatch --parsable scripts/delta/adaeze_c1_return_speed_smoke.sbatch`
+- Scheduling update: job `24045381` remained pending for priority. A
+  non-submitting `sbatch --test-only` check showed that the same one-GPU smoke
+  request was schedulable on `gpuA100x4-interactive` with a 30-minute limit.
+  Replacement job ID: **PENDING**.
 - Preflight checks: 17 focused return/checkpoint tests passed; 25 focused
   text-value tests passed with `--require-torch`; Slurm `--test-only` accepted
   the request.
