@@ -5,6 +5,9 @@ not establish that the November 12 exchange is approved. As of November 15,
 2026, ACCESS still reports it **Under Review**, and no Expanse account, project
 code, remote path, environment, or model result is claimed.
 
+For a plain-language teammate handoff, start with
+[`docs/EXPANSE_APPROVAL_CHECKLIST.md`](../../docs/EXPANSE_APPROVAL_CHECKLIST.md).
+
 Do not submit or transfer data until approval and individual provisioning are
 verified. The existing Delta job states must also be queried before they are
 described or canceled.

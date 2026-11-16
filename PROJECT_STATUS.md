@@ -80,6 +80,9 @@ the login check and bounded `gpu-debug` validation in
 A100-tested precision/cache configuration must not be assumed compatible with
 V100 merely because paths or filenames match.
 
+The plain-language teammate handoff is
+[`docs/EXPANSE_APPROVAL_CHECKLIST.md`](docs/EXPANSE_APPROVAL_CHECKLIST.md).
+
 ## Next team actions
 
 Leave the three verified-pending Delta jobs unchanged until Nicole confirms
