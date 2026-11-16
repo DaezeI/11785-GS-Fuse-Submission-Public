@@ -445,6 +445,7 @@ def load_pretrained_model(args, d: int):
         forecast_task_config=getattr(args, "forecast_task_config", None),
         use_raw_ts_residual=getattr(args, "use_raw_ts_residual", None),
         use_learnable_last_value=getattr(args, "use_learnable_last_value", None),
+        gate_target_objective=getattr(args, "gate_target_objective", "task"),
     )
     model.run_provenance = getattr(args, "run_provenance", {})
     live_print("[load] Model initialized. Loading checkpoint weights ...")

@@ -145,6 +145,8 @@ def resolved_return_run(path):
     for key in ("use_raw_ts_residual", "use_learnable_last_value"):
         if not isinstance(resolved.get(key), bool):
             raise ValueError(f"Training configuration needs resolved {key}")
+    if resolved.get("gate_target_objective", "task") not in ("task", "magnitude"):
+        raise ValueError("Training configuration has an invalid gate target objective")
     if not isinstance(resolved.get("source_commit"), str) or len(resolved["source_commit"]) != 40:
         raise ValueError("Training configuration needs its source commit")
     return resolved, config
@@ -239,6 +241,7 @@ def main():
         forecast_task_config=task_config,
         use_raw_ts_residual=run_config["use_raw_ts_residual"] if run_config else None,
         use_learnable_last_value=run_config["use_learnable_last_value"] if run_config else None,
+        gate_target_objective=run_config.get("gate_target_objective", "task") if run_config else "task",
         run_provenance=(dict(manifest_sha256=events.audit["manifest_sha256"],
                              price_sha256=events.audit["price_sha256"],
                              scale_population_sha256=events.audit["return_scale_population_sha256"],
@@ -269,7 +272,10 @@ def main():
                     from data.forecast_task import return_task_loss, gate_supervision_target
                     ts_loss = return_task_loss(ts_pred, target_batch, task_config, reduction="none")
                     full_loss = return_task_loss(pred, target_batch, task_config, reduction="none")
-                    target_gate, _ = gate_supervision_target(ts_loss, full_loss)
+                    from model.gs_fuse import gate_supervision_loss_per_event
+                    gate_ts_loss = gate_supervision_loss_per_event(model, ts_pred, target_batch)
+                    gate_full_loss = gate_supervision_loss_per_event(model, pred, target_batch)
+                    target_gate, _ = gate_supervision_target(gate_ts_loss, gate_full_loss)
                     strict_ts.append(ts_pred.cpu().numpy().transpose(0, 2, 1))
                     gate_text_weight.append(analysis["learned_gate_softmax"][:, 0].mean(-1).cpu().numpy())
                     full_task_loss.append(full_loss.cpu().numpy())
@@ -318,6 +324,7 @@ def main():
             majority[str(horizon)] = (1 if np.sum(actual[eligible] > 0) >=
                                       np.sum(actual[eligible] < 0) else -1)
         metadata["forecast_task_config"] = task_config.to_dict()
+        metadata["gate_target_objective"] = model.gate_target_objective
         metadata["training_majority_direction"] = majority
         metadata["task_config_json_sha256"] = file_hash(args.task_config_json)
         extra = {"strict_ts": np.concatenate(strict_ts), "fixed_gate": np.concatenate(fixed_gate),

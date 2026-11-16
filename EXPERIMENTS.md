@@ -35,7 +35,7 @@ population into another run's row.
 |---|---|---|---|
 | Screened C1 price baseline | Establish the price-task reference and matched text controls | Uses the November 13 screened C1 manifest | Training and paired jobs queued; see [project status](PROJECT_STATUS.md). No full result yet. |
 | Screened C1 return redesign | Test Adaeze's return design as a package on the same screened population | Return target, Huber/direction task loss, gate target, and last-value shortcut change together | Code in [draft return PR](https://github.com/DaezeI/11785-GS-Fuse-Submission-Public/pull/8); GPU smoke and full run pending. Do not attribute a future difference to one component. |
-| Return component ablations | Identify which return-design choices matter | Change direction penalty, gate target, and last-value shortcut separately while holding screened data and budget fixed | Run setup pending on the return branch; no result yet. |
+| Return component ablations R0→R3 | Identify which return-design choices matter | Add direction penalty, then full-task gate target, then last-value shortcut, one at a time | [Design and run handoff](docs/updates/2026-11-13-return-ablations.md) on the return branch; frozen-input audit and GPU runs pending. No result yet. |
 
 The original unscreened C1 manifest and historical outputs remain preserved for
 audit context. The screened subset excludes 883 suspect articles; publication

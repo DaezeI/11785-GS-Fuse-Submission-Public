@@ -628,6 +628,7 @@ class GSFuse(nn.Module):
             forecast_task_config=None,
             use_raw_ts_residual=None,
             use_learnable_last_value=None,
+            gate_target_objective="task",
             # legacy aliases
             llama_name=None,
     ):
@@ -657,6 +658,11 @@ class GSFuse(nn.Module):
         elif isinstance(forecast_task_config, dict):
             forecast_task_config = ForecastTaskConfig(**forecast_task_config)
         self.forecast_task_config = forecast_task_config
+        if gate_target_objective not in ("magnitude", "task"):
+            raise ValueError(f"Unknown gate_target_objective: {gate_target_objective}")
+        if forecast_task_config.task != RETURN_TASK and gate_target_objective != "task":
+            raise ValueError("Magnitude-only gate supervision requires the return task")
+        self.gate_target_objective = gate_target_objective
         self.run_provenance = {}
         self.use_raw_ts_residual = (USE_RAW_TS_RESIDUAL if use_raw_ts_residual is None
                                     else bool(use_raw_ts_residual))
@@ -1317,6 +1323,7 @@ class GSFuse(nn.Module):
             "num_heads_cross": int(NUM_HEADS),
             "device": str(self.device),
             "forecast_task": self.forecast_task_config.to_dict(),
+            "gate_target_objective": self.gate_target_objective,
         }
 
     def save_model_combined(self, save_path="model_checkpoint.pth", **kwargs):
@@ -1381,6 +1388,8 @@ class GSFuse(nn.Module):
         if saved_task_name == RETURN_TASK and saved_task != self.forecast_task_config.to_dict():
             raise ValueError("Return checkpoint task metadata does not match this run")
         if saved_task_name == RETURN_TASK:
+            if meta.get("gate_target_objective", "task") != self.gate_target_objective:
+                raise ValueError("Return checkpoint gate target objective does not match this run")
             for name, expected in (("use_raw_ts_residual", self.use_raw_ts_residual),
                                    ("use_learnable_last_value", self.use_learnable_last_value)):
                 if meta.get(name) is not expected:
@@ -1547,6 +1556,17 @@ def gate_task_loss_per_event(model, prediction, target):
             prediction, target, model.forecast_task_config, reduction="none"
         )
     return (prediction - target).square().mean(dim=(1, 2))
+
+
+def gate_supervision_loss_per_event(model, prediction, target):
+    """Loss used only to decide whether text helped the supervised gate."""
+    if model.forecast_task_config.task == RETURN_TASK and model.gate_target_objective == "magnitude":
+        _, components = return_task_loss(
+            prediction, target, model.forecast_task_config,
+            reduction="none", return_components=True,
+        )
+        return components["magnitude"]
+    return gate_task_loss_per_event(model, prediction, target)
 
 
 @torch.no_grad()
@@ -2135,8 +2155,8 @@ def train(model, train_loader, test_loader, vali_loader, num_epochs, output_path
                 if ts_inst is not None:
                     with torch.no_grad():
                         ts_only_pred = model.predict_strict_ts_only(ts_inst, analysis["x_cf"])
-                    err_ts = gate_task_loss_per_event(model, ts_only_pred, target)
-                    err_full = gate_task_loss_per_event(model, output, target)
+                    err_ts = gate_supervision_loss_per_event(model, ts_only_pred, target)
+                    err_full = gate_supervision_loss_per_event(model, output, target)
 
                     gc_score, diff = gate_supervision_target(
                         err_ts, err_full,

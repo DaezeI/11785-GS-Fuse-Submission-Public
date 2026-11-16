@@ -52,6 +52,8 @@ def parse_args():
     p.add_argument("--direction-tau-bp", type=float, default=None)
     p.add_argument("--direction-deadband-bp", type=float, default=0.0)
     p.add_argument("--direction-weight", type=float, default=1.0)
+    p.add_argument("--gate-target-objective", choices=["task", "magnitude"], default="task",
+                   help="Return gate target: complete task loss or Huber magnitude only")
     p.add_argument("--direction-horizons", type=int, nargs="+", default=[35, 70, 140])
     p.add_argument("--raw-ts-residual", action=argparse.BooleanOptionalAction, default=None)
     p.add_argument("--learnable-last-value", action=argparse.BooleanOptionalAction, default=None)
@@ -99,6 +101,8 @@ def main():
         torch.cuda.manual_seed_all(args.seed)
     if args.forecast_task == "return_bp" and not args.c1_manifest:
         raise ValueError("--forecast-task return_bp requires --c1-manifest")
+    if args.forecast_task != "return_bp" and args.gate_target_objective != "task":
+        raise ValueError("--gate-target-objective magnitude requires --forecast-task return_bp")
     gs_fuse_mod.TEXT_CACHE_PATH = args.text_cache
     if args.no_4bit:
         gs_fuse_mod.USE_4BIT = False
@@ -178,6 +182,7 @@ def main():
         forecast_task_config=(events.task_config if args.c1_manifest else ForecastTaskConfig()),
         use_raw_ts_residual=args.raw_ts_residual,
         use_learnable_last_value=args.learnable_last_value,
+        gate_target_objective=args.gate_target_objective,
     )
     if args.forecast_task == "return_bp":
         model.run_provenance = {

@@ -70,6 +70,8 @@ def parse_args():
                    help="Directional softplus temperature; defaults to the resolved return scale")
     p.add_argument("--direction-deadband-bp", type=float, default=0.0)
     p.add_argument("--direction-weight", type=float, default=1.0)
+    p.add_argument("--gate-target-objective", choices=["task", "magnitude"], default="task",
+                   help="Return gate target: complete task loss or Huber magnitude only")
     p.add_argument("--direction-horizons", type=int, nargs="+", default=[35, 70, 140])
     p.add_argument("--raw-ts-residual", action=argparse.BooleanOptionalAction, default=None)
     p.add_argument("--learnable-last-value", action=argparse.BooleanOptionalAction, default=None)
@@ -125,6 +127,8 @@ def main():
 
     if args.forecast_task == "return_bp" and not args.c1_manifest:
         raise ValueError("--forecast-task return_bp requires --c1-manifest")
+    if args.forecast_task != "return_bp" and args.gate_target_objective != "task":
+        raise ValueError("--gate-target-objective magnitude requires --forecast-task return_bp")
 
     if args.ts_backbone == "moment" and not args.moment_path:
         raise ValueError("--moment-path is required when --ts-backbone moment")
@@ -214,6 +218,7 @@ def main():
         forecast_task_config=(events.task_config if args.c1_manifest else ForecastTaskConfig()),
         use_raw_ts_residual=args.raw_ts_residual,
         use_learnable_last_value=args.learnable_last_value,
+        gate_target_objective=args.gate_target_objective,
     )
     if args.forecast_task == "return_bp":
         model.run_provenance = {

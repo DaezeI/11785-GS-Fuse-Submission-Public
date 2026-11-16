@@ -1,5 +1,9 @@
 # Return-task integration handoff — November 13, 2026
 
+The [return ablation and frozen-input handoff](2026-11-13-return-ablations.md)
+supersedes the GPU launch order below. It adds a one-time versioned input copy,
+full CPU audit, and R0→R3 single-factor comparisons. No return GPU job has run.
+
 This task branch starts from public `main` at `1db75e7` (including Nicole's
 screened C1 audit/PR #7) and cherry-picks Adaeze's return design and
 implementation commits `cb56231` and `f3ff7c2`. It adds the remaining paired
