@@ -105,3 +105,33 @@ Delta artifacts are group-readable under
   `36f1aac99822f1a6533a7d74ab835f4219ffd822b403db8c00afebe489803cf2`
 - `test_return_metrics.json` SHA-256:
   `be4106c6db69e5f6d414714dd63d3dc0afd6c5c347eed01e7ba049912fc810a0`
+
+## Full screened-C1 return baseline
+
+Status: **SUBMITTED — no result yet**.
+
+- Owner: Adaeze
+- Job ID: `24050724` (reported at submission; live scheduler state not yet
+  independently checked)
+- Executed code commit: `8fef0648afb1f2583e01f56cdb307e3a4085d10f`
+- Batch script: `scripts/delta/adaeze_c1_return_full.sbatch`
+- Submission command:
+  `sbatch --parsable scripts/delta/adaeze_c1_return_full.sbatch`
+- Manifest: `splits/manifests/purged_split_c1_date_screen_v1.json`, SHA-256
+  `1b04373a4361238b09c0b1d952163973403d2d7839dbb9e7215c429af14b23d1`
+- Timing policy: `category4_1400_strict_before`
+- Price file SHA-256:
+  `6a873b1d72d27f9188c6bf12acb756775916be8ed9ff42d9e9dd98028f68de2a`
+- Output path:
+  `/work/hdd/bjjg/gs-fuse/runs/adaeze/return-speed-pr8/full-v1`
+- Configuration: return basis-point target, raw-TS residual and learnable
+  last-value shortcut enabled, cross-attention plus softmax gate, seed 0,
+  batch size 8, Stage-1/2/3 budgets of two epochs each, one A100, TF32,
+  offline W&B.
+
+This job is independent of Nicole's price-task jobs `23840368`–`23840370` and
+does not supersede or alter them. It is a submitted experiment, not a result.
+If it completes, record the scheduler state, runtime, selected checkpoint hash,
+resolved configuration, W&B run, metrics, and limitations before interpreting
+model quality. Retained article publication times remain unverified, so the
+screened run cannot support publication-time-certified text claims.
