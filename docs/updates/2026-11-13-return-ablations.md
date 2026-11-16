@@ -42,7 +42,8 @@ If the four-run budget is unavailable, prioritize R3 versus screened price as
 a labeled package comparison and R2 versus R3 as a single-factor check. Do not
 claim effects for unrun comparisons. Report each run’s objective values for
 debugging. For R0 versus R1, the task losses use different direction weights.
-Use the common bp and hit-rate metrics for performance comparisons. Before a
+Use common bp errors and hit rates for performance comparisons. Validation
+selects each checkpoint using its configured training objective. Before a
 price-versus-return comparison, transform each price prediction to a bp return
 using its own last observed close, and verify the event IDs, windows, and
 article content match.
@@ -85,21 +86,38 @@ snapshot; investigate and create `v2` if a correction is justified.
 
 ## Later GPU order, after access returns
 
-The code checkout must be clean and fixed at one commit. Export that commit as
-`EXPECTED_CODE_COMMIT` and the snapshot's `content_sha256` as
-`C1_SNAPSHOT_SHA256` for **every** training and paired job. The scripts verify
-them before loading the model. Create the run `logs` directory first.
+Use one clean checkout and export its commit and the audited snapshot fingerprint
+for training and paired jobs. The scripts check both before loading a model.
+
+```bash
+cd /work/hdd/bjjg/gs-fuse/runs/nicole/return-v1/repo
+mkdir -p /work/hdd/bjjg/gs-fuse/runs/nicole/return-v1/logs
+export EXPECTED_CODE_COMMIT=$(git rev-parse HEAD)
+export C1_SNAPSHOT_SHA256=$(python -c 'import json; from pathlib import Path; p=Path("/work/hdd/bjjg/gs-fuse/data/snapshots/c1-screened-return-v1/snapshot.json"); print(json.loads(p.read_text())["content_sha256"])')
+```
 
 1. Submit `scripts/delta/nicole_c1_return_smoke.sbatch`; inspect all stages,
    checkpoint reload, resolved config, and input audit. Then submit
    `RUN_KIND=smoke-v1 sbatch scripts/delta/nicole_c1_return_paired.sbatch`.
-2. Once smoke passes, run `VARIANT=R0`, `R1`, `R2`, and `R3` via
-   `scripts/delta/nicole_c1_return_full.sbatch`. Each has a fresh output path;
+2. Once smoke passes, submit each variant separately as allocation allows, for
+   example `VARIANT=R0 sbatch scripts/delta/nicole_c1_return_full.sbatch`. Repeat
+   for R1, R2 and R3. Each has a fresh output path.
    R3 writes to `full-v1` and is the package-comparison return run.
 3. For each run, set `RUN_KIND` to its output directory name and run
    `scripts/delta/nicole_c1_return_paired.sbatch`. Save job IDs, selected
    checkpoint, config, hashes, paired outputs, metrics, findings, and
-   limitations in a linked result note. Do not interpret before these exist.
+   limitations in a linked result note. For each adjacent pair, run the CPU
+   analyzer with the new variant as `--predictions` and the preceding variant
+   as `--reference`. It verifies aligned events, targets, donor IDs, article
+   hashes, and the dataset fingerprint before computing error differences and
+   paired date-block intervals.
+
+```bash
+python scripts/analyze_return_predictions.py \
+  --predictions ../paired-ablation-r1-v1/zeroed_article_tokens.npz \
+  --reference ../paired-ablation-r0-v1/zeroed_article_tokens.npz \
+  --out ../r1-vs-r0-v1.json
+```
 
 The optional last-value module preserves the random state when initialized,
 so shared model weights and starting random draws agree for R2 and R3.

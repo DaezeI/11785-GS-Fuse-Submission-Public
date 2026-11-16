@@ -115,10 +115,67 @@ def analyze(blob, reps=1000, block=20):
     return out
 
 
+
+def compare_runs(candidate, reference, reps=1000, block=20):
+    """Compare real-text forecasts for two variants on the same events."""
+    candidate_meta = json.loads(str(candidate["metadata_json"].item()))
+    reference_meta = json.loads(str(reference["metadata_json"].item()))
+    for key in ("event_ids", "event_dates", "targets", "anchor_close", "shuffle_donor_ids"):
+        if not np.array_equal(candidate[key], reference[key]):
+            raise ValueError(f"Paired return runs differ in {key}")
+    for key in ("evaluation_split", "no_text_definition", "reference_source_commit",
+                "seed", "batch_size", "tf32", "four_bit", "article_content_sha256"):
+        if key not in candidate_meta or candidate_meta[key] != reference_meta.get(key):
+            raise ValueError(f"Paired return runs differ in {key}")
+    snapshot_key = "snapshot_content_sha256"
+    candidate_sha = candidate_meta["c1_data_audit"].get(snapshot_key)
+    if not candidate_sha or candidate_sha != reference_meta["c1_data_audit"].get(snapshot_key):
+        raise ValueError("Paired return runs require the same frozen snapshot")
+
+    target = candidate["targets"].astype(np.float64)
+    candidate_error = candidate["real_text"] - target
+    reference_error = reference["real_text"] - target
+    dates = candidate["event_dates"]
+    mask = np.ones(len(dates), dtype=bool)
+    result = {"candidate_checkpoint": candidate_meta["checkpoint_id"],
+              "reference_checkpoint": reference_meta["checkpoint_id"],
+              "events": len(dates), snapshot_key: candidate_sha, "errors": {}, "close_dhr": {}}
+    for name, transform in (("mae_bp", np.abs), ("mse_bp2", np.square)):
+        new = transform(candidate_error).mean(axis=(1, 2))
+        old = transform(reference_error).mean(axis=(1, 2))
+        result["errors"][name] = {
+            "candidate": float(new.mean()),
+            "reference": float(old.mean()),
+            "candidate_minus_reference": float((new - old).mean()),
+            "relative_improvement": block_bootstrap_improvement(
+                new, old, dates, mask, reps=reps, block=block),
+        }
+    config = candidate_meta["forecast_task_config"]
+    reference_config = reference_meta["forecast_task_config"]
+    for key in ("direction_horizons", "direction_deadband_bp", "close_channel"):
+        if config[key] != reference_config[key]:
+            raise ValueError(f"Paired directional metrics differ in {key}")
+    for horizon in config["direction_horizons"]:
+        index = int(horizon) - 1
+        close = config["close_channel"]
+        actual = target[:, index, close]
+        eligible = np.abs(actual) > config["direction_deadband_bp"]
+        row = {"eligible_events": int(eligible.sum())}
+        for name, predictions in (("candidate", candidate), ("reference", reference)):
+            predicted = predictions["real_text"][:, index, close][eligible]
+            row[name] = float((np.sign(predicted) == np.sign(actual[eligible])).mean()) if eligible.any() else None
+        row["candidate_minus_reference"] = (
+            row["candidate"] - row["reference"] if row["eligible_events"] else None
+        )
+        result["close_dhr"][str(horizon)] = row
+    return result
+
+
 def main():
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument("--predictions", type=Path, required=True)
     parser.add_argument("--out", type=Path, required=True)
+    parser.add_argument("--reference", type=Path, help="Aligned return predictions from the comparison run")
     parser.add_argument("--bootstrap-reps", type=int, default=1000)
     parser.add_argument("--block-dates", type=int, default=20)
     args = parser.parse_args()
@@ -126,8 +183,13 @@ def main():
         parser.error("bootstrap-reps and block-dates must be positive")
     with np.load(args.predictions, allow_pickle=False) as blob:
         result = analyze(blob, args.bootstrap_reps, args.block_dates)
+        if args.reference:
+            with np.load(args.reference, allow_pickle=False) as reference:
+                result["paired_reference"] = compare_runs(
+                    blob, reference, args.bootstrap_reps, args.block_dates)
     args.out.parent.mkdir(parents=True, exist_ok=True)
-    args.out.write_text(json.dumps(result, indent=2, allow_nan=False) + "\n")
+    with args.out.open("x", encoding="utf-8") as output:
+        output.write(json.dumps(result, indent=2, allow_nan=False) + "\n")
     print(f"Saved {result['events']} aligned return events to {args.out}")
 
 

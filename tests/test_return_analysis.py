@@ -3,7 +3,7 @@ import json
 import numpy as np
 import pytest
 
-from scripts.analyze_return_predictions import analyze
+from scripts.analyze_return_predictions import analyze, compare_runs
 from scripts.run_text_controls import resolved_return_run
 
 
@@ -47,3 +47,27 @@ def test_aligned_return_report_uses_close_endpoints_and_eligible_counts():
     blob["anchor_close"][0] = 0
     with pytest.raises(ValueError, match="anchors"):
         analyze(blob, reps=20, block=3)
+
+
+def test_compare_runs_rejects_changed_population_and_snapshot():
+    truth = np.ones((2, 1, 4))
+    metadata = dict(evaluation_split="c1_test", no_text_definition="zeroed_article_tokens",
+                    reference_source_commit="commit", seed=23, batch_size=8,
+                    tf32=True, four_bit=False, article_content_sha256=["one", "two"],
+                    checkpoint_id="reference",
+                    forecast_task_config=dict(direction_horizons=[1],
+                                              direction_deadband_bp=0, close_channel=3),
+                    c1_data_audit=dict(snapshot_content_sha256="frozen"))
+    reference = dict(targets=truth, real_text=-truth, event_ids=np.array(["1", "2"]),
+                     event_dates=np.array(["20200101", "20200102"]),
+                     anchor_close=np.ones(2), shuffle_donor_ids=np.array([["2", "1"]]),
+                     metadata_json=np.array(json.dumps(metadata)))
+    candidate = dict(reference, real_text=truth)
+    result = compare_runs(candidate, reference)
+    assert result["errors"]["mae_bp"]["candidate_minus_reference"] == -2
+    assert result["close_dhr"]["1"]["candidate_minus_reference"] == 1
+    with pytest.raises(ValueError, match="event_ids"):
+        compare_runs(dict(candidate, event_ids=np.array(["2", "1"])), reference)
+    metadata["c1_data_audit"]["snapshot_content_sha256"] = "different"
+    with pytest.raises(ValueError, match="same frozen snapshot"):
+        compare_runs(dict(candidate, metadata_json=np.array(json.dumps(metadata))), reference)
