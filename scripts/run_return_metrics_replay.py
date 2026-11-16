@@ -14,12 +14,17 @@ import hashlib
 import json
 import random
 import subprocess
+import sys
 from pathlib import Path
 from types import SimpleNamespace
 
 import numpy as np
 import torch
 from torch.utils.data import DataLoader, Subset
+
+ROOT = Path(__file__).resolve().parents[1]
+if str(ROOT) not in sys.path:
+    sys.path.insert(0, str(ROOT))
 
 from data.forecast_task import ForecastTaskConfig, RETURN_TASK
 from interpret import evenly_spaced
@@ -93,7 +98,7 @@ def subset_loader(dataset, count: int, batch_size: int, seed: int):
 
 def source_commit() -> str:
     return subprocess.check_output(
-        ["git", "rev-parse", "HEAD"], cwd=Path(__file__).resolve().parents[1],
+        ["git", "rev-parse", "HEAD"], cwd=ROOT,
         text=True,
     ).strip()
 

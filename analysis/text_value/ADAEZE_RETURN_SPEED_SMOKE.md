@@ -73,3 +73,9 @@ directory
 not modify the source run or checkpoint. The reusable batch entrypoint is
 `scripts/delta/adaeze_c1_return_metrics_replay.sbatch`. Job ID, exact replay
 commit, checkpoint hash, outputs, and findings remain **PENDING** until execution.
+
+Initial replay job `24046517` failed before model initialization after 11 seconds
+with `ModuleNotFoundError: No module named 'data'`; its batch step used about
+551 MB of host RAM and did not create the replay output directory. The runner
+now adds the repository root to Python's import path. This failed launch produced
+no metrics and did not read or modify checkpoint tensors.
