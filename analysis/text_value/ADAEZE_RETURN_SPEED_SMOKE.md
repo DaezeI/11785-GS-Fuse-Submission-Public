@@ -28,14 +28,20 @@ one component and is not a model-quality comparison.
 
 ## Status and provenance
 
-Status: **PLANNED — not yet a result**.
+Status: **SUBMITTED — not yet a result**.
 
 - Owner: Adaeze
 - Branch: `adaeze/pr8-speed-smoke`
 - Source: PR #8 (`nicole/return-task-integration`)
 - Slurm script: `scripts/delta/adaeze_c1_return_speed_smoke.sbatch`
 - Delta output: `/work/hdd/bjjg/gs-fuse/runs/adaeze/return-speed-pr8/smoke-speed-v1`
-- Commit, job ID, command, checks, and result: **PENDING**
+- Commit: `5d25ace3624c029988bd3a5602f8a90442244031`
+- Job ID: `24045381`
+- Submission command: `sbatch --parsable scripts/delta/adaeze_c1_return_speed_smoke.sbatch`
+- Preflight checks: 17 focused return/checkpoint tests passed; 25 focused
+  text-value tests passed with `--require-torch`; Slurm `--test-only` accepted
+  the request.
+- Result: **PENDING**
 
 ## Limitations
 
