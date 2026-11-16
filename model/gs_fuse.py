@@ -4,7 +4,7 @@ GS-FUSE unified multimodal forecasting model and training utilities.
 """
 
 import os
-import gc
+import json
 import sys
 import warnings
 from pathlib import Path
@@ -1329,8 +1329,6 @@ class GSFuse(nn.Module):
     def save_model_combined(self, save_path="model_checkpoint.pth", **kwargs):
         state_dicts = {
             "ts_encoder": self.ts_encoder.state_dict(),
-            "text_encoder": self.text_encoder.state_dict(),
-            "llm": self.text_encoder.llm.state_dict(),
             "llm_proj": self.llm_proj.state_dict(),
             "embed_project": self.embed_project.state_dict(),
             "ts_feat_to_fuse": self.ts_feat_to_fuse.state_dict(),
@@ -1351,6 +1349,12 @@ class GSFuse(nn.Module):
             "text_only_head": self.text_only_head.state_dict(),
             "token_align_module": self.token_align_module.state_dict(),
         }
+
+        # The base text model is loaded from text_model_path for every run. A
+        # frozen copy would make each checkpoint much larger without adding
+        # learned state. Save it only when this run can change its parameters.
+        if FINETUNE_LLM_LAST_LAYER:
+            state_dicts["text_encoder"] = self.text_encoder.state_dict()
 
         if USE_MULTI_SCALE_TS:
             state_dicts["multi_scale_extractor"] = self.multi_scale_extractor.state_dict()
@@ -1576,7 +1580,7 @@ def evaluate_return_loader(model, loader):
     if config.task != RETURN_TASK:
         raise ValueError("Return evaluator needs a return-task model")
     model.eval()
-    events = elements = task_sum = abs_sum = square_sum = 0
+    events = elements = task_sum = magnitude_sum = direction_sum = abs_sum = square_sum = 0
     hits = {int(h): 0 for h in config.direction_horizons}
     eligible_counts = {int(h): 0 for h in config.direction_horizons}
     for batch in loader:
@@ -1586,7 +1590,12 @@ def evaluate_return_loader(model, loader):
         count = target.shape[0]
         events += count
         elements += target.numel()
-        task_sum += float(return_task_loss(prediction, target, config, reduction="sum"))
+        task_loss, components = return_task_loss(
+            prediction, target, config, reduction="none", return_components=True
+        )
+        task_sum += float(task_loss.sum())
+        magnitude_sum += float(components["magnitude"].sum())
+        direction_sum += float(components["direction"].sum())
         abs_sum += float((prediction - target).abs().sum())
         square_sum += float((prediction - target).square().sum())
         for h in hits:
@@ -1597,10 +1606,50 @@ def evaluate_return_loader(model, loader):
             hits[h] += int(((actual.sign() == predicted.sign()) & eligible).sum())
     if not events:
         raise ValueError("Return validation loader emitted no events")
+    direction_loss = direction_sum / events
     return {"events": events, "task_loss": task_sum / events,
+            "magnitude_loss": magnitude_sum / events,
+            "direction_loss": direction_loss,
+            "weighted_direction_loss": float(config.direction_weight) * direction_loss,
             "return_mae_bp": abs_sum / elements, "return_mse_bp2": square_sum / elements,
             "close_dhr": {str(h): {"rate": hits[h] / eligible_counts[h] if eligible_counts[h] else None,
                                    "eligible_events": eligible_counts[h]} for h in hits}}
+
+
+def return_metrics_for_tracking(split, result):
+    """Flatten structured return metrics without inventing values for empty DHR cells."""
+    metrics = {
+        f"{split}/events": result["events"],
+        f"{split}/task_loss": result["task_loss"],
+        f"{split}/magnitude_loss": result["magnitude_loss"],
+        f"{split}/direction_loss": result["direction_loss"],
+        f"{split}/weighted_direction_loss": result["weighted_direction_loss"],
+        f"{split}/return_mae_bp": result["return_mae_bp"],
+        f"{split}/return_mse_bp2": result["return_mse_bp2"],
+    }
+    for horizon, values in result["close_dhr"].items():
+        metrics[f"{split}/close_dhr_h{horizon}_eligible"] = values["eligible_events"]
+        if values["rate"] is not None:
+            metrics[f"{split}/close_dhr_h{horizon}"] = values["rate"]
+    return metrics
+
+
+def write_return_metrics(path, split, result, model, checkpoint, **metadata):
+    """Atomically persist one selected-checkpoint return evaluation."""
+    payload = {
+        "schema_version": 1,
+        "split": split,
+        "checkpoint": str(checkpoint),
+        "forecast_task": model.forecast_task_config.to_dict(),
+        "run_provenance": dict(model.run_provenance),
+        "metrics": result,
+        **metadata,
+    }
+    path = Path(path)
+    tmp = path.with_suffix(path.suffix + ".tmp")
+    tmp.write_text(json.dumps(payload, indent=2, allow_nan=False) + "\n", encoding="utf-8")
+    os.replace(tmp, path)
+    return payload
 
 
 # ============================= Train / Eval ==================================
@@ -1803,6 +1852,7 @@ def train(model, train_loader, test_loader, vali_loader, num_epochs, output_path
     global_step = 0
     last_vali_metrics = None
     last_test_metrics = None
+    last_return_vali_result = None
 
     # Subsampled training-modality evaluation (to avoid an expensive full pass over train_loader).
     # Set to 0/None to disable, or increase for less overhead.
@@ -1905,7 +1955,7 @@ def train(model, train_loader, test_loader, vali_loader, num_epochs, output_path
         return msgs
 
     def _do_eval_and_log(tag: str):
-        nonlocal last_vali_metrics, last_test_metrics
+        nonlocal last_vali_metrics, last_test_metrics, last_return_vali_result
 
         for m in _summarize_gate_and_causal(window, tag=tag, step=global_step):
             print(m)
@@ -1914,6 +1964,7 @@ def train(model, train_loader, test_loader, vali_loader, num_epochs, output_path
         if model.forecast_task_config.task == RETURN_TASK:
             # Keep test events untouched while selecting a return checkpoint.
             result = evaluate_return_loader(model, vali_loader)
+            last_return_vali_result = result
             swap_from_backup(_backup)
             model.train()
             last_vali_metrics = (result["task_loss"], result["return_mse_bp2"],
@@ -1923,9 +1974,7 @@ def train(model, train_loader, test_loader, vali_loader, num_epochs, output_path
                   f"return MAE {result['return_mae_bp']:.6f} bp, "
                   f"MSE {result['return_mse_bp2']:.6f} bp², "
                   f"close DHR {result['close_dhr']}")
-            tracking.log({"vali/task_loss": result["task_loss"],
-                          "vali/return_mae_bp": result["return_mae_bp"],
-                          "vali/return_mse_bp2": result["return_mse_bp2"]},
+            tracking.log(return_metrics_for_tracking("vali", result),
                          stage="stage3", step=global_step)
             return
         vali_result = test(
@@ -2075,6 +2124,9 @@ def train(model, train_loader, test_loader, vali_loader, num_epochs, output_path
         epoch_mse_sum = 0.0
         epoch_mae_sum = 0.0
         epoch_contrastive_sum = 0.0
+        epoch_return_magnitude_sum = 0.0
+        epoch_return_direction_sum = 0.0
+        epoch_return_events = 0
 
         # Subsampled modality metrics on training batches (approximate, to keep runtime reasonable)
         epoch_modality_batches = 0
@@ -2115,13 +2167,23 @@ def train(model, train_loader, test_loader, vali_loader, num_epochs, output_path
 
             target = batch_pred_scale.float().to(device)
             if model.forecast_task_config.task == RETURN_TASK:
-                core_reg = forecast_training_loss(
-                    output.float(), target, model.forecast_task_config
+                core_reg, return_components = return_task_loss(
+                    output.float(), target, model.forecast_task_config,
+                    return_components=True,
                 )
+                batch_return_magnitude = float(return_components["magnitude"].mean().detach().cpu())
+                batch_return_direction = float(return_components["direction"].mean().detach().cpu())
+                epoch_return_magnitude_sum += float(return_components["magnitude"].sum().detach().cpu())
+                epoch_return_direction_sum += float(return_components["direction"].sum().detach().cpu())
+                epoch_return_events += int(target.shape[0])
             elif h_w is not None:
+                batch_return_magnitude = None
+                batch_return_direction = None
                 mse_w, mae_w = weighted_mse_mae(output.float(), target, h_w)
                 core_reg = 0.7 * mse_w + 0.3 * mae_w
             else:
+                batch_return_magnitude = None
+                batch_return_direction = None
                 mse_loss = criterion_mse(target, output.float())
                 mae_loss = criterion_mae(target, output.float())
                 huber = criterion_huber(target, output.float())
@@ -2331,6 +2393,12 @@ def train(model, train_loader, test_loader, vali_loader, num_epochs, output_path
                 }
                 if analysis is not None and analysis.get("gate_softmax") is not None:
                     step_metrics["gate/text_openness_step"] = float(analysis["gate_softmax"][:, 0].mean())
+                if batch_return_magnitude is not None:
+                    step_metrics["loss/return_magnitude"] = batch_return_magnitude
+                    step_metrics["loss/return_direction"] = batch_return_direction
+                    step_metrics["loss/return_direction_weighted"] = (
+                        batch_return_direction * float(model.forecast_task_config.direction_weight)
+                    )
                 if analysis is not None and analysis.get("moe_aux_loss") is not None:
                     step_metrics["loss/moe_aux"] = float(analysis["moe_aux_loss"].detach())
                     load = analysis["moe_dispatch"].detach().mean(dim=0).cpu().tolist()
@@ -2342,9 +2410,6 @@ def train(model, train_loader, test_loader, vali_loader, num_epochs, output_path
 
             del output, batch_fusion_embeddings, batch_series_embeddings, batch_text_embeddings
             del batch_sent_report_embeddings, batch_negative_type_report_embeddings, analysis
-            gc.collect()
-            if torch.cuda.is_available():
-                torch.cuda.empty_cache()
 
             if eval_every_steps is not None and eval_every_steps > 0 and (global_step % eval_every_steps == 0):
                 _do_eval_and_log(tag=f"Eval@{eval_every_steps}steps")
@@ -2368,6 +2433,15 @@ def train(model, train_loader, test_loader, vali_loader, num_epochs, output_path
                       "train/rmse": epoch_train_rmse, "train/mae": epoch_train_mae,
                       "train/contrastive": epoch_train_contr, "train/smape": epoch_train_smape},
                      stage="stage3", step=global_step)
+        if epoch_return_events:
+            tracking.log({
+                "train/return_magnitude_loss": epoch_return_magnitude_sum / epoch_return_events,
+                "train/return_direction_loss": epoch_return_direction_sum / epoch_return_events,
+                "train/return_direction_loss_weighted": (
+                    epoch_return_direction_sum / epoch_return_events *
+                    float(model.forecast_task_config.direction_weight)
+                ),
+            }, stage="stage3", step=global_step)
 
         if epoch_gate_count > 0:
             epoch_gate_avg = (epoch_gate_sum / epoch_gate_count).tolist()
@@ -2426,11 +2500,23 @@ def train(model, train_loader, test_loader, vali_loader, num_epochs, output_path
             model.save_model_combined(save_path=save_path)
             swap_from_backup(_backup)
             if model.forecast_task_config.task == RETURN_TASK:
+                if last_return_vali_result is None:
+                    raise RuntimeError("Return checkpoint selection has no validation metrics")
+                metrics_path = os.path.join(model_output_path, "best_validation_return_metrics.json")
+                write_return_metrics(
+                    metrics_path, "validation", last_return_vali_result, model, save_path,
+                    epoch=epoch + 1, global_step=global_step,
+                )
                 print(f"[Save Best] epoch {epoch + 1} | "
                       f"Vali task {vali_combine_loss:.6f}, MAE {vali_mae_loss:.6f} bp")
-                tracking.summary({"best/epoch": epoch + 1,
-                                  "best/vali_task_loss": vali_combine_loss,
-                                  "best/vali_return_mae_bp": vali_mae_loss})
+                best_summary = {
+                    "best/epoch": epoch + 1,
+                    "best/vali_task_loss": vali_combine_loss,
+                    "best/vali_return_mae_bp": vali_mae_loss,
+                }
+                best_summary.update({f"best/{key}": value for key, value in
+                                     return_metrics_for_tracking("vali", last_return_vali_result).items()})
+                tracking.summary(best_summary)
             else:
                 print(f'[Save Best] epoch {epoch + 1} | '
                       f'Vali MSE {vali_mse_loss:.6f} | Test MSE {test_mse_loss:.6f}')
@@ -3500,6 +3586,38 @@ def train_three_stage(model, train_loader, test_loader, vali_loader, num_epochs,
             eval_every_steps=eval_every_steps,
             simplified_mode=simplified_mode
         )
+
+        if model.forecast_task_config.task == RETURN_TASK:
+            selected_checkpoint = os.path.join(model_output_path, "best_model.pth")
+            if not os.path.isfile(selected_checkpoint):
+                raise FileNotFoundError(
+                    f"Selected return checkpoint is missing: {selected_checkpoint}"
+                )
+            model.load_model_combined(save_path=selected_checkpoint, strict=True)
+            selected_test_result = evaluate_return_loader(model, test_loader)
+            selected_test_path = os.path.join(
+                model_output_path, "selected_test_return_metrics.json"
+            )
+            write_return_metrics(
+                selected_test_path, "test", selected_test_result, model,
+                selected_checkpoint, selection="minimum_validation_task_loss",
+            )
+            print(
+                "[Selected Test] "
+                f"task {selected_test_result['task_loss']:.6f}, "
+                f"magnitude {selected_test_result['magnitude_loss']:.6f}, "
+                f"direction {selected_test_result['direction_loss']:.6f}, "
+                f"weighted direction {selected_test_result['weighted_direction_loss']:.6f}, "
+                f"MAE {selected_test_result['return_mae_bp']:.6f} bp, "
+                f"MSE {selected_test_result['return_mse_bp2']:.6f} bp², "
+                f"close DHR {selected_test_result['close_dhr']}"
+            )
+            selected_tracking = return_metrics_for_tracking(
+                "selected_test", selected_test_result
+            )
+            tracking.log(selected_tracking)
+            tracking.summary({f"selected/{key}": value
+                              for key, value in selected_tracking.items()})
 
         print("=" * 80)
         print("THREE-STAGE TRAINING COMPLETED")
