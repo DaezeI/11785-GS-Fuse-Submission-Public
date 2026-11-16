@@ -1321,9 +1321,6 @@ class GSFuse(nn.Module):
     def save_model_combined(self, save_path="model_checkpoint.pth", **kwargs):
         state_dicts = {
             "ts_encoder": self.ts_encoder.state_dict(),
-            # This includes the registered language-model backbone. Keep the
-            # legacy "llm" loader below, but do not save the same tensors twice.
-            "text_encoder": self.text_encoder.state_dict(),
             "llm_proj": self.llm_proj.state_dict(),
             "embed_project": self.embed_project.state_dict(),
             "ts_feat_to_fuse": self.ts_feat_to_fuse.state_dict(),
@@ -1344,6 +1341,12 @@ class GSFuse(nn.Module):
             "text_only_head": self.text_only_head.state_dict(),
             "token_align_module": self.token_align_module.state_dict(),
         }
+
+        # The base text model is loaded from text_model_path for every run. A
+        # frozen copy would make each checkpoint much larger without adding
+        # learned state. Save it only when this run can change its parameters.
+        if FINETUNE_LLM_LAST_LAYER:
+            state_dicts["text_encoder"] = self.text_encoder.state_dict()
 
         if USE_MULTI_SCALE_TS:
             state_dicts["multi_scale_extractor"] = self.multi_scale_extractor.state_dict()

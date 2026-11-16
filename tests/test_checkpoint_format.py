@@ -3,6 +3,7 @@ from types import SimpleNamespace
 import torch
 import torch.nn as nn
 
+import model.gs_fuse as gs_fuse_mod
 from model.gs_fuse import GSFuse
 
 
@@ -52,7 +53,22 @@ def _checkpoint_model():
     return model
 
 
-def test_checkpoint_saves_text_backbone_once_and_still_loads(tmp_path):
+def test_frozen_text_backbone_is_not_copied_into_checkpoint(tmp_path):
+    source = _checkpoint_model()
+    path = tmp_path / "checkpoint.pth"
+    source.save_model_combined(path)
+
+    checkpoint = torch.load(path, map_location="cpu")
+    states = checkpoint["state_dicts"]
+    assert "text_encoder" not in states
+    assert "llm" not in states
+
+    target = _checkpoint_model()
+    target.load_model_combined(path, strict=False)
+
+
+def test_finetuned_text_backbone_is_saved_once_and_loads(tmp_path, monkeypatch):
+    monkeypatch.setattr(gs_fuse_mod, "FINETUNE_LLM_LAST_LAYER", True)
     source = _checkpoint_model()
     path = tmp_path / "checkpoint.pth"
     source.save_model_combined(path)
@@ -65,10 +81,8 @@ def test_checkpoint_saves_text_backbone_once_and_still_loads(tmp_path):
 
     target = _checkpoint_model()
     target.load_model_combined(path, strict=False)
-    assert torch.equal(
-        target.text_encoder.backbone.weight,
-        source.text_encoder.backbone.weight,
-    )
+    assert torch.equal(target.text_encoder.backbone.weight,
+                       source.text_encoder.backbone.weight)
 
 
 def test_legacy_llm_entry_remains_loadable(tmp_path):

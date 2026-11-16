@@ -27,6 +27,8 @@ export TOKENIZERS_PARALLELISM=false
 
 MANIFEST=splits/manifests/purged_split_c1_date_screen_v1.json
 PRICE=/work/hdd/bjjg/gs-fuse/data/series/SP500.csv
+CACHE=/work/hdd/bjjg/gs-fuse/cache/text_inst_llama1b_tf32.pt
+test -r "$CACHE"
 test "$(sha256sum "$MANIFEST" | cut -d' ' -f1)" = 1b04373a4361238b09c0b1d952163973403d2d7839dbb9e7215c429af14b23d1
 test "$(sha256sum "$PRICE" | cut -d' ' -f1)" = 6a873b1d72d27f9188c6bf12acb756775916be8ed9ff42d9e9dd98028f68de2a
 
@@ -45,7 +47,7 @@ python -u smoke_train.py \
   --series-dir /work/hdd/bjjg/gs-fuse/data/series \
   --moment-path /work/hdd/bjjg/gs-fuse/pretrained/MOMENT-1-large \
   --text-model-path /work/hdd/bjjg/gs-fuse/pretrained/Llama-3.2-1B \
-  --text-cache /work/hdd/bjjg/gs-fuse/cache/text_inst_llama1b_tf32.pt \
+  --text-cache "$CACHE" \
   --no-4bit --tf32 --batch-size 2 \
   --n-event-train 16 --n-event-eval 8 --n-sw-train 32 --n-sw-eval 16 \
   --n-interpret 0 --stage1-epochs 1 --stage2-epochs 1 --num-epochs 1 \

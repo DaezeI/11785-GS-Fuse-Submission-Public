@@ -10,8 +10,9 @@ without changing its mathematical or evaluation contract?
 - Reference: PR #8 return-task code before this focused patch.
 - Package under test: anomaly detection is opt-in in `train.py`, and Stage 3 no
   longer forces Python garbage collection plus an empty CUDA cache every step.
-- Checkpoint format: new checkpoints avoid a second copy of the text backbone;
-  the legacy `llm` key remains accepted when loading old checkpoints.
+- Checkpoint format: frozen text-backbone weights are reloaded from the fixed
+  pretrained path instead of copied into every checkpoint. Fine-tuned text
+  weights are saved once, and the legacy `llm` key remains loadable.
 
 This is a multi-change operational package. It cannot attribute timing gains to
 one component and is not a model-quality comparison.
