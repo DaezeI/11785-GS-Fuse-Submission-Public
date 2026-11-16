@@ -247,6 +247,17 @@ def main():
                              scale_population_sha256=events.audit["return_scale_population_sha256"],
                              training_seed=run_config["seed"],
                              source_commit=run_config["source_commit"]) if run_config else {}))
+    if run_config and run_config.get("snapshot_content_sha256"):
+        from scripts.freeze_c1_inputs import verify
+
+        root = Path(args.c1_manifest).resolve().parent
+        snapshot_sha = verify(root)["content_sha256"]
+        if (snapshot_sha != run_config["snapshot_content_sha256"]
+                or Path(args.event_dir).resolve() != root / "event"
+                or Path(args.series_dir).resolve() != root / "series"):
+            raise ValueError("Evaluation data differs from the frozen training snapshot")
+        config.run_provenance["snapshot_content_sha256"] = snapshot_sha
+        events.audit["snapshot_content_sha256"] = snapshot_sha
     checkpoint_sha = file_hash(args.model_path)
     model = load_pretrained_model(config, d=events.d); model.eval()
     # The legacy encoder's disk cache is keyed only by text. Isolate this run
@@ -272,9 +283,8 @@ def main():
                     from data.forecast_task import return_task_loss, gate_supervision_target
                     ts_loss = return_task_loss(ts_pred, target_batch, task_config, reduction="none")
                     full_loss = return_task_loss(pred, target_batch, task_config, reduction="none")
-                    from model.gs_fuse import gate_supervision_loss_per_event
-                    gate_ts_loss = gate_supervision_loss_per_event(model, ts_pred, target_batch)
-                    gate_full_loss = gate_supervision_loss_per_event(model, pred, target_batch)
+                    gate_ts_loss = module.gate_supervision_loss_per_event(model, ts_pred, target_batch)
+                    gate_full_loss = module.gate_supervision_loss_per_event(model, pred, target_batch)
                     target_gate, _ = gate_supervision_target(gate_ts_loss, gate_full_loss)
                     strict_ts.append(ts_pred.cpu().numpy().transpose(0, 2, 1))
                     gate_text_weight.append(analysis["learned_gate_softmax"][:, 0].mean(-1).cpu().numpy())

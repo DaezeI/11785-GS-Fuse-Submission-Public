@@ -126,7 +126,6 @@ def main():
             direction_weight=args.direction_weight,
             direction_horizons=tuple(args.direction_horizons), seed=args.seed)
         output.mkdir(parents=True, exist_ok=True)
-        (output / "c1_data_audit.json").write_text(json.dumps(events.audit, indent=2) + "\n")
         resolved = vars(args).copy()
         resolved["source_commit"] = subprocess.check_output(
             ["git", "rev-parse", "HEAD"], cwd=Path(__file__).resolve().parent,
@@ -134,10 +133,15 @@ def main():
         resolved.update({"sw_stride": 1, "window": 500, "stride": 400,
                          "decoder_layers": 3, "decoder_heads": 8,
                          "use_ts_memory": False, "run_kind": "smoke_subset"})
+        snapshot_sha = os.getenv("C1_SNAPSHOT_SHA256") if args.forecast_task == "return_bp" else None
+        if snapshot_sha:
+            resolved["snapshot_content_sha256"] = snapshot_sha
+            events.audit["snapshot_content_sha256"] = snapshot_sha
         resolved["forecast_task_config"] = events.task_config.to_dict()
         resolved["use_raw_ts_residual"] = True if args.raw_ts_residual is None else args.raw_ts_residual
         resolved["use_learnable_last_value"] = (args.forecast_task == "return_bp" if
                                                args.learnable_last_value is None else args.learnable_last_value)
+        (output / "c1_data_audit.json").write_text(json.dumps(events.audit, indent=2) + "\n")
         (output / "resolved_config.json").write_text(json.dumps(resolved, indent=2) + "\n")
         sw_train_set, sw_vali_set = events.sw_train_set, events.sw_vali_set
     else:
@@ -192,6 +196,8 @@ def main():
             "training_seed": args.seed,
             "source_commit": resolved["source_commit"],
         }
+        if snapshot_sha:
+            model.run_provenance["snapshot_content_sha256"] = snapshot_sha
     if args.skip_checkpoints:
         model.save_model_combined = lambda save_path=None, **kw: print(f"[smoke] checkpoint skipped: {save_path}")
 
@@ -208,6 +214,7 @@ def main():
             output_path=args.output_path,
             contrastive_lambda=1.0,
             eval_every_steps=None,
+            evaluate_saved_return=not args.skip_checkpoints,
         )
         if args.n_interpret > 0:
             summary = run_and_log(model, events.test_set, args.n_interpret,

@@ -3489,7 +3489,8 @@ def train_three_stage(model, train_loader, test_loader, vali_loader, num_epochs,
                       eval_every_steps: int = 100,
                       simplified_mode: bool = None,
                       stage1_epochs=None,
-                      stage2_epochs=None):
+                      stage2_epochs=None,
+                      evaluate_saved_return=True):
     """
     Three-Stage Training Pipeline
 
@@ -3587,7 +3588,7 @@ def train_three_stage(model, train_loader, test_loader, vali_loader, num_epochs,
             simplified_mode=simplified_mode
         )
 
-        if model.forecast_task_config.task == RETURN_TASK:
+        if model.forecast_task_config.task == RETURN_TASK and evaluate_saved_return:
             selected_checkpoint = os.path.join(model_output_path, "best_model.pth")
             if not os.path.isfile(selected_checkpoint):
                 raise FileNotFoundError(

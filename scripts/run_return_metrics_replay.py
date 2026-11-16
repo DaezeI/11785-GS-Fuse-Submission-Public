@@ -152,6 +152,16 @@ def main():
         "training_seed": seed,
         "source_commit": resolved["source_commit"],
     }
+    if resolved.get("snapshot_content_sha256"):
+        from scripts.freeze_c1_inputs import verify
+
+        root = args.manifest.resolve().parent
+        snapshot_sha = verify(root)["content_sha256"]
+        if (snapshot_sha != resolved["snapshot_content_sha256"]
+                or args.event_dir.resolve() != root / "event"
+                or args.series_dir.resolve() != root / "series"):
+            raise ValueError("Replay data differs from the frozen training snapshot")
+        provenance["snapshot_content_sha256"] = snapshot_sha
     model_args = SimpleNamespace(
         text_model_path=str(args.text_model_path), ts_backbone="moment",
         text_backbone="llama", moment_path=str(args.moment_path),
@@ -166,6 +176,7 @@ def main():
         qformer_layers=resolved["qformer_layers"], forecast_task_config=task,
         use_raw_ts_residual=resolved["use_raw_ts_residual"],
         use_learnable_last_value=resolved["use_learnable_last_value"],
+        gate_target_objective=resolved.get("gate_target_objective", "task"),
     )
     model = GSFuse(**vars(model_args))
     model.run_provenance = provenance
