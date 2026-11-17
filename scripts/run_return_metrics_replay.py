@@ -12,6 +12,7 @@ from __future__ import annotations
 import argparse
 import hashlib
 import json
+import os
 import random
 import subprocess
 import sys
@@ -153,10 +154,12 @@ def main():
         "source_commit": resolved["source_commit"],
     }
     if resolved.get("snapshot_content_sha256"):
-        from scripts.freeze_c1_inputs import verify
+        from scripts.freeze_c1_inputs import verify, verify_audit
 
         root = args.manifest.resolve().parent
-        snapshot_sha = verify(root)["content_sha256"]
+        receipt = os.environ.get("C1_SNAPSHOT_AUDIT")
+        record = verify_audit(root, receipt) if receipt else verify(root)
+        snapshot_sha = record["content_sha256"]
         if (snapshot_sha != resolved["snapshot_content_sha256"]
                 or args.event_dir.resolve() != root / "event"
                 or args.series_dir.resolve() != root / "series"):

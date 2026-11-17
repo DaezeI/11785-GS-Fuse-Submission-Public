@@ -17,6 +17,7 @@ Example (in the team's model environment):
 import argparse
 import hashlib
 import json
+import os
 import subprocess
 import sys
 from pathlib import Path
@@ -248,10 +249,12 @@ def main():
                              training_seed=run_config["seed"],
                              source_commit=run_config["source_commit"]) if run_config else {}))
     if run_config and run_config.get("snapshot_content_sha256"):
-        from scripts.freeze_c1_inputs import verify
+        from scripts.freeze_c1_inputs import verify, verify_audit
 
         root = Path(args.c1_manifest).resolve().parent
-        snapshot_sha = verify(root)["content_sha256"]
+        receipt = os.environ.get("C1_SNAPSHOT_AUDIT")
+        record = verify_audit(root, receipt) if receipt else verify(root)
+        snapshot_sha = record["content_sha256"]
         if (snapshot_sha != run_config["snapshot_content_sha256"]
                 or Path(args.event_dir).resolve() != root / "event"
                 or Path(args.series_dir).resolve() != root / "series"):

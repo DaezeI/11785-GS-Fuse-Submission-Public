@@ -27,7 +27,9 @@ export TOKENIZERS_PARALLELISM=false
 
 SNAPSHOT=/work/hdd/bjjg/gs-fuse/data/snapshots/c1-screened-return-v1
 : "${C1_SNAPSHOT_SHA256:?set the frozen input content_sha256 from snapshot.json}"
-python scripts/freeze_c1_inputs.py --verify "$SNAPSHOT" --expect-content-sha256 "$C1_SNAPSHOT_SHA256"
+export C1_SNAPSHOT_AUDIT="$RUN_ROOT/input-audit-v2/summary.json"
+python scripts/freeze_c1_inputs.py --verify "$SNAPSHOT" --audit "$C1_SNAPSHOT_AUDIT" \
+  --expect-content-sha256 "$C1_SNAPSHOT_SHA256"
 MANIFEST="$SNAPSHOT/manifest.json"
 PRICE="$SNAPSHOT/series/SP500.csv"
 test "$(sha256sum "$MANIFEST" | cut -d' ' -f1)" = 1b04373a4361238b09c0b1d952163973403d2d7839dbb9e7215c429af14b23d1

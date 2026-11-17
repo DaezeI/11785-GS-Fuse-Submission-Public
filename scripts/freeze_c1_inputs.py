@@ -45,16 +45,42 @@ def content_inventory(root):
     return {"file_count": len(files), "content_sha256": h.hexdigest()}
 
 
-def verify(root):
+def snapshot_record(root):
     root = Path(root)
     record = json.loads((root / "snapshot.json").read_text())
-    actual = content_inventory(root)
-    if actual != {k: record[k] for k in ("file_count", "content_sha256")}:
-        raise ValueError("Frozen C1 snapshot content differs from its recorded fingerprint")
     for name, relative in (("manifest_sha256", "manifest.json"),
                            ("price_sha256", "series/SP500.csv")):
         if sha256_file(root / relative) != record[name]:
             raise ValueError(f"Frozen C1 snapshot {relative} differs from its recorded hash")
+    return record
+
+
+def verify(root):
+    record = snapshot_record(root)
+    actual = content_inventory(root)
+    if actual != {k: record[k] for k in ("file_count", "content_sha256")}:
+        raise ValueError("Frozen C1 snapshot content differs from its recorded fingerprint")
+    return record
+
+
+def verify_audit(root, audit_path):
+    """Check the full audit receipt for a read-only snapshot before a GPU run."""
+    root = Path(root)
+    record = snapshot_record(root)
+    audit = json.loads(Path(audit_path).read_text())
+    for path in (root, root / "event", root / "series", root / "manifest.json",
+                 root / "series" / "SP500.csv", root / "snapshot.json"):
+        if path.stat().st_mode & 0o222:
+            raise ValueError(f"Frozen C1 snapshot path has write permissions: {path}")
+    if (audit.get("snapshot_content_sha256") != record["content_sha256"]
+            or audit.get("manifest_sha256") != record["manifest_sha256"]
+            or audit.get("price_sha256") != record["price_sha256"]
+            or audit.get("excluded_counts") != {}
+            or audit.get("emitted_counts") != audit.get("manifest_counts")
+            or audit.get("forecast_task", {}).get("task") != "return_bp"
+            or audit.get("return_checks", {}).get("event_windows_checked")
+            != record["event_folder_count"]):
+        raise ValueError("The frozen snapshot does not match its passing return audit")
     return record
 
 
@@ -122,14 +148,15 @@ def main():
     p.add_argument("--series", type=Path)
     p.add_argument("--out", type=Path)
     p.add_argument("--verify", type=Path, help="Check an existing snapshot without changing it")
+    p.add_argument("--audit", type=Path, help="Verify a prior full audit for a read-only snapshot")
     p.add_argument("--expect-content-sha256", help="Require the exact frozen content fingerprint")
     args = p.parse_args()
-    if args.expect_content_sha256 and not args.verify:
-        p.error("--expect-content-sha256 requires --verify")
+    if (args.audit or args.expect_content_sha256) and not args.verify:
+        p.error("--audit and --expect-content-sha256 require --verify")
     if args.verify:
         if any(x is not None for x in (args.manifest, args.event_dir, args.series, args.out)):
             p.error("--verify cannot be combined with copy arguments")
-        record = verify(args.verify)
+        record = verify_audit(args.verify, args.audit) if args.audit else verify(args.verify)
     else:
         if any(x is None for x in (args.manifest, args.event_dir, args.series, args.out)):
             p.error("copying requires --manifest, --event-dir, --series, and --out")
