@@ -113,16 +113,12 @@ smoke_job=$(sbatch --parsable \
 printf 'SMOKE=%s\n' "$smoke_job" >> "$JOB_FILE"
 
 paired_smoke_zero=$(sbatch --parsable \
-  --partition=gpuA100x4-interactive \
-  --time=01:00:00 \
   --dependency=afterok:"$smoke_job" \
   --export=ALL,EXPECTED_CODE_COMMIT="$RUN_COMMIT",C1_SNAPSHOT_SHA256="$SNAPSHOT_SHA",RUN_KIND=smoke-v1,MODE=zeroed_article_tokens \
   scripts/delta/adaeze_c1_return_paired.sbatch)
 printf 'SMOKE_ZERO=%s\n' "$paired_smoke_zero" >> "$JOB_FILE"
 
 paired_smoke_bypass=$(sbatch --parsable \
-  --partition=gpuA100x4-interactive \
-  --time=01:00:00 \
   --dependency=afterok:"$paired_smoke_zero" \
   --export=ALL,EXPECTED_CODE_COMMIT="$RUN_COMMIT",C1_SNAPSHOT_SHA256="$SNAPSHOT_SHA",RUN_KIND=smoke-v1,MODE=fusion_bypass_ts_inst \
   scripts/delta/adaeze_c1_return_paired.sbatch)

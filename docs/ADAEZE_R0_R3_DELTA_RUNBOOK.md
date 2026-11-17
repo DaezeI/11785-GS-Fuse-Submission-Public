@@ -245,20 +245,17 @@ Smoke acceptance checklist:
 Run paired smoke evaluation before committing the allocation to four full
 trainings. Each mode must use the smoke checkpoint and the same eight events.
 Run the two modes in sequence because they share a checkpoint-keyed text cache.
-The command-line overrides keep these short checks on the interactive queue;
-the wrapper's non-interactive defaults remain in place for full evaluation.
+Only the initial training smoke uses the interactive partition. Delta permits
+at most one queued or running job per user there, so both paired smoke controls
+use the wrapper's regular non-preempt `gpuA100x4` partition.
 
 ```bash
 paired_smoke_zero=$(sbatch --parsable \
-  --partition=gpuA100x4-interactive \
-  --time=01:00:00 \
   --dependency=afterok:"$smoke_job" \
   --export=ALL,EXPECTED_CODE_COMMIT="$RUN_COMMIT",C1_SNAPSHOT_SHA256="$SNAPSHOT_SHA",RUN_KIND=smoke-v1,MODE=zeroed_article_tokens \
   scripts/delta/adaeze_c1_return_paired.sbatch)
 
 paired_smoke_bypass=$(sbatch --parsable \
-  --partition=gpuA100x4-interactive \
-  --time=01:00:00 \
   --dependency=afterok:"$paired_smoke_zero" \
   --export=ALL,EXPECTED_CODE_COMMIT="$RUN_COMMIT",C1_SNAPSHOT_SHA256="$SNAPSHOT_SHA",RUN_KIND=smoke-v1,MODE=fusion_bypass_ts_inst \
   scripts/delta/adaeze_c1_return_paired.sbatch)
