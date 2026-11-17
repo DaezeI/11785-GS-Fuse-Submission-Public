@@ -28,6 +28,15 @@ timing comparison; its queued job was canceled at the user's request.
 Develop on personal/task branches and open focused PRs for ready changes, following
 the November 5 meeting guidance recorded in the update.
 
+**November 16 return integration:** PR #8 merged to `main` as commit
+`f0ac8ef`. For new screened-C1 return training and R0–R3 comparisons, use the
+read-only snapshot at
+`/work/hdd/bjjg/gs-fuse/data/snapshots/c1-screened-return-v1` with content
+SHA-256 `049aa089d2eaa77644be5deba3abad3fa33c0a18b4375553664cafc71370c2bf`
+and the merged R0–R3 scripts/protocol. Adaeze's older jobs `24050724` and
+`24051590` are user-held with zero elapsed time and are not results; do not
+release or relabel them as the frozen-input R0–R3 runs.
+
 For every proposed or executed experiment, follow [EXPERIMENTS.md](EXPERIMENTS.md).
 Record its question, comparison, intended change, fixed settings, status,
 provenance, result, and limitations. Prefer one changed factor when attributing
