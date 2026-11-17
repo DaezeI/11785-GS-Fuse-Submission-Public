@@ -33,6 +33,10 @@ R0–R3 dependency graph, and writes every job ID to:
 /work/hdd/bjjg/gs-fuse/runs/adaeze/return-r0-r3-v1/job_ids.env
 ```
 
+If Slurm has already purged either superseded job from the active queue, the
+launcher records it as inactive and continues; it does not treat a missing old
+job ID as a launch failure.
+
 If any guard fails, the launcher stops. Do not delete an existing campaign
 root or weaken a guard to make it continue. The remaining sections explain
 the same process step by step and provide monitoring, recovery, analysis, and
