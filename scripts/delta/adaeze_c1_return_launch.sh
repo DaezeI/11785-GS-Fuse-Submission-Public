@@ -14,11 +14,17 @@ SNAPSHOT=/work/hdd/bjjg/gs-fuse/data/snapshots/c1-screened-return-v1
 SNAPSHOT_SHA=049aa089d2eaa77644be5deba3abad3fa33c0a18b4375553664cafc71370c2bf
 SUPERSEDED_JOBS=(24050724 24051590)
 
+active_job_record() {
+  local target=$1
+  squeue -h -o '%i|%u|%T|%M' | \
+    awk -F'|' -v target="$target" '$1 == target && !found { print; found=1 }'
+}
+
 cancel_superseded_jobs() {
   local job record job_id owner state elapsed
 
   for job in "${SUPERSEDED_JOBS[@]}"; do
-    record=$(squeue -h -j "$job" -o '%i|%u|%T|%M')
+    record=$(active_job_record "$job")
     if [[ -z "$record" ]]; then
       echo "superseded_job=$job is not active; nothing to cancel"
       continue
@@ -36,7 +42,7 @@ cancel_superseded_jobs() {
 
   sleep 2
   for job in "${SUPERSEDED_JOBS[@]}"; do
-    if squeue -h -j "$job" | grep -q .; then
+    if [[ -n "$(active_job_record "$job")" ]]; then
       echo "STOP: superseded job $job is still active" >&2
       exit 1
     fi
