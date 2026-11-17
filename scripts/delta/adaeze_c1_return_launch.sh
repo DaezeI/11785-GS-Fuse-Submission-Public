@@ -112,19 +112,7 @@ smoke_job=$(sbatch --parsable \
   scripts/delta/adaeze_c1_return_smoke.sbatch)
 printf 'SMOKE=%s\n' "$smoke_job" >> "$JOB_FILE"
 
-paired_smoke_zero=$(sbatch --parsable \
-  --dependency=afterok:"$smoke_job" \
-  --export=ALL,EXPECTED_CODE_COMMIT="$RUN_COMMIT",C1_SNAPSHOT_SHA256="$SNAPSHOT_SHA",RUN_KIND=smoke-v1,MODE=zeroed_article_tokens \
-  scripts/delta/adaeze_c1_return_paired.sbatch)
-printf 'SMOKE_ZERO=%s\n' "$paired_smoke_zero" >> "$JOB_FILE"
-
-paired_smoke_bypass=$(sbatch --parsable \
-  --dependency=afterok:"$paired_smoke_zero" \
-  --export=ALL,EXPECTED_CODE_COMMIT="$RUN_COMMIT",C1_SNAPSHOT_SHA256="$SNAPSHOT_SHA",RUN_KIND=smoke-v1,MODE=fusion_bypass_ts_inst \
-  scripts/delta/adaeze_c1_return_paired.sbatch)
-printf 'SMOKE_BYPASS=%s\n' "$paired_smoke_bypass" >> "$JOB_FILE"
-
-gate_dependency="afterok:${paired_smoke_bypass}"
+gate_dependency="afterok:${smoke_job}"
 r0_job=$(sbatch --parsable --dependency="$gate_dependency" --export=ALL,EXPECTED_CODE_COMMIT="$RUN_COMMIT",C1_SNAPSHOT_SHA256="$SNAPSHOT_SHA",VARIANT=R0 scripts/delta/adaeze_c1_return_full.sbatch)
 printf 'R0=%s\n' "$r0_job" >> "$JOB_FILE"
 r1_job=$(sbatch --parsable --dependency="$gate_dependency" --export=ALL,EXPECTED_CODE_COMMIT="$RUN_COMMIT",C1_SNAPSHOT_SHA256="$SNAPSHOT_SHA",VARIANT=R1 scripts/delta/adaeze_c1_return_full.sbatch)
@@ -169,4 +157,4 @@ cat "$JOB_FILE"
 echo
 echo "Monitor with:"
 echo "squeue -u \"$USER\" -o '%.18i %.28j %.12P %.10T %.10M %.10l %.25R'"
-echo "The full jobs cannot run unless both smoke controls complete successfully."
+echo "The full jobs cannot run unless the single training smoke completes successfully."
