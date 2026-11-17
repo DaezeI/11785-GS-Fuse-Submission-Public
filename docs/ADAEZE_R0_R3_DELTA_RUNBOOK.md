@@ -1,7 +1,8 @@
 # Adaeze frozen-input R0–R3 Delta runbook
 
-**Handoff status:** this file and the three `adaeze_c1_return_*.sbatch`
-wrappers form one execution package. Use this runbook only after that package
+**Handoff status:** this file, the one-command launcher, and the three
+`adaeze_c1_return_*.sbatch` wrappers form one execution package. Use this
+runbook only after that package
 is merged to `main`. Do not run from the handoff branch or from
 `adaeze/pr8-speed-smoke`.
 
@@ -9,6 +10,34 @@ This is designed to be followed without another coding agent. Run each section
 in order. A command that fails is a stop condition: preserve its output and do
 not skip the guard, change a hash, reuse an output directory, or release an old
 job to work around it.
+
+## One-command launch
+
+After this package is merged to `main`, update any clean Delta clone of the
+repository and run:
+
+```bash
+git fetch origin main
+git checkout main
+git pull --ff-only origin main
+
+CANCEL_SUPERSEDED=1 bash scripts/delta/adaeze_c1_return_launch.sh
+```
+
+That command safely checks and cancels only Adaeze's superseded jobs
+`24050724` and `24051590`, creates a permanent checkout at the current merged
+`main` commit, validates all four shell scripts, submits the smoke and the full
+R0–R3 dependency graph, and writes every job ID to:
+
+```text
+/work/hdd/bjjg/gs-fuse/runs/adaeze/return-r0-r3-v1/job_ids.env
+```
+
+If any guard fails, the launcher stops. Do not delete an existing campaign
+root or weaken a guard to make it continue. The remaining sections explain
+the same process step by step and provide monitoring, recovery, analysis, and
+handoff commands; they are not additional submissions to run after the
+one-command launcher.
 
 ## 1. Source of truth and non-negotiable inputs
 
@@ -81,6 +110,7 @@ This runbook is shipped with these reusable files:
 scripts/delta/adaeze_c1_return_smoke.sbatch
 scripts/delta/adaeze_c1_return_full.sbatch
 scripts/delta/adaeze_c1_return_paired.sbatch
+scripts/delta/adaeze_c1_return_launch.sh
 ```
 
 They use the following Adaeze-owned paths:
@@ -108,6 +138,7 @@ Before merging the execution-package PR, run:
 bash -n scripts/delta/adaeze_c1_return_smoke.sbatch
 bash -n scripts/delta/adaeze_c1_return_full.sbatch
 bash -n scripts/delta/adaeze_c1_return_paired.sbatch
+bash -n scripts/delta/adaeze_c1_return_launch.sh
 git diff --check
 ```
 
@@ -141,6 +172,7 @@ git show "$RUN_COMMIT":docs/ADAEZE_R0_R3_DELTA_RUNBOOK.md >/dev/null
 git show "$RUN_COMMIT":scripts/delta/adaeze_c1_return_smoke.sbatch >/dev/null
 git show "$RUN_COMMIT":scripts/delta/adaeze_c1_return_full.sbatch >/dev/null
 git show "$RUN_COMMIT":scripts/delta/adaeze_c1_return_paired.sbatch >/dev/null
+git show "$RUN_COMMIT":scripts/delta/adaeze_c1_return_launch.sh >/dev/null
 git checkout --detach "$RUN_COMMIT"
 
 echo "RUN_COMMIT=$RUN_COMMIT"
