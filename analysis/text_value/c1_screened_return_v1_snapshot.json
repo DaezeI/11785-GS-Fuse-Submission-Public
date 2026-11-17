@@ -1,0 +1,10 @@
+{
+  "schema": "c1-screened-input-snapshot-v1",
+  "created_utc": "2026-11-16T23:29:01.040357+00:00",
+  "source_commit": "d90313b0b63d9d2a92784336b0268faa32c588b2",
+  "event_folder_count": 10705,
+  "manifest_sha256": "1b04373a4361238b09c0b1d952163973403d2d7839dbb9e7215c429af14b23d1",
+  "price_sha256": "6a873b1d72d27f9188c6bf12acb756775916be8ed9ff42d9e9dd98028f68de2a",
+  "file_count": 121156,
+  "content_sha256": "049aa089d2eaa77644be5deba3abad3fa33c0a18b4375553664cafc71370c2bf"
+}

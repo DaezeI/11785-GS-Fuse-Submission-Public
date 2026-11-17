@@ -9,8 +9,9 @@ and commit only small run records or summaries here.
 
 Record the question the run answers, the comparison run, the one intended
 change, and what stays fixed: manifest and timing policy, event population,
-price file, code version, model/backbones, training budget, seed, metrics, and
-evaluation controls. Save the exact launch command and a fresh output path.
+price and article snapshot hashes, code version, model/backbones, training
+budget, seed, metrics, and evaluation controls. Publish changed data as a new
+version, preserving the prior copy and its audit. Save the exact launch command and a fresh output path.
 Run the same evaluation population and metric definitions for both sides.
 
 One-change comparisons support claims about that change. A bundled redesign is
@@ -22,7 +23,7 @@ an ablation. If the population changes, state that the scores are not paired.
 ## After a run
 
 Add a result note or update the linked handoff with: status, owner, code commit,
-manifest and price hashes, training seed and resolved settings, job ID, exact
+manifest, price, and article snapshot hashes, training seed and resolved settings, job ID, exact
 command, checkpoint, output path, paired evaluation IDs, metrics with counts and
 uncertainty, observed finding, interpretation, limitations, and next action.
 Use `PENDING` for unknown fields. A queued job has no result. A smoke run checks
@@ -34,8 +35,8 @@ population into another run's row.
 | Run or comparison | Purpose | Intended change | Status and evidence |
 |---|---|---|---|
 | Screened C1 price baseline | Establish the price-task reference and matched text controls | Uses the November 13 screened C1 manifest | Training and paired jobs queued; see [project status](PROJECT_STATUS.md). No full result yet. |
-| Screened C1 return redesign | Test Adaeze's return design as a package on the same screened population | Return target, Huber/direction task loss, gate target, and last-value shortcut change together | Code in [draft return PR](https://github.com/DaezeI/11785-GS-Fuse-Submission-Public/pull/8); GPU smoke and full run pending. Do not attribute a future difference to one component. |
-| Return component ablations | Identify which return-design choices matter | Change direction penalty, gate target, and last-value shortcut separately while holding screened data and budget fixed | Run setup pending on the return branch; no result yet. |
+| Screened C1 return redesign | Test Adaeze's return design as a package on the same screened population | Return target, Huber/direction task loss, gate target, and last-value shortcut change together | The [runtime smoke and metrics replay](analysis/text_value/ADAEZE_RETURN_SPEED_SMOKE.md) completed on 16 training and eight validation/test events. This verifies execution and structured metric capture only; the full run remains pending. Code builds on [draft return PR](https://github.com/DaezeI/11785-GS-Fuse-Submission-Public/pull/8). Do not attribute a future difference to one component. |
+| Return component ablations R0→R3 | Identify which return-design choices matter | Add direction penalty, then full-task gate target, then last-value shortcut, one at a time | [Design and run handoff](docs/updates/2026-11-13-return-ablations.md) with the verified frozen snapshot and audit. Variant GPU jobs remain planned. |
 
 The original unscreened C1 manifest and historical outputs remain preserved for
 audit context. The screened subset excludes 883 suspect articles; publication

@@ -1,0 +1,90 @@
+{
+  "manifest_counts": {
+    "train": 6167,
+    "vali": 2302,
+    "test": 2236
+  },
+  "emitted_counts": {
+    "train": 6167,
+    "vali": 2302,
+    "test": 2236
+  },
+  "excluded_counts": {},
+  "excluded_examples": {},
+  "price": {
+    "raw_rows": 331256,
+    "clean_rows": 331094,
+    "exact_duplicate_rows": 162
+  },
+  "timing_policy": "category4_1400_strict_before",
+  "manifest_sha256": "1b04373a4361238b09c0b1d952163973403d2d7839dbb9e7215c429af14b23d1",
+  "price_sha256": "6a873b1d72d27f9188c6bf12acb756775916be8ed9ff42d9e9dd98028f68de2a",
+  "release_time_verified": false,
+  "return_scale_computed_bp": 48.340354919433594,
+  "return_scale_population_events": 6167,
+  "return_scale_population_sha256": "b8d1d475d39bbf95c19a76d6c86a5b93410fb449a91eb45aafdb4a350db83d68",
+  "return_scale_overridden": false,
+  "covered_bars": {
+    "train": 180151,
+    "vali": 65573,
+    "test": 63577
+  },
+  "forecast_task": {
+    "task": "return_bp",
+    "anchor": "last_observed_close",
+    "units": "basis_point_log_return",
+    "scale_bp": 48.340354919433594,
+    "huber_delta_bp": 48.340354919433594,
+    "direction_tau_bp": 48.340354919433594,
+    "direction_deadband_bp": 0.0,
+    "direction_weight": 1.0,
+    "direction_horizons": [
+      35,
+      70,
+      140
+    ],
+    "close_channel": 3
+  },
+  "seed": 0,
+  "stage1_train_windows": 15945,
+  "stage1_vali_windows": 6523,
+  "source_commit": "d90313b0b63d9d2a92784336b0268faa32c588b2",
+  "snapshot_content_sha256": "049aa089d2eaa77644be5deba3abad3fa33c0a18b4375553664cafc71370c2bf",
+  "stage1_train_window_count": 15945,
+  "stage1_vali_window_count": 6523,
+  "reuters_dateline_screen": {
+    "test:folder_date_matches": 2,
+    "test:no_opening_reuters_dateline": 2234,
+    "test:opening_reuters_dateline": 2,
+    "test:total": 2236,
+    "train:no_opening_reuters_dateline": 6167,
+    "train:total": 6167,
+    "vali:folder_date_matches": 2,
+    "vali:no_opening_reuters_dateline": 2300,
+    "vali:opening_reuters_dateline": 2,
+    "vali:total": 2302
+  },
+  "return_checks": {
+    "event_windows_checked": 10705,
+    "stage1_train_windows_checked": 15945,
+    "stage1_vali_windows_checked": 6523,
+    "max_price_roundtrip_abs_error": 0.0009765625,
+    "direction_eligible_events": {
+      "train": {
+        "35": 6167,
+        "70": 6167,
+        "140": 6167
+      },
+      "vali": {
+        "35": 2302,
+        "70": 2302,
+        "140": 2302
+      },
+      "test": {
+        "35": 2236,
+        "70": 2232,
+        "140": 2236
+      }
+    }
+  }
+}

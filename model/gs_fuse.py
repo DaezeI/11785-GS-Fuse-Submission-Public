@@ -4,7 +4,7 @@ GS-FUSE unified multimodal forecasting model and training utilities.
 """
 
 import os
-import gc
+import json
 import sys
 import warnings
 from pathlib import Path
@@ -28,6 +28,13 @@ from model.text_encoders import build_text_encoder
 from model.variants import MoEModalityGate, QFormerFusion
 from model import tracking
 from model.text_cache import TextEmbeddingCache, cache_signature
+from data.forecast_task import (
+    ForecastTaskConfig,
+    RETURN_TASK,
+    forecast_training_loss,
+    gate_supervision_target,
+    return_task_loss,
+)
 
 
 
@@ -618,6 +625,10 @@ class GSFuse(nn.Module):
             moe_top_k=2,
             num_queries=16,
             qformer_layers=2,
+            forecast_task_config=None,
+            use_raw_ts_residual=None,
+            use_learnable_last_value=None,
+            gate_target_objective="task",
             # legacy aliases
             llama_name=None,
     ):
@@ -642,6 +653,24 @@ class GSFuse(nn.Module):
         self.max_text_tokens = max_token_num
         self.ts_backbone = ts_backbone
         self.text_backbone = text_backbone
+        if forecast_task_config is None:
+            forecast_task_config = ForecastTaskConfig()
+        elif isinstance(forecast_task_config, dict):
+            forecast_task_config = ForecastTaskConfig(**forecast_task_config)
+        self.forecast_task_config = forecast_task_config
+        if gate_target_objective not in ("magnitude", "task"):
+            raise ValueError(f"Unknown gate_target_objective: {gate_target_objective}")
+        if forecast_task_config.task != RETURN_TASK and gate_target_objective != "task":
+            raise ValueError("Magnitude-only gate supervision requires the return task")
+        self.gate_target_objective = gate_target_objective
+        self.run_provenance = {}
+        self.use_raw_ts_residual = (USE_RAW_TS_RESIDUAL if use_raw_ts_residual is None
+                                    else bool(use_raw_ts_residual))
+        self.use_learnable_last_value = (
+            forecast_task_config.task == RETURN_TASK if use_learnable_last_value is None
+            else bool(use_learnable_last_value)
+        )
+        self.fixed_text_gate = None  # inference-only paired control
 
         # -------- Text encoder (LLaMA or Phi) --------
         self.text_encoder = build_text_encoder(text_backbone, text_model_path, use_4bit=USE_4BIT)
@@ -770,13 +799,6 @@ class GSFuse(nn.Module):
             seq_len=self.seq_len
         ).to(self.device)
 
-        # NEW: Learnable last-value residual module
-        if USE_LEARNABLE_LAST_VALUE:
-            self.last_value_module = LearnableLastValueResidual(
-                context_dim=FUSE_DIM, d_channels=self.d, pred_len=self.pred_len,
-                init_alpha=LAST_VALUE_INIT_WEIGHT
-            ).to(self.device)
-
         # Memory conditioning
         self.mem_type_embed = nn.Embedding(2, FUSE_DIM).to(self.device)
         enc_layer = nn.TransformerEncoderLayer(
@@ -805,6 +827,14 @@ class GSFuse(nn.Module):
             nn.GELU(),
             nn.Linear(FUSE_DIM, self.d * self.pred_len)
         ).to(self.device)
+
+        # Keep shared initialization and training draws aligned in the ablation.
+        if self.use_learnable_last_value:
+            with torch.random.fork_rng(devices=[]):
+                self.last_value_module = LearnableLastValueResidual(
+                    context_dim=FUSE_DIM, d_channels=self.d, pred_len=self.pred_len,
+                    init_alpha=LAST_VALUE_INIT_WEIGHT
+                ).to(self.device)
 
     # ---------- utilities ----------
     def _ensure_cf(self, x: torch.Tensor) -> torch.Tensor:
@@ -884,7 +914,7 @@ class GSFuse(nn.Module):
         ts_inst = self.ts_inst_to_fuse(ts_instance)
 
         # Add raw TS residual to TS instance embedding
-        if USE_RAW_TS_RESIDUAL:
+        if self.use_raw_ts_residual:
             raw_ts_residual = self._compute_raw_ts_residual(x_cf)
             ts_inst = ts_inst + RAW_TS_RESIDUAL_WEIGHT * raw_ts_residual
 
@@ -939,7 +969,7 @@ class GSFuse(nn.Module):
         t_vec_residual = F.layer_norm(self._masked_mean(H_text, align_text_mask), (FUSE_DIM,))
 
         s_vec_residual_base = F.layer_norm(self._masked_mean(H_ts, ts_mask), (FUSE_DIM,))
-        if USE_RAW_TS_RESIDUAL and ts_inst is not None:
+        if self.use_raw_ts_residual and ts_inst is not None:
             s_vec_residual = s_vec_residual_base + (ts_inst - self._masked_mean(ts_tokens, ts_mask))
             s_vec_residual = F.layer_norm(s_vec_residual, (FUSE_DIM,))
         else:
@@ -973,12 +1003,22 @@ class GSFuse(nn.Module):
             concat_all = torch.cat([t_vec_norm, s_vec_norm], dim=-1)
             gate_logits = self.bi_gate_layer(concat_all).reshape(-1, 2, FUSE_DIM)
             gate = F.softmax(gate_logits / max(self.gate_tau, 1e-6), dim=1)
+        learned_gate = gate
+        if self.fixed_text_gate is not None:
+            if self.training:
+                raise RuntimeError("Fixed text gate is an inference-only control")
+            weight = float(self.fixed_text_gate)
+            if not 0.0 <= weight <= 1.0:
+                raise ValueError("fixed_text_gate must be between zero and one")
+            gate = torch.stack((torch.full_like(gate[:, 0], weight),
+                                torch.full_like(gate[:, 1], 1.0 - weight)), dim=1)
         fused_emb = gate[:, 0] * t_vec_norm + gate[:, 1] * s_vec_norm
 
         if return_analysis:
             return fused_emb, {
                 **variant_info,
                 "gate_softmax": gate,
+                "learned_gate_softmax": learned_gate,
                 "attn_t2s": w_text2ts,
                 "attn_s2t": w_ts2text,
                 "token_align_loss": token_align_loss,
@@ -1026,19 +1066,23 @@ class GSFuse(nn.Module):
         s_vec_norm = F.normalize(s_vec_residual, p=2, dim=-1)
         core = self.decoder(s_vec_norm, x_cf=x_cf)
 
-        if USE_LEARNABLE_LAST_VALUE:
+        if self.use_learnable_last_value:
             last_val = x_cf[:, :, -1:].detach()
             output, _ = self.last_value_module(core, last_val, s_vec_norm)
         else:
             output = core
         return output
 
+    def predict_strict_ts_only(self, ts_inst: torch.Tensor, x_cf: torch.Tensor) -> torch.Tensor:
+        """Decode from pre-cross-attention TS features only."""
+        return self.predict_ts_only_full_decoder(None, None, ts_inst, x_cf)
+
     def predict_text_only_full_decoder(self, text_tok: torch.Tensor, text_mask: torch.Tensor,
                                        t_vec_residual: torch.Tensor, x_cf: torch.Tensor) -> torch.Tensor:
         t_vec_norm = F.normalize(t_vec_residual, p=2, dim=-1)
         core = self.decoder(t_vec_norm, x_cf=x_cf)
 
-        if USE_LEARNABLE_LAST_VALUE:
+        if self.use_learnable_last_value:
             last_val = x_cf[:, :, -1:].detach()
             output, _ = self.last_value_module(core, last_val, t_vec_norm)
         else:
@@ -1047,7 +1091,7 @@ class GSFuse(nn.Module):
 
     def _apply_output_refinement(self, core_output, fused_emb, x_cf):
         """Apply learnable last-value refinement if enabled."""
-        if USE_LEARNABLE_LAST_VALUE:
+        if self.use_learnable_last_value:
             last_val = x_cf[:, :, -1:].detach()
             output, alpha = self.last_value_module(core_output, last_val, fused_emb)
             return output, alpha
@@ -1148,7 +1192,9 @@ class GSFuse(nn.Module):
             analysis["x_cf"] = x_cf
             analysis["last_value_alpha"] = alpha
 
-        batch_series_embeddings_for_contrastive = analysis.get("s_vec_residual", ts_inst)
+        batch_series_embeddings_for_contrastive = (
+            analysis.get("s_vec_residual", ts_inst) if analysis is not None else ts_inst
+        )
 
         return (
             output,
@@ -1160,7 +1206,7 @@ class GSFuse(nn.Module):
             analysis,
         )
 
-    def predict_single_case(self, batch_text, batch_seq):
+    def predict_single_case(self, batch_text, batch_seq, return_analysis=False):
         tlist, mlist = [], []
         for t in batch_text:
             T, M = self.get_text_tokens_all(t)
@@ -1177,10 +1223,13 @@ class GSFuse(nn.Module):
         x_cf = self._ensure_cf(batch_seq)
         ts_tok, ts_mask, ts_inst = self.get_ts_tokens_full(x_cf)
 
-        fused_emb, _ = self._fuse_from_sequences(text_tok, ts_tok, text_mask, ts_mask,
-                                                 ts_inst=ts_inst, return_analysis=False)
+        fused_emb, analysis = self._fuse_from_sequences(
+            text_tok, ts_tok, text_mask, ts_mask,
+            ts_inst=ts_inst, return_analysis=return_analysis)
         core = self.decoder(fused_emb, x_cf=x_cf)
         output, _ = self._apply_output_refinement(core, fused_emb, x_cf)
+        if return_analysis:
+            return output, fused_emb, ts_inst, batch_text_embeddings, analysis
         return output, fused_emb, ts_inst, batch_text_embeddings
 
     def predict_one(self, text, seq_data):
@@ -1253,8 +1302,8 @@ class GSFuse(nn.Module):
         return {
             "arch": "GS-FUSE",
             "version": "v3-learnable-last-value-llm-last-layer-finetune",
-            "use_raw_ts_residual": USE_RAW_TS_RESIDUAL,
-            "use_learnable_last_value": USE_LEARNABLE_LAST_VALUE,
+            "use_raw_ts_residual": self.use_raw_ts_residual,
+            "use_learnable_last_value": self.use_learnable_last_value,
             "use_multi_scale_ts": USE_MULTI_SCALE_TS,
             "finetune_llm_last_layer": FINETUNE_LLM_LAST_LAYER,
             "llm_finetune_lr": LLM_FINETUNE_LR,
@@ -1274,13 +1323,13 @@ class GSFuse(nn.Module):
             "gate_tau": float(getattr(self, "gate_tau", 1.0)),
             "num_heads_cross": int(NUM_HEADS),
             "device": str(self.device),
+            "forecast_task": self.forecast_task_config.to_dict(),
+            "gate_target_objective": self.gate_target_objective,
         }
 
     def save_model_combined(self, save_path="model_checkpoint.pth", **kwargs):
         state_dicts = {
             "ts_encoder": self.ts_encoder.state_dict(),
-            "text_encoder": self.text_encoder.state_dict(),
-            "llm": self.text_encoder.llm.state_dict(),
             "llm_proj": self.llm_proj.state_dict(),
             "embed_project": self.embed_project.state_dict(),
             "ts_feat_to_fuse": self.ts_feat_to_fuse.state_dict(),
@@ -1302,16 +1351,22 @@ class GSFuse(nn.Module):
             "token_align_module": self.token_align_module.state_dict(),
         }
 
+        # The base text model is loaded from text_model_path for every run. A
+        # frozen copy would make each checkpoint much larger without adding
+        # learned state. Save it only when this run can change its parameters.
+        if FINETUNE_LLM_LAST_LAYER:
+            state_dicts["text_encoder"] = self.text_encoder.state_dict()
+
         if USE_MULTI_SCALE_TS:
             state_dicts["multi_scale_extractor"] = self.multi_scale_extractor.state_dict()
-        if USE_LEARNABLE_LAST_VALUE:
+        if self.use_learnable_last_value:
             state_dicts["last_value_module"] = self.last_value_module.state_dict()
         for name, mod in self.variant_modules().items():
             state_dicts[name] = mod.state_dict()
 
         checkpoint = {
             "state_dicts": state_dicts,
-            "metadata": {**self._arch_metadata(), **kwargs},
+            "metadata": {**self._arch_metadata(), "run_provenance": self.run_provenance, **kwargs},
         }
         torch.save(checkpoint, save_path)
         print(f"[save] Model weights saved to: {save_path}")
@@ -1328,6 +1383,24 @@ class GSFuse(nn.Module):
         ckpt = torch.load(save_path, map_location="cpu")
         sd = ckpt["state_dicts"]
         meta = ckpt.get("metadata", {})
+        saved_task = meta.get("forecast_task")
+        current_task = self.forecast_task_config.task
+        saved_task_name = saved_task.get("task") if isinstance(saved_task, dict) else None
+        if current_task == RETURN_TASK and saved_task_name != RETURN_TASK:
+            raise ValueError(
+                "Cannot resume a return run from a price-space or unlabelled checkpoint"
+            )
+        if saved_task_name == RETURN_TASK and saved_task != self.forecast_task_config.to_dict():
+            raise ValueError("Return checkpoint task metadata does not match this run")
+        if saved_task_name == RETURN_TASK:
+            if meta.get("gate_target_objective", "task") != self.gate_target_objective:
+                raise ValueError("Return checkpoint gate target objective does not match this run")
+            for name, expected in (("use_raw_ts_residual", self.use_raw_ts_residual),
+                                   ("use_learnable_last_value", self.use_learnable_last_value)):
+                if meta.get(name) is not expected:
+                    raise ValueError(f"Return checkpoint {name} does not match this run")
+            if not self.run_provenance or meta.get("run_provenance") != self.run_provenance:
+                raise ValueError("Return checkpoint data/seed provenance does not match this run")
 
         if "ts_encoder" in sd and sd["ts_encoder"] is not None:
             try:
@@ -1379,7 +1452,7 @@ class GSFuse(nn.Module):
 
         if USE_MULTI_SCALE_TS and "multi_scale_extractor" in sd:
             self.multi_scale_extractor.load_state_dict(sd["multi_scale_extractor"], strict=False)
-        if USE_LEARNABLE_LAST_VALUE and "last_value_module" in sd:
+        if self.use_learnable_last_value and "last_value_module" in sd:
             self.last_value_module.load_state_dict(sd["last_value_module"], strict=False)
 
         self.mem_type_embed.load_state_dict(sd["mem_type_embed"], strict=False)
@@ -1481,6 +1554,105 @@ def weighted_mse_mae(y_hat, y_true, h_w):
     return se, l1
 
 
+def gate_task_loss_per_event(model, prediction, target):
+    """Complete return task for the redesigned gate; legacy MSE for price runs."""
+    if model.forecast_task_config.task == RETURN_TASK:
+        return forecast_training_loss(
+            prediction, target, model.forecast_task_config, reduction="none"
+        )
+    return (prediction - target).square().mean(dim=(1, 2))
+
+
+def gate_supervision_loss_per_event(model, prediction, target):
+    """Loss used only to decide whether text helped the supervised gate."""
+    if model.forecast_task_config.task == RETURN_TASK and model.gate_target_objective == "magnitude":
+        _, components = return_task_loss(
+            prediction, target, model.forecast_task_config,
+            reduction="none", return_components=True,
+        )
+        return components["magnitude"]
+    return gate_task_loss_per_event(model, prediction, target)
+
+
+@torch.no_grad()
+def evaluate_return_loader(model, loader):
+    """Event-weighted validation metrics for the return task; no test inspection."""
+    config = model.forecast_task_config
+    if config.task != RETURN_TASK:
+        raise ValueError("Return evaluator needs a return-task model")
+    model.eval()
+    events = elements = task_sum = magnitude_sum = direction_sum = abs_sum = square_sum = 0
+    hits = {int(h): 0 for h in config.direction_horizons}
+    eligible_counts = {int(h): 0 for h in config.direction_horizons}
+    for batch in loader:
+        texts, seq, target = batch[0], batch[5], batch[6]
+        prediction, *_ = model.predict_single_case(texts, seq)
+        target = target.float().to(prediction.device)
+        count = target.shape[0]
+        events += count
+        elements += target.numel()
+        task_loss, components = return_task_loss(
+            prediction, target, config, reduction="none", return_components=True
+        )
+        task_sum += float(task_loss.sum())
+        magnitude_sum += float(components["magnitude"].sum())
+        direction_sum += float(components["direction"].sum())
+        abs_sum += float((prediction - target).abs().sum())
+        square_sum += float((prediction - target).square().sum())
+        for h in hits:
+            actual = target[:, config.close_channel, h - 1]
+            predicted = prediction[:, config.close_channel, h - 1]
+            eligible = (actual != 0) & (actual.abs() > config.direction_deadband_bp)
+            eligible_counts[h] += int(eligible.sum())
+            hits[h] += int(((actual.sign() == predicted.sign()) & eligible).sum())
+    if not events:
+        raise ValueError("Return validation loader emitted no events")
+    direction_loss = direction_sum / events
+    return {"events": events, "task_loss": task_sum / events,
+            "magnitude_loss": magnitude_sum / events,
+            "direction_loss": direction_loss,
+            "weighted_direction_loss": float(config.direction_weight) * direction_loss,
+            "return_mae_bp": abs_sum / elements, "return_mse_bp2": square_sum / elements,
+            "close_dhr": {str(h): {"rate": hits[h] / eligible_counts[h] if eligible_counts[h] else None,
+                                   "eligible_events": eligible_counts[h]} for h in hits}}
+
+
+def return_metrics_for_tracking(split, result):
+    """Flatten structured return metrics without inventing values for empty DHR cells."""
+    metrics = {
+        f"{split}/events": result["events"],
+        f"{split}/task_loss": result["task_loss"],
+        f"{split}/magnitude_loss": result["magnitude_loss"],
+        f"{split}/direction_loss": result["direction_loss"],
+        f"{split}/weighted_direction_loss": result["weighted_direction_loss"],
+        f"{split}/return_mae_bp": result["return_mae_bp"],
+        f"{split}/return_mse_bp2": result["return_mse_bp2"],
+    }
+    for horizon, values in result["close_dhr"].items():
+        metrics[f"{split}/close_dhr_h{horizon}_eligible"] = values["eligible_events"]
+        if values["rate"] is not None:
+            metrics[f"{split}/close_dhr_h{horizon}"] = values["rate"]
+    return metrics
+
+
+def write_return_metrics(path, split, result, model, checkpoint, **metadata):
+    """Atomically persist one selected-checkpoint return evaluation."""
+    payload = {
+        "schema_version": 1,
+        "split": split,
+        "checkpoint": str(checkpoint),
+        "forecast_task": model.forecast_task_config.to_dict(),
+        "run_provenance": dict(model.run_provenance),
+        "metrics": result,
+        **metadata,
+    }
+    path = Path(path)
+    tmp = path.with_suffix(path.suffix + ".tmp")
+    tmp.write_text(json.dumps(payload, indent=2, allow_nan=False) + "\n", encoding="utf-8")
+    os.replace(tmp, path)
+    return payload
+
+
 # ============================= Train / Eval ==================================
 def train(model, train_loader, test_loader, vali_loader, num_epochs, output_path=None,
           use_horizon_weight=True, horizon_decay=0.00,
@@ -1505,9 +1677,16 @@ def train(model, train_loader, test_loader, vali_loader, num_epochs, output_path
         inv_lambda = 0.0
         model.token_align_loss_w = 0.0
 
-    print(f"[CONFIG] USE_RAW_TS_RESIDUAL: {USE_RAW_TS_RESIDUAL}")
-    print(f"[CONFIG] USE_LEARNABLE_LAST_VALUE: {USE_LEARNABLE_LAST_VALUE}")
+    print(f"[CONFIG] USE_RAW_TS_RESIDUAL: {model.use_raw_ts_residual}")
+    print(f"[CONFIG] USE_LEARNABLE_LAST_VALUE: {model.use_learnable_last_value}")
     print(f"[CONFIG] USE_MULTI_SCALE_TS: {USE_MULTI_SCALE_TS}")
+    print(f"[CONFIG] Loss weights: contrastive={contrastive_lambda}, gate={gate_causal_lambda}, "
+          f"TS-only={TrainingConfig.TS_ONLY_LAMBDA if not simplified_mode else 0.0}, "
+          f"token_align={model.token_align_loss_w}, entropy={TrainingConfig.GATE_ENTROPY_LAMBDA}, "
+          f"MoE={TrainingConfig.MOE_AUX_LAMBDA}")
+    print(f"[CONFIG] Gate target: adaptive={TrainingConfig.GC_USE_ADAPTIVE_SCALE}, "
+          f"fixed_scale={TrainingConfig.GC_SIGMOID_SCALE}, min_scale={TrainingConfig.GC_MIN_SCALE}, "
+          f"gain={TrainingConfig.GC_GAIN}, clamp={TrainingConfig.GC_LOGIT_CLAMP}")
 
     device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
     model.train()
@@ -1572,7 +1751,7 @@ def train(model, train_loader, test_loader, vali_loader, num_epochs, output_path
     if USE_MULTI_SCALE_TS:
         for p in model.multi_scale_extractor.parameters():
             p.requires_grad = True
-    if USE_LEARNABLE_LAST_VALUE:
+    if model.use_learnable_last_value:
         for p in model.last_value_module.parameters():
             p.requires_grad = True
 
@@ -1604,7 +1783,7 @@ def train(model, train_loader, test_loader, vali_loader, num_epochs, output_path
     if USE_MULTI_SCALE_TS:
         trainable_groups.append(
             {'params': model.multi_scale_extractor.parameters(), 'lr': base_lr, 'weight_decay': 0.01})
-    if USE_LEARNABLE_LAST_VALUE:
+    if model.use_learnable_last_value:
         trainable_groups.append({'params': model.last_value_module.parameters(), 'lr': base_lr * 2,
                                  'weight_decay': 0.01})  # Higher LR for last value module
     for name, mod in model.variant_modules().items():
@@ -1674,6 +1853,7 @@ def train(model, train_loader, test_loader, vali_loader, num_epochs, output_path
     global_step = 0
     last_vali_metrics = None
     last_test_metrics = None
+    last_return_vali_result = None
 
     # Subsampled training-modality evaluation (to avoid an expensive full pass over train_loader).
     # Set to 0/None to disable, or increase for less overhead.
@@ -1685,6 +1865,7 @@ def train(model, train_loader, test_loader, vali_loader, num_epochs, output_path
             "gate_count": 0,
             "gc_scores": [],
             "gc_scores_raw": [],
+            "gc_scales": [],
             "gate_texts": [],
             "train_loss_sum": 0.0,
             "train_smape_sum": 0.0,
@@ -1728,12 +1909,17 @@ def train(model, train_loader, test_loader, vali_loader, num_epochs, output_path
             if len(window_dict["gc_scores_raw"]) > 0:
                 gc_raw_all = torch.cat(window_dict["gc_scores_raw"])
                 gc_raw_mean = gc_raw_all.mean().item()
+            scale_text = ""
+            if window_dict["gc_scales"]:
+                scales = torch.tensor(window_dict["gc_scales"])
+                scale_text = (f", gate scale min/median/max: {scales.min().item():.6f}/"
+                              f"{scales.median().item():.6f}/{scales.max().item():.6f}")
 
             msg_causal = (
                 f"[Causal | last window] mean Granger score: {gc_mean:.4f} (sigmoid), {gc_raw_mean:.6f} (raw), "
                 f"mean text gate: {gate_text_mean:.4f}, "
                 f"frac(text improves TS-only): {gc_improve_ratio:.4f}, "
-                f"corr(gate,text_help): {corr:.4f}"
+                f"corr(gate,text_help): {corr:.4f}{scale_text}"
             )
             msgs.append(msg_causal)
 
@@ -1770,12 +1956,28 @@ def train(model, train_loader, test_loader, vali_loader, num_epochs, output_path
         return msgs
 
     def _do_eval_and_log(tag: str):
-        nonlocal last_vali_metrics, last_test_metrics
+        nonlocal last_vali_metrics, last_test_metrics, last_return_vali_result
 
         for m in _summarize_gate_and_causal(window, tag=tag, step=global_step):
             print(m)
 
         _backup = swap_to_ema()
+        if model.forecast_task_config.task == RETURN_TASK:
+            # Keep test events untouched while selecting a return checkpoint.
+            result = evaluate_return_loader(model, vali_loader)
+            last_return_vali_result = result
+            swap_from_backup(_backup)
+            model.train()
+            last_vali_metrics = (result["task_loss"], result["return_mse_bp2"],
+                                 result["return_mae_bp"], float("nan"), float("nan"), float("nan"))
+            last_test_metrics = (float("nan"),) * 6
+            print(f"[{tag}] Step {global_step} | Vali task {result['task_loss']:.6f}, "
+                  f"return MAE {result['return_mae_bp']:.6f} bp, "
+                  f"MSE {result['return_mse_bp2']:.6f} bp², "
+                  f"close DHR {result['close_dhr']}")
+            tracking.log(return_metrics_for_tracking("vali", result),
+                         stage="stage3", step=global_step)
+            return
         vali_result = test(
             model, vali_loader, use_horizon_weight=use_horizon_weight, horizon_decay=horizon_decay,
             contrastive_lambda=contrastive_lambda, compute_modality_scores=True
@@ -1785,6 +1987,7 @@ def train(model, train_loader, test_loader, vali_loader, num_epochs, output_path
             contrastive_lambda=contrastive_lambda, compute_modality_scores=True
         )
         swap_from_backup(_backup)
+        model.train()
 
         (vali_combine_loss, vali_mse_loss, vali_mae_loss, vali_contras_loss, vali_rmse_loss,
          vali_smape_loss, vali_modality) = vali_result
@@ -1922,6 +2125,9 @@ def train(model, train_loader, test_loader, vali_loader, num_epochs, output_path
         epoch_mse_sum = 0.0
         epoch_mae_sum = 0.0
         epoch_contrastive_sum = 0.0
+        epoch_return_magnitude_sum = 0.0
+        epoch_return_direction_sum = 0.0
+        epoch_return_events = 0
 
         # Subsampled modality metrics on training batches (approximate, to keep runtime reasonable)
         epoch_modality_batches = 0
@@ -1961,10 +2167,24 @@ def train(model, train_loader, test_loader, vali_loader, num_epochs, output_path
             )
 
             target = batch_pred_scale.float().to(device)
-            if h_w is not None:
+            if model.forecast_task_config.task == RETURN_TASK:
+                core_reg, return_components = return_task_loss(
+                    output.float(), target, model.forecast_task_config,
+                    return_components=True,
+                )
+                batch_return_magnitude = float(return_components["magnitude"].mean().detach().cpu())
+                batch_return_direction = float(return_components["direction"].mean().detach().cpu())
+                epoch_return_magnitude_sum += float(return_components["magnitude"].sum().detach().cpu())
+                epoch_return_direction_sum += float(return_components["direction"].sum().detach().cpu())
+                epoch_return_events += int(target.shape[0])
+            elif h_w is not None:
+                batch_return_magnitude = None
+                batch_return_direction = None
                 mse_w, mae_w = weighted_mse_mae(output.float(), target, h_w)
                 core_reg = 0.7 * mse_w + 0.3 * mae_w
             else:
+                batch_return_magnitude = None
+                batch_return_direction = None
                 mse_loss = criterion_mse(target, output.float())
                 mae_loss = criterion_mae(target, output.float())
                 huber = criterion_huber(target, output.float())
@@ -1994,28 +2214,21 @@ def train(model, train_loader, test_loader, vali_loader, num_epochs, output_path
                 gate = analysis["gate_softmax"]
                 gate_text_scalar = gate[:, 0, :].mean(dim=-1)
 
-                s_vec_residual = analysis.get("s_vec_residual")
-                if s_vec_residual is not None:
+                ts_inst = analysis.get("ts_inst")
+                if ts_inst is not None:
                     with torch.no_grad():
-                        ts_only_pred = model.predict_ts_only_full_decoder(
-                            analysis["ts_tokens"], analysis["ts_mask"], s_vec_residual, analysis["x_cf"]
-                        )
-                    err_ts = ((ts_only_pred - target) ** 2).mean(dim=(1, 2))
-                    err_full = ((output - target) ** 2).mean(dim=(1, 2))
+                        ts_only_pred = model.predict_strict_ts_only(ts_inst, analysis["x_cf"])
+                    err_ts = gate_supervision_loss_per_event(model, ts_only_pred, target)
+                    err_full = gate_supervision_loss_per_event(model, output, target)
 
-                    diff = (err_ts - err_full)
-
-                    if TrainingConfig.GC_USE_ADAPTIVE_SCALE:
-                        s = torch.clamp(diff.detach().abs().mean(), min=TrainingConfig.GC_MIN_SCALE)
-                    else:
-                        s = torch.tensor(TrainingConfig.GC_SIGMOID_SCALE, device=diff.device, dtype=diff.dtype)
-
-                    logit = TrainingConfig.GC_GAIN * diff / s
-                    logit = torch.clamp(logit, -TrainingConfig.GC_LOGIT_CLAMP, TrainingConfig.GC_LOGIT_CLAMP)
-
-                    gc_score = torch.sigmoid(logit).detach()
-
-                    # gc_score = torch.sigmoid(err_ts - err_full).detach()
+                    gc_score, diff = gate_supervision_target(
+                        err_ts, err_full,
+                        adaptive=TrainingConfig.GC_USE_ADAPTIVE_SCALE,
+                        fixed_scale=TrainingConfig.GC_SIGMOID_SCALE,
+                        min_scale=TrainingConfig.GC_MIN_SCALE,
+                        gain=TrainingConfig.GC_GAIN,
+                        logit_clamp=TrainingConfig.GC_LOGIT_CLAMP,
+                    )
 
                     gate_gc_loss = F.mse_loss(gate_text_scalar, gc_score)
                     combined_loss = combined_loss + gate_causal_lambda * gate_gc_loss
@@ -2023,6 +2236,10 @@ def train(model, train_loader, test_loader, vali_loader, num_epochs, output_path
 
                     window["gc_scores"].append(gc_score.detach().cpu())
                     window["gc_scores_raw"].append(diff.detach().cpu())
+                    scale = (float(diff.abs().mean().clamp_min(TrainingConfig.GC_MIN_SCALE))
+                             if TrainingConfig.GC_USE_ADAPTIVE_SCALE
+                             else float(TrainingConfig.GC_SIGMOID_SCALE))
+                    window["gc_scales"].append(scale)
                     window["gate_texts"].append(gate_text_scalar.detach().cpu())
 
             if inv_lambda > 0:
@@ -2047,15 +2264,18 @@ def train(model, train_loader, test_loader, vali_loader, num_epochs, output_path
 
             ts_only_lambda = TrainingConfig.TS_ONLY_LAMBDA if not simplified_mode else 0.0
             if ts_only_lambda > 0 and analysis is not None:
-                s_vec_residual = analysis.get("s_vec_residual")
                 ts_tokens = analysis.get("ts_tokens")
                 ts_mask = analysis.get("ts_mask")
+                ts_inst = analysis.get("ts_inst")
                 x_cf = analysis.get("x_cf")
-                if s_vec_residual is not None and ts_tokens is not None and x_cf is not None:
-                    ts_only_pred = model.predict_ts_only_full_decoder(
-                        ts_tokens, ts_mask, s_vec_residual, x_cf
-                    )
-                    ts_only_loss = F.mse_loss(ts_only_pred.float(), target)
+                if ts_inst is not None and ts_tokens is not None and x_cf is not None:
+                    ts_only_pred = model.predict_strict_ts_only(ts_inst, x_cf)
+                    if model.forecast_task_config.task == RETURN_TASK:
+                        ts_only_loss = forecast_training_loss(
+                            ts_only_pred.float(), target, model.forecast_task_config
+                        )
+                    else:
+                        ts_only_loss = F.mse_loss(ts_only_pred.float(), target)
                     combined_loss = combined_loss + ts_only_lambda * ts_only_loss
                     loss_ts_only = float(ts_only_loss.detach().cpu()) * ts_only_lambda
 
@@ -2095,7 +2315,7 @@ def train(model, train_loader, test_loader, vali_loader, num_epochs, output_path
             window["ts_only_sum"] += loss_ts_only
 
             # Track alpha if using learnable last value
-            if USE_LEARNABLE_LAST_VALUE and analysis is not None and "last_value_alpha" in analysis:
+            if model.use_learnable_last_value and analysis is not None and "last_value_alpha" in analysis:
                 alpha = analysis["last_value_alpha"]
                 if alpha is not None:
                     window["alpha_sum"] += float(alpha.mean().detach().cpu())
@@ -2119,15 +2339,15 @@ def train(model, train_loader, test_loader, vali_loader, num_epochs, output_path
                 ts_tokens = analysis.get("ts_tokens")
                 text_mask = analysis.get("text_mask")
                 ts_mask = analysis.get("ts_mask")
+                ts_inst = analysis.get("ts_inst")
                 x_cf = analysis.get("x_cf")
 
                 if (t_vec_residual is not None and s_vec_residual is not None and
                         text_tokens is not None and ts_tokens is not None and
-                        text_mask is not None and ts_mask is not None and x_cf is not None):
+                        text_mask is not None and ts_mask is not None and ts_inst is not None and
+                        x_cf is not None):
                     with torch.no_grad():
-                        ts_only_pred_eval = model.predict_ts_only_full_decoder(
-                            ts_tokens, ts_mask, s_vec_residual, x_cf
-                        )
+                        ts_only_pred_eval = model.predict_strict_ts_only(ts_inst, x_cf)
                         text_only_pred_eval = model.predict_text_only_full_decoder(
                             text_tokens, text_mask, t_vec_residual, x_cf
                         )
@@ -2139,9 +2359,9 @@ def train(model, train_loader, test_loader, vali_loader, num_epochs, output_path
                         ts_only_sm = smape(ts_only_pred_eval.float(), target.float())
                         text_only_sm = smape(text_only_pred_eval.float(), target.float())
 
-                        err_full = ((output.float() - target.float()) ** 2).mean(dim=(1, 2))
-                        err_ts = ((ts_only_pred_eval.float() - target.float()) ** 2).mean(dim=(1, 2))
-                        err_text = ((text_only_pred_eval.float() - target.float()) ** 2).mean(dim=(1, 2))
+                        err_full = gate_task_loss_per_event(model, output.float(), target.float())
+                        err_ts = gate_task_loss_per_event(model, ts_only_pred_eval.float(), target.float())
+                        err_text = gate_task_loss_per_event(model, text_only_pred_eval.float(), target.float())
 
                         err_ts_safe = torch.clamp(err_ts, min=1e-8)
                         err_text_safe = torch.clamp(err_text, min=1e-8)
@@ -2174,6 +2394,12 @@ def train(model, train_loader, test_loader, vali_loader, num_epochs, output_path
                 }
                 if analysis is not None and analysis.get("gate_softmax") is not None:
                     step_metrics["gate/text_openness_step"] = float(analysis["gate_softmax"][:, 0].mean())
+                if batch_return_magnitude is not None:
+                    step_metrics["loss/return_magnitude"] = batch_return_magnitude
+                    step_metrics["loss/return_direction"] = batch_return_direction
+                    step_metrics["loss/return_direction_weighted"] = (
+                        batch_return_direction * float(model.forecast_task_config.direction_weight)
+                    )
                 if analysis is not None and analysis.get("moe_aux_loss") is not None:
                     step_metrics["loss/moe_aux"] = float(analysis["moe_aux_loss"].detach())
                     load = analysis["moe_dispatch"].detach().mean(dim=0).cpu().tolist()
@@ -2185,9 +2411,6 @@ def train(model, train_loader, test_loader, vali_loader, num_epochs, output_path
 
             del output, batch_fusion_embeddings, batch_series_embeddings, batch_text_embeddings
             del batch_sent_report_embeddings, batch_negative_type_report_embeddings, analysis
-            gc.collect()
-            if torch.cuda.is_available():
-                torch.cuda.empty_cache()
 
             if eval_every_steps is not None and eval_every_steps > 0 and (global_step % eval_every_steps == 0):
                 _do_eval_and_log(tag=f"Eval@{eval_every_steps}steps")
@@ -2211,6 +2434,15 @@ def train(model, train_loader, test_loader, vali_loader, num_epochs, output_path
                       "train/rmse": epoch_train_rmse, "train/mae": epoch_train_mae,
                       "train/contrastive": epoch_train_contr, "train/smape": epoch_train_smape},
                      stage="stage3", step=global_step)
+        if epoch_return_events:
+            tracking.log({
+                "train/return_magnitude_loss": epoch_return_magnitude_sum / epoch_return_events,
+                "train/return_direction_loss": epoch_return_direction_sum / epoch_return_events,
+                "train/return_direction_loss_weighted": (
+                    epoch_return_direction_sum / epoch_return_events *
+                    float(model.forecast_task_config.direction_weight)
+                ),
+            }, stage="stage3", step=global_step)
 
         if epoch_gate_count > 0:
             epoch_gate_avg = (epoch_gate_sum / epoch_gate_count).tolist()
@@ -2257,20 +2489,41 @@ def train(model, train_loader, test_loader, vali_loader, num_epochs, output_path
         model_output_path = output_path or "./model_output"
         Path(model_output_path).mkdir(parents=True, exist_ok=True)
 
-        lastest_loss = float(vali_mse_loss)
+        # Return MSE is an evaluation metric, not the return training objective.
+        lastest_loss = float(
+            vali_combine_loss if model.forecast_task_config.task == RETURN_TASK
+            else vali_mse_loss
+        )
         if lastest_loss < best_loss:
             best_loss = lastest_loss
             _backup = swap_to_ema()
             save_path = os.path.join(model_output_path, "best_model.pth")
             model.save_model_combined(save_path=save_path)
             swap_from_backup(_backup)
-            print(
-                f'[Save Best] epoch {epoch + 1} | '
-                f'Vali MSE {vali_mse_loss:.6f} | Test MSE {test_mse_loss:.6f}'
-            )
-            tracking.summary({"best/epoch": epoch + 1, "best/vali_mse": vali_mse_loss,
-                              "best/vali_mae": vali_mae_loss, "best/test_mse": test_mse_loss,
-                              "best/test_mae": test_mae_loss})
+            if model.forecast_task_config.task == RETURN_TASK:
+                if last_return_vali_result is None:
+                    raise RuntimeError("Return checkpoint selection has no validation metrics")
+                metrics_path = os.path.join(model_output_path, "best_validation_return_metrics.json")
+                write_return_metrics(
+                    metrics_path, "validation", last_return_vali_result, model, save_path,
+                    epoch=epoch + 1, global_step=global_step,
+                )
+                print(f"[Save Best] epoch {epoch + 1} | "
+                      f"Vali task {vali_combine_loss:.6f}, MAE {vali_mae_loss:.6f} bp")
+                best_summary = {
+                    "best/epoch": epoch + 1,
+                    "best/vali_task_loss": vali_combine_loss,
+                    "best/vali_return_mae_bp": vali_mae_loss,
+                }
+                best_summary.update({f"best/{key}": value for key, value in
+                                     return_metrics_for_tracking("vali", last_return_vali_result).items()})
+                tracking.summary(best_summary)
+            else:
+                print(f'[Save Best] epoch {epoch + 1} | '
+                      f'Vali MSE {vali_mse_loss:.6f} | Test MSE {test_mse_loss:.6f}')
+                tracking.summary({"best/epoch": epoch + 1, "best/vali_mse": vali_mse_loss,
+                                  "best/vali_mae": vali_mae_loss, "best/test_mse": test_mse_loss,
+                                  "best/test_mae": test_mae_loss})
 
         save_path = os.path.join(model_output_path, "lastest_model.pth")
         model.save_model_combined(save_path=save_path)
@@ -2389,7 +2642,9 @@ def test(model, test_loader, return_analysis: bool = False,
         target = batch_pred_scale.to(device)
 
         # ---------------- main horizon loss (UNCHANGED) ----------------
-        if h_w is not None:
+        if model.forecast_task_config.task == RETURN_TASK:
+            core_reg = forecast_training_loss(output, target, model.forecast_task_config)
+        elif h_w is not None:
             mse_w, mae_w = weighted_mse_mae(output, target, h_w)
             core_reg = 0.7 * mse_w + 0.3 * mae_w
         else:
@@ -2440,14 +2695,14 @@ def test(model, test_loader, return_analysis: bool = False,
             ts_tokens = analysis.get("ts_tokens")
             text_mask = analysis.get("text_mask")
             ts_mask = analysis.get("ts_mask")
+            ts_inst = analysis.get("ts_inst")
             x_cf = analysis.get("x_cf")
 
             if (t_vec_residual is not None and s_vec_residual is not None and
-                    text_tokens is not None and ts_tokens is not None and x_cf is not None):
+                    text_tokens is not None and ts_tokens is not None and ts_inst is not None and
+                    x_cf is not None):
 
-                ts_only_pred = model.predict_ts_only_full_decoder(
-                    ts_tokens, ts_mask, s_vec_residual, x_cf
-                )
+                ts_only_pred = model.predict_strict_ts_only(ts_inst, x_cf)
                 ts_only_mse = nn.MSELoss()(ts_only_pred, target)
                 ts_only_mae = nn.L1Loss()(ts_only_pred, target)
                 ts_only_mse_output += float(ts_only_mse.detach().cpu())
@@ -2464,9 +2719,9 @@ def test(model, test_loader, return_analysis: bool = False,
                 text_only_smape_output += float(smape(text_only_pred.float(), target.float()).detach().cpu())
 
                 # ---- main horizon modality scores (UNCHANGED) ----
-                err_full = ((output - target) ** 2).mean(dim=(1, 2))
-                err_ts = ((ts_only_pred - target) ** 2).mean(dim=(1, 2))
-                err_text = ((text_only_pred - target) ** 2).mean(dim=(1, 2))
+                err_full = gate_task_loss_per_event(model, output, target)
+                err_ts = gate_task_loss_per_event(model, ts_only_pred, target)
+                err_text = gate_task_loss_per_event(model, text_only_pred, target)
 
                 diff_ts = (err_ts - err_full)
                 diff_text = (err_text - err_full)
@@ -2875,7 +3130,7 @@ def train_stage1_ts_only(model, sw_train_loader, sw_vali_loader, num_epochs=None
     if USE_MULTI_SCALE_TS:
         for p in model.multi_scale_extractor.parameters():
             p.requires_grad = True
-    if USE_LEARNABLE_LAST_VALUE:
+    if model.use_learnable_last_value:
         for p in model.last_value_module.parameters():
             p.requires_grad = True
 
@@ -2904,7 +3159,7 @@ def train_stage1_ts_only(model, sw_train_loader, sw_vali_loader, num_epochs=None
         trainable_groups.append(
             {'params': model.multi_scale_extractor.parameters(), 'lr': TrainingConfig.STAGE1_LR, 'weight_decay': 0.01}
         )
-    if USE_LEARNABLE_LAST_VALUE:
+    if model.use_learnable_last_value:
         trainable_groups.append(
             {'params': model.last_value_module.parameters(), 'lr': TrainingConfig.STAGE1_LR * 2, 'weight_decay': 0.01}
         )
@@ -2948,7 +3203,7 @@ def train_stage1_ts_only(model, sw_train_loader, sw_vali_loader, num_epochs=None
             # Decode using TS-only pathway
             core = model.decoder(s_vec_norm, x_cf=x_cf)
 
-            if USE_LEARNABLE_LAST_VALUE:
+            if model.use_learnable_last_value:
                 last_val = x_cf[:, :, -1:].detach()
                 output, _ = model.last_value_module(core, last_val, s_vec_norm)
             else:
@@ -2956,10 +3211,9 @@ def train_stage1_ts_only(model, sw_train_loader, sw_vali_loader, num_epochs=None
 
             target = batch_pred_scale.float().to(device)
 
-            # Simple regression loss
-            mse_loss = criterion_mse(output, target)
-            mae_loss = criterion_mae(output, target)
-            combined_loss = 0.7 * mse_loss + 0.3 * mae_loss
+            combined_loss = forecast_training_loss(
+                output, target, model.forecast_task_config
+            )
 
             combined_loss.backward()
             clip_grad_norm_(model.parameters(), max_norm=TrainingConfig.GRAD_CLIP_NORM)
@@ -2993,21 +3247,25 @@ def train_stage1_ts_only(model, sw_train_loader, sw_vali_loader, num_epochs=None
                 s_vec_norm = F.normalize(ts_inst, p=2, dim=-1)
                 core = model.decoder(s_vec_norm, x_cf=x_cf)
 
-                if USE_LEARNABLE_LAST_VALUE:
+                if model.use_learnable_last_value:
                     last_val = x_cf[:, :, -1:].detach()
                     output, _ = model.last_value_module(core, last_val, s_vec_norm)
                 else:
                     output = core
 
                 target = batch_pred_scale.float().to(device)
-                vali_loss += float(nn.MSELoss()(output, target).detach().cpu())
+                vali_loss += float(forecast_training_loss(
+                    output, target, model.forecast_task_config
+                ).detach().cpu())
 
         vali_loss /= max(1, len(sw_vali_loader))
 
-        msg = f'[Stage 1] Epoch {epoch + 1}/{num_epochs} | Train Loss: {epoch_avg_loss:.6f} | Train SMAPE: {epoch_avg_smape:.4f} | Vali MSE: {vali_loss:.6f}'
+        vali_label = "Task Loss" if model.forecast_task_config.task == RETURN_TASK else "MSE"
+        vali_key = "vali/task_loss" if model.forecast_task_config.task == RETURN_TASK else "vali/mse"
+        msg = f'[Stage 1] Epoch {epoch + 1}/{num_epochs} | Train Loss: {epoch_avg_loss:.6f} | Train SMAPE: {epoch_avg_smape:.4f} | Vali {vali_label}: {vali_loss:.6f}'
         print(msg)
         tracking.log({"epoch": epoch + 1, "train/loss": epoch_avg_loss, "train/smape": epoch_avg_smape,
-                      "vali/mse": vali_loss},
+                      vali_key: vali_loss},
                      stage="stage1", step=(epoch + 1) * len(sw_train_loader))
         log_file += msg + "\n"
 
@@ -3017,9 +3275,9 @@ def train_stage1_ts_only(model, sw_train_loader, sw_vali_loader, num_epochs=None
                 save_path = os.path.join(output_path, "stage1_best_model.pth")
                 Path(output_path).mkdir(parents=True, exist_ok=True)
                 model.save_model_combined(save_path=save_path)
-                print(f'[Stage 1] Saved best model with Vali MSE: {vali_loss:.6f}')
+                print(f'[Stage 1] Saved best model with Vali {vali_label}: {vali_loss:.6f}')
 
-    print(f"[Stage 1] Completed. Best Vali MSE: {best_loss:.6f}")
+    print(f"[Stage 1] Completed. Best Vali {vali_label}: {best_loss:.6f}")
     return log_file
 
 
@@ -3060,7 +3318,7 @@ def train_stage2_text_only(model, train_loader, vali_loader, num_epochs=None, ou
     for p in model.text_only_head.parameters():
         p.requires_grad = True
 
-    if USE_LEARNABLE_LAST_VALUE:
+    if model.use_learnable_last_value:
         for p in model.last_value_module.parameters():
             p.requires_grad = True
 
@@ -3085,7 +3343,7 @@ def train_stage2_text_only(model, train_loader, vali_loader, num_epochs=None, ou
         {'params': model.text_only_head.parameters(), 'lr': TrainingConfig.STAGE2_LR, 'weight_decay': 0.01},
     ]
 
-    if USE_LEARNABLE_LAST_VALUE:
+    if model.use_learnable_last_value:
         trainable_groups.append(
             {'params': model.last_value_module.parameters(), 'lr': TrainingConfig.STAGE2_LR * 2, 'weight_decay': 0.01}
         )
@@ -3135,7 +3393,7 @@ def train_stage2_text_only(model, train_loader, vali_loader, num_epochs=None, ou
             # Decode using text-only pathway
             core = model.decoder(t_vec_norm, x_cf=x_cf)
 
-            if USE_LEARNABLE_LAST_VALUE:
+            if model.use_learnable_last_value:
                 last_val = x_cf[:, :, -1:].detach()
                 output, _ = model.last_value_module(core, last_val, t_vec_norm)
             else:
@@ -3143,10 +3401,9 @@ def train_stage2_text_only(model, train_loader, vali_loader, num_epochs=None, ou
 
             target = batch_pred_scale.float().to(device)
 
-            # Simple regression loss
-            mse_loss = criterion_mse(output, target)
-            mae_loss = criterion_mae(output, target)
-            combined_loss = 0.7 * mse_loss + 0.3 * mae_loss
+            combined_loss = forecast_training_loss(
+                output, target, model.forecast_task_config
+            )
 
             combined_loss.backward()
             clip_grad_norm_(model.parameters(), max_norm=TrainingConfig.GRAD_CLIP_NORM)
@@ -3189,21 +3446,25 @@ def train_stage2_text_only(model, train_loader, vali_loader, num_epochs=None, ou
                 x_cf = model._ensure_cf(batch_seq_scale)
                 core = model.decoder(t_vec_norm, x_cf=x_cf)
 
-                if USE_LEARNABLE_LAST_VALUE:
+                if model.use_learnable_last_value:
                     last_val = x_cf[:, :, -1:].detach()
                     output, _ = model.last_value_module(core, last_val, t_vec_norm)
                 else:
                     output = core
 
                 target = batch_pred_scale.float().to(device)
-                vali_loss += float(nn.MSELoss()(output, target).detach().cpu())
+                vali_loss += float(forecast_training_loss(
+                    output, target, model.forecast_task_config
+                ).detach().cpu())
 
         vali_loss /= max(1, len(vali_loader))
 
-        msg = f'[Stage 2] Epoch {epoch + 1}/{num_epochs} | Train Loss: {epoch_avg_loss:.6f} | Train SMAPE: {epoch_avg_smape:.4f} | Vali MSE: {vali_loss:.6f}'
+        vali_label = "Task Loss" if model.forecast_task_config.task == RETURN_TASK else "MSE"
+        vali_key = "vali/task_loss" if model.forecast_task_config.task == RETURN_TASK else "vali/mse"
+        msg = f'[Stage 2] Epoch {epoch + 1}/{num_epochs} | Train Loss: {epoch_avg_loss:.6f} | Train SMAPE: {epoch_avg_smape:.4f} | Vali {vali_label}: {vali_loss:.6f}'
         print(msg)
         tracking.log({"epoch": epoch + 1, "train/loss": epoch_avg_loss, "train/smape": epoch_avg_smape,
-                      "vali/mse": vali_loss},
+                      vali_key: vali_loss},
                      stage="stage2", step=(epoch + 1) * len(train_loader))
         log_file += msg + "\n"
 
@@ -3213,9 +3474,9 @@ def train_stage2_text_only(model, train_loader, vali_loader, num_epochs=None, ou
                 save_path = os.path.join(output_path, "stage2_best_model.pth")
                 Path(output_path).mkdir(parents=True, exist_ok=True)
                 model.save_model_combined(save_path=save_path)
-                print(f'[Stage 2] Saved best model with Vali MSE: {vali_loss:.6f}')
+                print(f'[Stage 2] Saved best model with Vali {vali_label}: {vali_loss:.6f}')
 
-    print(f"[Stage 2] Completed. Best Vali MSE: {best_loss:.6f}")
+    print(f"[Stage 2] Completed. Best Vali {vali_label}: {best_loss:.6f}")
     return log_file
 
 
@@ -3229,7 +3490,8 @@ def train_three_stage(model, train_loader, test_loader, vali_loader, num_epochs,
                       eval_every_steps: int = 100,
                       simplified_mode: bool = None,
                       stage1_epochs=None,
-                      stage2_epochs=None):
+                      stage2_epochs=None,
+                      evaluate_saved_return=True):
     """
     Three-Stage Training Pipeline
 
@@ -3326,6 +3588,38 @@ def train_three_stage(model, train_loader, test_loader, vali_loader, num_epochs,
             eval_every_steps=eval_every_steps,
             simplified_mode=simplified_mode
         )
+
+        if model.forecast_task_config.task == RETURN_TASK and evaluate_saved_return:
+            selected_checkpoint = os.path.join(model_output_path, "best_model.pth")
+            if not os.path.isfile(selected_checkpoint):
+                raise FileNotFoundError(
+                    f"Selected return checkpoint is missing: {selected_checkpoint}"
+                )
+            model.load_model_combined(save_path=selected_checkpoint, strict=True)
+            selected_test_result = evaluate_return_loader(model, test_loader)
+            selected_test_path = os.path.join(
+                model_output_path, "selected_test_return_metrics.json"
+            )
+            write_return_metrics(
+                selected_test_path, "test", selected_test_result, model,
+                selected_checkpoint, selection="minimum_validation_task_loss",
+            )
+            print(
+                "[Selected Test] "
+                f"task {selected_test_result['task_loss']:.6f}, "
+                f"magnitude {selected_test_result['magnitude_loss']:.6f}, "
+                f"direction {selected_test_result['direction_loss']:.6f}, "
+                f"weighted direction {selected_test_result['weighted_direction_loss']:.6f}, "
+                f"MAE {selected_test_result['return_mae_bp']:.6f} bp, "
+                f"MSE {selected_test_result['return_mse_bp2']:.6f} bp², "
+                f"close DHR {selected_test_result['close_dhr']}"
+            )
+            selected_tracking = return_metrics_for_tracking(
+                "selected_test", selected_test_result
+            )
+            tracking.log(selected_tracking)
+            tracking.summary({f"selected/{key}": value
+                              for key, value in selected_tracking.items()})
 
         print("=" * 80)
         print("THREE-STAGE TRAINING COMPLETED")

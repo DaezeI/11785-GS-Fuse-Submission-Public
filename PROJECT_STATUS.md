@@ -1,7 +1,9 @@
 # Project status
 
-Updated November 13, 2026, after the screened C1 input audit completed and
-the queued model jobs became eligible to run.
+Updated November 16, 2026, after Adaeze's return-task runtime smoke and
+structured-metrics replay completed and the frozen screened C1 dataset passed its full audit.
+The [dataset and run handoff](docs/updates/2026-11-13-return-ablations.md) lists
+the Delta path, fingerprint, and commands for the controlled return comparisons.
 This page is the current team overview. [TEAM_WORKFLOW.md](TEAM_WORKFLOW.md)
 has the owner-by-owner handoff and experiment checklist; dated updates preserve
 earlier status without rewriting it.
@@ -35,11 +37,14 @@ properly trained model.
 |---|---|---|
 | C1 implementation | Merged in PR #4; loader audit and focused tests passed. | Use `main` for new work and keep explicit timing/data provenance. |
 | Full C1 text comparison | Old unscreened jobs `23812725`, `23812734`, and `23812735` were canceled. Screened input audit `23835057` **passed** (10,705 events, no exclusions, zero shared bars across splits). Training `23840368` is pending GPU scheduling; paired jobs `23840369`/`23840370` are pending on its completion. No full run has started. See the [audit result](analysis/text_value/c1_date_screen_v1_audit_summary.json) and [handoff](analysis/text_value/ARTICLE_DATE_AUDIT.md). | Monitor training and paired comparisons. |
+| Return-task runtime package | Adaeze's 16-training-event three-stage smoke job `24045929` completed on one A100 in 8:50. Inference-only replay job `24046557` completed in 8:04 and wrote structured validation/test metrics for eight events per split. See the [result note](analysis/text_value/ADAEZE_RETURN_SPEED_SMOKE.md). This is branch work and a smoke execution result, not a full C1 benchmark. | Open a focused PR based on PR #8; do not use the eight-event scores as model-quality or text-value evidence. |
 | Publication-time validity | Five source-checked test records have corrected calendar dates but no verified release times. The [evidence ledger](analysis/text_value/c1_article_date_policy_v1.csv) excludes those five and 878 more Reuters candidates; 10,705 retained records still have unknown release times. The screen retains 6,167 / 2,302 / 2,236 train/validation/test events. | Label the dependent run a date-screened sensitivity comparison. Do not claim publication-time-safe C1. |
 | Jessica's padding fix | Merged to `main` in [commit `96cc6d7`](https://github.com/DaezeI/11785-GS-Fuse-Submission-Public/commit/96cc6d7900dedd8b867b39a951045fe3804aa778) with three CPU tests. | Ask for links to any Q-Former analysis missing from GitHub before assigning further work. |
 | Gate, MoE, Q-Former diagnostics | Adaeze, Joye, and Jessica retain their existing streams. The inspected November 11 team job scripts used the earlier split; their outputs are historical diagnostics, not the C1 baseline. | Keep each checkpoint/split identity explicit; use the [owner handoff](TEAM_WORKFLOW.md#9-immediate-next-actions-agent-handoff-for-wednesday-november-11). |
 
 The full C1 training and paired jobs are queued work, **not completed results**.
+At the November 16 check, `23840368` remained pending for priority and
+`23840369`/`23840370` remained pending on dependency; Adaeze did not alter them.
 The prepared [eight-announcement BLS check](analysis/text_value/GOVERNMENT_CHECKED.md)
 has source and price-order evidence, but its paired model comparison `23841902`
 was canceled on November 13 at the user's request. It produced no model result.
