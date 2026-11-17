@@ -69,9 +69,10 @@ case and team agreement. Delta remains the active resource.
 
 ## Next team actions
 
-Keep Adaeze's two superseded jobs held. For return work, create a fresh branch
-and Delta checkout from updated `main`, use the verified frozen snapshot, and
-submit the merged R0–R3 protocol only after recording exact job provenance.
+Reconfirm and cancel only Adaeze's two superseded jobs, then follow the
+[Adaeze R0–R3 Delta runbook](docs/ADAEZE_R0_R3_DELTA_RUNBOOK.md). Create its
+permanent Delta checkout from updated `main`, use the verified frozen snapshot,
+and submit the merged protocol only after recording exact job provenance.
 Continue monitoring Nicole's separate price job and its dependent controls.
 Matched gate claims still require a completed full C1 checkpoint. Joye's
 historical jobs must not be relabelled as C1 merely because later C1 code
