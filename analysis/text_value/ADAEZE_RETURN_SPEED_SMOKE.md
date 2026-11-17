@@ -108,11 +108,11 @@ Delta artifacts are group-readable under
 
 ## Full screened-C1 return baseline
 
-Status: **SUBMITTED — no result yet**.
+Status: **USER-HELD — no result**.
 
 - Owner: Adaeze
-- Job ID: `24050724` (reported at submission; live scheduler state not yet
-  independently checked)
+- Job ID: `24050724`; a November 16 terminal check showed `JobHeldUser`, zero
+  elapsed time, and unknown start/end times after Adaeze paused the job.
 - Executed code commit: `8fef0648afb1f2583e01f56cdb307e3a4085d10f`
 - Batch script: `scripts/delta/adaeze_c1_return_full.sbatch`
 - Submission command:
@@ -130,7 +130,7 @@ Status: **SUBMITTED — no result yet**.
   offline W&B.
 
 This job is independent of Nicole's price-task jobs `23840368`–`23840370` and
-does not supersede or alter them. It is a submitted experiment, not a result.
+does not supersede or alter them. It is held queued work, not a result.
 If it completes, record the scheduler state, runtime, selected checkpoint hash,
 resolved configuration, W&B run, metrics, and limitations before interpreting
 model quality. Retained article publication times remain unverified, so the
@@ -138,10 +138,11 @@ screened run cannot support publication-time-certified text claims.
 
 ## Four-GPU return campaign
 
-Status: **SUBMITTED — pending with no predicted start and no result**.
+Status: **USER-HELD — no result**.
 
 - Owner: Adaeze
-- Job ID: `24051590`
+- Job ID: `24051590`; a November 16 terminal check showed `JobHeldUser`, zero
+  elapsed time, and unknown start/end times after Adaeze paused the job.
 - Executed code commit: `74e5cf8cca08fce55b478c5919e53e504cf88908`
 - Batch script: `scripts/delta/adaeze_c1_return_campaign.sbatch`
 - Submission command:
@@ -154,9 +155,9 @@ Status: **SUBMITTED — pending with no predicted start and no result**.
   weight 1 with the learnable last-value shortcut disabled.
 
 The direction-weight and last-value runs are separate one-factor comparisons
-against the campaign baseline. Job `24050724` remains pending as a redundant
-single-GPU baseline until the campaign has a credible live start; do not let
-both baseline copies run without making an explicit keep/cancel decision.
-Nicole's jobs remain separate and unchanged. A test-only estimate predicted a
-November 17 slot, but the real job currently reports `Priority` and no start
-time; the test-only estimate is not recorded as a scheduled start.
+against the campaign baseline, but they predate the later frozen-input R0–R3
+protocol on Nicole's branch. Both this campaign and redundant single-GPU job
+`24050724` are held; neither should be released as the final protocol without
+an explicit reconciliation decision. Nicole's jobs remain separate and
+unchanged. A test-only estimate predicted a November 17 slot, but it was not a
+reservation and is not recorded as a scheduled start.
