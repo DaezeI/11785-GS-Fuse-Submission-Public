@@ -1,7 +1,7 @@
 # Project status
 
-Updated November 16, 2026, after Adaeze's return-task runtime smoke and
-structured-metrics replay completed and the frozen screened C1 dataset passed its full audit.
+Updated November 16, 2026, after PR #8 merged the return-task implementation,
+runtime fixes, frozen-input audit, and R0–R3 protocol to `main`.
 The [dataset and run handoff](docs/updates/2026-11-13-return-ablations.md) lists
 the Delta path, fingerprint, and commands for the controlled return comparisons.
 This page is the current team overview. [TEAM_WORKFLOW.md](TEAM_WORKFLOW.md)
@@ -37,7 +37,7 @@ properly trained model.
 |---|---|---|
 | C1 implementation | Merged in PR #4; loader audit and focused tests passed. | Use `main` for new work and keep explicit timing/data provenance. |
 | Full C1 text comparison | Old unscreened jobs `23812725`, `23812734`, and `23812735` were canceled. Screened input audit `23835057` **passed** (10,705 events, no exclusions, zero shared bars across splits). Training `23840368` is pending GPU scheduling; paired jobs `23840369`/`23840370` are pending on its completion. No full run has started. See the [audit result](analysis/text_value/c1_date_screen_v1_audit_summary.json) and [handoff](analysis/text_value/ARTICLE_DATE_AUDIT.md). | Monitor training and paired comparisons. |
-| Return-task runtime package | Adaeze's 16-training-event three-stage smoke job `24045929` completed on one A100 in 8:50. Inference-only replay job `24046557` completed in 8:04 and wrote structured validation/test metrics for eight events per split. See the [result note](analysis/text_value/ADAEZE_RETURN_SPEED_SMOKE.md). This is branch work and a smoke execution result, not a full C1 benchmark. | Open a focused PR based on PR #8; do not use the eight-event scores as model-quality or text-value evidence. |
+| Return-task integration and controls | [PR #8](https://github.com/DaezeI/11785-GS-Fuse-Submission-Public/pull/8) merged to `main` at `f0ac8ef`. Exact head `e0daa50` passed compilation, 30 affected tests, and 25 required text-value checks. Adaeze's smoke `24045929` and replay `24046557` completed, and frozen-input audit `24050520` passed. These validate execution and inputs, not full-model quality. | Launch new return work only from updated `main`, the verified frozen snapshot, and the merged R0–R3 protocol. Do not use eight-event scores as model-quality or text-value evidence. |
 | Publication-time validity | Five source-checked test records have corrected calendar dates but no verified release times. The [evidence ledger](analysis/text_value/c1_article_date_policy_v1.csv) excludes those five and 878 more Reuters candidates; 10,705 retained records still have unknown release times. The screen retains 6,167 / 2,302 / 2,236 train/validation/test events. | Label the dependent run a date-screened sensitivity comparison. Do not claim publication-time-safe C1. |
 | Jessica's padding fix | Merged to `main` in [commit `96cc6d7`](https://github.com/DaezeI/11785-GS-Fuse-Submission-Public/commit/96cc6d7900dedd8b867b39a951045fe3804aa778) with three CPU tests. | Ask for links to any Q-Former analysis missing from GitHub before assigning further work. |
 | Gate, MoE, Q-Former diagnostics | Adaeze, Joye, and Jessica retain their existing streams. The inspected November 11 team job scripts used the earlier split; their outputs are historical diagnostics, not the C1 baseline. | Keep each checkpoint/split identity explicit; use the [owner handoff](TEAM_WORKFLOW.md#9-immediate-next-actions-agent-handoff-for-wednesday-november-11). |
@@ -53,32 +53,29 @@ account balance and queue can change; query them before planning more compute.
 Large checkpoints, raw articles/prices, and full prediction NPZ files stay on
 Delta. GitHub holds code, commands, hashes, and shareable derived records.
 
-## Alternative GPU resource
+Adaeze's separate return jobs `24050724` and `24051590` were submitted from
+pre-merge commits, then user-held with zero elapsed time after the frozen-input
+R0–R3 integration became the source of truth. They produced no result and must
+not be released or described as R0–R3 runs. The merged R0–R3 GPU jobs remain
+planned, not submitted.
 
-On November 12, Nicole submitted an ACCESS exchange request for **100 SDSC
-Expanse GPU-hours and 200 GB of Expanse Projects Storage** (5,585 ACCESS
-credits). The portal showed the request **Under Review**. It is a single pool
-for the team project, not a per-person allocation; the existing 972 remaining
-Delta GPU-hours were left unchanged. The [course migration note](https://piazza.com/class/mo4ko44arnc3sg/post/659)
-allows other ACCESS resources, and the [ACCESS exchange guide](https://allocations.access-ci.org/how-to)
-explains provider approval.
+## Declined Expanse exchange
 
-Do not treat the request as Expanse access yet. After approval, check each
-teammate's Expanse access in ACCESS Users + Roles and complete any account
-provisioning. Transfer only authorized inputs and model files through Globus,
-verify hashes and permissions, then run a short Expanse Slurm memory/environment
-check before submitting full C1 training and dependent paired controls. Standard
-Expanse GPUs are 32 GB V100s, so the A100-tested configuration may need an
-adjustment. Keep the Delta jobs queued until an alternative run is ready.
+ACCESS declined the proposed request for 100 SDSC Expanse GPU-hours and 200 GB
+of storage on November 16. No Expanse allocation, transfer, or model run
+resulted. Do not describe Expanse as an active execution path or resubmit the
+same queue-wait justification without a materially different provider-appropriate
+case and team agreement. Delta remains the active resource.
 
 ## Next team actions
 
-Check the Delta queue and Expanse exchange status, choose an owner and policy
-for article/price timing, and have each diagnostic owner link an artifact or
-record a concrete blocker. Adaeze can debug gate instrumentation on Nicole's
-16-event checkpoint, but matched C1 gate claims need a completed full C1
-checkpoint. Joye's historical jobs should not be relabelled as C1 merely
-because C1 code later merged to `main`.
+Keep Adaeze's two superseded jobs held. For return work, create a fresh branch
+and Delta checkout from updated `main`, use the verified frozen snapshot, and
+submit the merged R0–R3 protocol only after recording exact job provenance.
+Continue monitoring Nicole's separate price job and its dependent controls.
+Matched gate claims still require a completed full C1 checkpoint. Joye's
+historical jobs must not be relabelled as C1 merely because later C1 code
+merged to `main`.
 
 ## History and maintenance
 

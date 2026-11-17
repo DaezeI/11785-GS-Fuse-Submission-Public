@@ -105,3 +105,12 @@ Delta artifacts are group-readable under
   `36f1aac99822f1a6533a7d74ab835f4219ffd822b403db8c00afebe489803cf2`
 - `test_return_metrics.json` SHA-256:
   `be4106c6db69e5f6d414714dd63d3dc0afd6c5c347eed01e7ba049912fc810a0`
+
+## Superseded held jobs
+
+Adaeze later submitted full baseline job `24050724` and four-GPU campaign job
+`24051590` from pre-merge commits. On November 16 both were user-held before
+execution; `sacct` showed zero elapsed time and unknown start/end times. They
+produced no checkpoint or result. They predate the frozen-input R0–R3 protocol
+merged in PR #8 and must not be released or described as R0–R3 runs. Nicole's
+separate price-task jobs `23840368`–`23840370` were not altered.

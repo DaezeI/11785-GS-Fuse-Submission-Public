@@ -12,9 +12,15 @@ three-stage 16-event GPU smoke and a separate inference-only structured-metrics
 replay. See the [result note](analysis/text_value/ADAEZE_RETURN_SPEED_SMOKE.md).
 The scores cover only eight validation/test events and are not a full C1 result.
 
-**November 13 return integration branch:** The [implementation handoff](docs/updates/2026-11-13-return-integration.md)
-records the return-task code, focused CPU checks, and separate Delta smoke/full/
-paired scripts. GPU execution remains pending. The queued price run is distinct.
+**November 16 return integration merge:** [PR #8](https://github.com/DaezeI/11785-GS-Fuse-Submission-Public/pull/8)
+merged to `main` as `f0ac8ef`, including the runtime fixes, frozen-input audit,
+and controlled R0–R3 protocol. Exact head `e0daa50` passed compilation, 30
+affected tests, and 25 required text-value checks on Delta before merge. The
+[implementation handoff](docs/updates/2026-11-13-return-integration.md) and
+[R0–R3 handoff](docs/updates/2026-11-13-return-ablations.md) define new return
+runs. Full R0–R3 GPU training remains unsubmitted; the queued price run is
+distinct. Adaeze's older jobs `24050724` and `24051590` are user-held with zero
+elapsed time and must not be treated as the frozen-input R0–R3 runs.
 
 **Recorded November 4, 2026.** This is the starting point for post-midterm work.
 It records the confirmed C1 decision and TA work split, then makes the working
