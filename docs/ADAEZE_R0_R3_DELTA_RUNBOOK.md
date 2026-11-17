@@ -240,58 +240,27 @@ Smoke acceptance checklist:
 - `smoke-v1/resolved_config.json` exists;
 - no fallback to price task, live article tree, 4-bit loading, or another split.
 
-## 7. Run both paired smoke controls
+## 7. Do not repeat the paired smoke controls
 
-Run paired smoke evaluation before committing the allocation to four full
-trainings. Each mode must use the smoke checkpoint and the same eight events.
-Run the two modes in sequence because they share a checkpoint-keyed text cache.
-Only the initial training smoke uses the interactive partition. Delta permits
-at most one queued or running job per user there, so both paired smoke controls
-use the wrapper's regular non-preempt `gpuA100x4` partition.
+The completed PR #8 smoke and metrics replay already established the small-run
+training and structured-evaluation paths. This campaign performs one new smoke
+only to verify the exact merged commit, frozen snapshot, and Adaeze-owned paths.
+It does not repeat the two eight-event paired controls. The full paired
+evaluations in Section 9 remain required for every completed full checkpoint.
 
-```bash
-paired_smoke_zero=$(sbatch --parsable \
-  --dependency=afterok:"$smoke_job" \
-  --export=ALL,EXPECTED_CODE_COMMIT="$RUN_COMMIT",C1_SNAPSHOT_SHA256="$SNAPSHOT_SHA",RUN_KIND=smoke-v1,MODE=zeroed_article_tokens \
-  scripts/delta/adaeze_c1_return_paired.sbatch)
-
-paired_smoke_bypass=$(sbatch --parsable \
-  --dependency=afterok:"$paired_smoke_zero" \
-  --export=ALL,EXPECTED_CODE_COMMIT="$RUN_COMMIT",C1_SNAPSHOT_SHA256="$SNAPSHOT_SHA",RUN_KIND=smoke-v1,MODE=fusion_bypass_ts_inst \
-  scripts/delta/adaeze_c1_return_paired.sbatch)
-
-echo "paired_smoke_zero=$paired_smoke_zero"
-echo "paired_smoke_bypass=$paired_smoke_bypass"
-```
-
-Check both:
-
-```bash
-sacct -j "$paired_smoke_zero,$paired_smoke_bypass" -X \
-  --format=JobID,JobName%30,State,ExitCode,Elapsed,Start,End
-```
-
-Required outputs:
-
-```text
-paired-smoke-v1/zeroed_article_tokens.npz
-paired-smoke-v1/zeroed_article_tokens.analysis.json
-paired-smoke-v1/fusion_bypass_ts_inst.npz
-paired-smoke-v1/fusion_bypass_ts_inst.analysis.json
-```
-
-If the smoke or either paired smoke job fails, stop. Do not submit full R0–R3
-training until the failure is understood, recorded, and fixed in a new commit.
+If the single training smoke fails, stop. The full jobs use an `afterok`
+dependency and will not start.
 
 ## 8. Submit full R0, R1, R2, and R3 training
 
 Use the same exact checkout and commit for every variant. The simplest auditable
 plan is four one-GPU jobs. They may run in parallel when Delta schedules them.
 
-Only run this block after both paired smoke jobs complete successfully:
+The launcher submits these jobs immediately with a dependency on successful
+completion of the single training smoke:
 
 ```bash
-gate_dependency="afterok:${paired_smoke_bypass}"
+gate_dependency="afterok:${smoke_job}"
 
 r0_job=$(sbatch --parsable \
   --dependency="$gate_dependency" \
