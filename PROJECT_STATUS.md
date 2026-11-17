@@ -1,9 +1,10 @@
 # Project status
 
-Updated November 16, 2026, after PR #8 merged the return-task implementation,
-runtime fixes, frozen-input audit, and R0–R3 protocol to `main`.
-The [dataset and run handoff](docs/updates/2026-11-13-return-ablations.md) lists
-the Delta path, fingerprint, and commands for the controlled return comparisons.
+Updated November 17, 2026, after Adaeze's frozen-input R0–R3 campaign launcher
+was merged to `main` and submitted on Delta.
+The [dataset and run handoff](docs/updates/2026-11-13-return-ablations.md) and
+[campaign launch update](docs/updates/2026-11-17-adaeze-r0-r3-launch.md) list
+the Delta paths, fingerprints, verified smoke execution, and live queued jobs.
 This page is the current team overview. [TEAM_WORKFLOW.md](TEAM_WORKFLOW.md)
 has the owner-by-owner handoff and experiment checklist; dated updates preserve
 earlier status without rewriting it.
@@ -37,7 +38,7 @@ properly trained model.
 |---|---|---|
 | C1 implementation | Merged in PR #4; loader audit and focused tests passed. | Use `main` for new work and keep explicit timing/data provenance. |
 | Full C1 text comparison | Old unscreened jobs `23812725`, `23812734`, and `23812735` were canceled. Screened input audit `23835057` **passed** (10,705 events, no exclusions, zero shared bars across splits). Training `23840368` is pending GPU scheduling; paired jobs `23840369`/`23840370` are pending on its completion. No full run has started. See the [audit result](analysis/text_value/c1_date_screen_v1_audit_summary.json) and [handoff](analysis/text_value/ARTICLE_DATE_AUDIT.md). | Monitor training and paired comparisons. |
-| Return-task integration and controls | [PR #8](https://github.com/DaezeI/11785-GS-Fuse-Submission-Public/pull/8) merged to `main` at `f0ac8ef`. Exact head `e0daa50` passed compilation, 30 affected tests, and 25 required text-value checks. Adaeze's smoke `24045929` and replay `24046557` completed, and frozen-input audit `24050520` passed. These validate execution and inputs, not full-model quality. | Launch new return work only from updated `main`, the verified frozen snapshot, and the merged R0–R3 protocol. Do not use eight-event scores as model-quality or text-value evidence. |
+| Return-task integration and R0–R3 campaign | PRs #8 and #11–#13 merged to `main`. Frozen date-screened R3 smoke job `24055019` completed `0:0` (00:45:23) with verified artifacts (`best_model.pth`, `resolved_config.json`, offline W&B). Dependency cleared for full training jobs R0–R3 (`24055020`–`24055023`), currently `PENDING` on Delta (`gpuA100x4`) with projected start `2026-11-18 16:36:05`. Paired controls (`24055024`–`24055031`) are `PENDING` on dependency. See [launch update](docs/updates/2026-11-17-adaeze-r0-r3-launch.md). | Monitor queue; do not alter or resubmit pending jobs. Verify log outputs and loss curves upon dispatch. |
 | Publication-time validity | Five source-checked test records have corrected calendar dates but no verified release times. The [evidence ledger](analysis/text_value/c1_article_date_policy_v1.csv) excludes those five and 878 more Reuters candidates; 10,705 retained records still have unknown release times. The screen retains 6,167 / 2,302 / 2,236 train/validation/test events. | Label the dependent run a date-screened sensitivity comparison. Do not claim publication-time-safe C1. |
 | Jessica's padding fix | Merged to `main` in [commit `96cc6d7`](https://github.com/DaezeI/11785-GS-Fuse-Submission-Public/commit/96cc6d7900dedd8b867b39a951045fe3804aa778) with three CPU tests. | Ask for links to any Q-Former analysis missing from GitHub before assigning further work. |
 | Gate, MoE, Q-Former diagnostics | Adaeze, Joye, and Jessica retain their existing streams. The inspected November 11 team job scripts used the earlier split; their outputs are historical diagnostics, not the C1 baseline. | Keep each checkpoint/split identity explicit; use the [owner handoff](TEAM_WORKFLOW.md#9-immediate-next-actions-agent-handoff-for-wednesday-november-11). |
@@ -53,11 +54,14 @@ account balance and queue can change; query them before planning more compute.
 Large checkpoints, raw articles/prices, and full prediction NPZ files stay on
 Delta. GitHub holds code, commands, hashes, and shareable derived records.
 
-Adaeze's separate return jobs `24050724` and `24051590` were submitted from
-pre-merge commits, then user-held with zero elapsed time after the frozen-input
-R0–R3 integration became the source of truth. They produced no result and must
-not be released or described as R0–R3 runs. The merged R0–R3 GPU jobs remain
-planned, not submitted.
+Adaeze's superseded return jobs `24050724` and `24051590` were cancelled as
+intended. Adaeze's frozen-input R0–R3 campaign was submitted directly from
+`main` into `/work/hdd/bjjg/gs-fuse/runs/adaeze/return-r0-r3-v1` using the
+guarded launcher. The single R3 smoke job `24055019` completed `0:0` in 45m23s
+and verified model reloading and evaluation. Full training jobs `24055020`–`24055023`
+are queued in `gpuA100x4` awaiting node availability, and dependent paired
+controls `24055024`–`24055031` wait for training completion. Pending jobs are
+not results; smoke metrics are execution checks, not full-C1 benchmark performance.
 
 ## Declined Expanse exchange
 
@@ -69,14 +73,11 @@ case and team agreement. Delta remains the active resource.
 
 ## Next team actions
 
-Reconfirm and cancel only Adaeze's two superseded jobs, then follow the
-[Adaeze R0–R3 Delta runbook](docs/ADAEZE_R0_R3_DELTA_RUNBOOK.md). Create its
-permanent Delta checkout from updated `main`, use the verified frozen snapshot,
-and submit the merged protocol only after recording exact job provenance.
-Continue monitoring Nicole's separate price job and its dependent controls.
-Matched gate claims still require a completed full C1 checkpoint. Joye's
-historical jobs must not be relabelled as C1 merely because later C1 code
-merged to `main`.
+Leave Adaeze's submitted R0–R3 campaign jobs (`24055020`–`24055031`) and Nicole's
+price jobs (`23840368`–`23840370`) untouched in the Delta queue so their accumulated
+priority age is preserved. Monitor Delta queue turnover. Matched gate claims
+still require a completed full C1 checkpoint. Joye's historical jobs must not be
+relabelled as C1 merely because later C1 code merged to `main`.
 
 ## History and maintenance
 
