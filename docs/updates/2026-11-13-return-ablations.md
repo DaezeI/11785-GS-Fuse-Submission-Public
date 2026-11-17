@@ -114,40 +114,20 @@ as the version record. Send the snapshot `content_sha256`, audit paths and
 summary, and any failure to the group. Do not silently replace a failed
 snapshot; investigate and create `v2` if a correction is justified.
 
-## Later GPU order, after access returns
+## Current GPU execution
 
-Use one clean checkout and export its commit and the audited snapshot fingerprint
-for training and paired jobs. The scripts check both before loading a model.
+The earlier Nicole-path submission examples in this handoff are superseded for
+Adaeze's campaign. Follow the self-contained
+[Adaeze frozen-input R0–R3 Delta runbook](../ADAEZE_R0_R3_DELTA_RUNBOOK.md).
+It pins one merged `main` commit, uses Adaeze-owned output paths, keeps full
+training and evaluation on the non-preempt A100 partition, serializes paired
+modes that share a cache, and includes the three adjacent-variant analyzer
+commands. Do not substitute the older Nicole paths or preempt-queue wrappers.
 
-```bash
-cd /work/hdd/bjjg/gs-fuse/runs/nicole/return-v1/repo
-mkdir -p /work/hdd/bjjg/gs-fuse/runs/nicole/return-v1/logs
-export EXPECTED_CODE_COMMIT=$(git rev-parse HEAD)
-export C1_SNAPSHOT_SHA256=049aa089d2eaa77644be5deba3abad3fa33c0a18b4375553664cafc71370c2bf
-```
-
-1. Submit `scripts/delta/nicole_c1_return_smoke.sbatch`; inspect all stages,
-   checkpoint reload, resolved config, and input audit. Then submit
-   `RUN_KIND=smoke-v1 sbatch scripts/delta/nicole_c1_return_paired.sbatch`.
-2. Once smoke passes, submit each variant separately as allocation allows, for
-   example `VARIANT=R0 sbatch scripts/delta/nicole_c1_return_full.sbatch`. Repeat
-   for R1, R2 and R3. Each has a fresh output path.
-   R3 writes to `full-v1` and is the package-comparison return run.
-3. After each training job completes, submit its paired evaluation. For example,
-   `RUN_KIND=ablation-r0-v1 sbatch scripts/delta/nicole_c1_return_paired.sbatch`. Save job IDs, selected
-   checkpoint, config, hashes, paired outputs, metrics, findings, and
-   limitations in a linked result note. For each adjacent pair, run the CPU
-   analyzer with the new variant as `--predictions` and the preceding variant
-   as `--reference`. It verifies aligned events, targets, donor IDs, article
-   hashes, and the dataset fingerprint before computing error differences and
-   paired date-block intervals.
-
-```bash
-python scripts/analyze_return_predictions.py \
-  --predictions ../paired-ablation-r1-v1/zeroed_article_tokens.npz \
-  --reference ../paired-ablation-r0-v1/zeroed_article_tokens.npz \
-  --out ../r1-vs-r0-v1.json
-```
+Save job IDs, checkpoint and config hashes, paired outputs, metrics, findings,
+and limitations in a linked result note. The analyzer verifies aligned events,
+targets, donor IDs, article hashes, and the dataset fingerprint before
+computing error differences and paired date-block intervals.
 
 The optional last-value module preserves the random state when initialized,
 so shared model weights and starting random draws agree for R2 and R3.
