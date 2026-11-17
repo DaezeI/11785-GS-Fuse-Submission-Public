@@ -135,3 +135,28 @@ If it completes, record the scheduler state, runtime, selected checkpoint hash,
 resolved configuration, W&B run, metrics, and limitations before interpreting
 model quality. Retained article publication times remain unverified, so the
 screened run cannot support publication-time-certified text claims.
+
+## Four-GPU return campaign
+
+Status: **SUBMITTED — pending with no predicted start and no result**.
+
+- Owner: Adaeze
+- Job ID: `24051590`
+- Executed code commit: `74e5cf8cca08fce55b478c5919e53e504cf88908`
+- Batch script: `scripts/delta/adaeze_c1_return_campaign.sbatch`
+- Submission command:
+  `sbatch --parsable scripts/delta/adaeze_c1_return_campaign.sbatch`
+- Run root: `/work/hdd/bjjg/gs-fuse/runs/adaeze/return-campaign-v1`
+- Resources: one four-A100 node, 32 CPU cores, 160 GB host memory, 12-hour
+  limit, preempt queue with explicit requeue and provenance-checked resume.
+- Parallel variants, all with seed 0 and identical screened-C1 data/budget:
+  baseline direction weight 1; direction weights 0.25 and 4; and direction
+  weight 1 with the learnable last-value shortcut disabled.
+
+The direction-weight and last-value runs are separate one-factor comparisons
+against the campaign baseline. Job `24050724` remains pending as a redundant
+single-GPU baseline until the campaign has a credible live start; do not let
+both baseline copies run without making an explicit keep/cancel decision.
+Nicole's jobs remain separate and unchanged. A test-only estimate predicted a
+November 17 slot, but the real job currently reports `Priority` and no start
+time; the test-only estimate is not recorded as a scheduled start.
