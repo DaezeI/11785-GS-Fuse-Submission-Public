@@ -9,20 +9,20 @@
 #SBATCH --mem=160G
 #SBATCH --time=12:00:00
 #SBATCH --requeue
-#SBATCH --output=/work/hdd/bjjg/gs-fuse/runs/adaeze/return-speed-pr8/logs/return-campaign-%j.out
+#SBATCH --output=/work/hdd/bjjg/gs-fuse/runs/adaeze/return-campaign-v1/logs/return-campaign-%j.out
 
 set -euo pipefail
 umask 007
 
-RUN_ROOT=/work/hdd/bjjg/gs-fuse/runs/adaeze/return-speed-pr8
+RUN_ROOT=/work/hdd/bjjg/gs-fuse/runs/adaeze/return-campaign-v1
 REPO_ROOT="$RUN_ROOT/repo"
-CAMPAIGN_ROOT="$RUN_ROOT/campaign-v1"
+CAMPAIGN_ROOT="$RUN_ROOT/outputs"
 mkdir -p "$CAMPAIGN_ROOT"
 
 module load pytorch-conda/2.8
 source /projects/bjjg/gs-fuse/env/gsfuse/bin/activate
 cd "$REPO_ROOT"
-export HF_HOME="$RUN_ROOT/hf-cache"
+export HF_HOME=/work/hdd/bjjg/gs-fuse/runs/adaeze/return-speed-pr8/hf-cache
 export TRANSFORMERS_OFFLINE=1
 export TOKENIZERS_PARALLELISM=false
 
