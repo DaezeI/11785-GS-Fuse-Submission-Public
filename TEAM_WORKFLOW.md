@@ -1,5 +1,11 @@
 # Team workflow, decisions, and work ownership
 
+**Final-delivery update:** screened data preparation is complete, and Nicole's
+[full price result](results/screened-price-v1/summary.md) is available. Use the
+[delivery workflow](docs/FINAL_DELIVERY_WORKFLOW.md) for result packs, GPU handoffs
+and versioned final writing. Existing return and architecture work remains
+separately owned; old queue prose below is historical.
+
 **November 12 return-task decision:** Adaeze accepted cumulative log-return
 forecasting and complete magnitude-plus-direction gate supervision. Read the
 [return design and Nicole handoff](docs/updates/2026-11-12-return-design-handoff.md)

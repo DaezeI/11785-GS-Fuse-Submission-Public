@@ -1,5 +1,11 @@
 # Project status
 
+**Latest result update:** Nicole's screened-price baseline and both full paired
+evaluations completed on H200. The [result pack](results/screened-price-v1/summary.md)
+contains the measured finding and provenance. Earlier queue descriptions below
+are historical. Adaeze owns the separately submitted return campaign; completed
+return findings have not yet been collected in this result hub.
+
 Updated November 16, 2026, after PR #8 merged the return-task implementation,
 runtime fixes, frozen-input audit, and R0–R3 protocol to `main`.
 The [dataset and run handoff](docs/updates/2026-11-13-return-ablations.md) lists
