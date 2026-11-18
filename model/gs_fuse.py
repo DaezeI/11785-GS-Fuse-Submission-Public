@@ -1653,6 +1653,18 @@ def write_return_metrics(path, split, result, model, checkpoint, **metadata):
     return payload
 
 
+def unfreeze_variant_modules(model):
+    """Let the optional fusion variants (Q-Former, MoE gate) train in stage 3.
+
+    train() freezes every parameter and re-enables a fixed list of modules.
+    The variant modules are added to the optimizer separately, so they must
+    also be unfrozen here, or they stay at their random initialization.
+    """
+    for mod in model.variant_modules().values():
+        for p in mod.parameters():
+            p.requires_grad = True
+
+
 # ============================= Train / Eval ==================================
 def train(model, train_loader, test_loader, vali_loader, num_epochs, output_path=None,
           use_horizon_weight=True, horizon_decay=0.00,
@@ -1754,6 +1766,7 @@ def train(model, train_loader, test_loader, vali_loader, num_epochs, output_path
     if model.use_learnable_last_value:
         for p in model.last_value_module.parameters():
             p.requires_grad = True
+    unfreeze_variant_modules(model)
 
     criterion_mse = nn.MSELoss()
     criterion_mae = nn.L1Loss()
