@@ -14,9 +14,9 @@ real-input window audit passes; do not release the old jobs or describe the
 screened subset as publication-time certified.
 The screened real-input audit passed on November 13 with all 10,705 events
 emitted and zero cross-split shared price bars. Its [summary](analysis/text_value/c1_date_screen_v1_audit_summary.json)
-has exact counts. A brief Delta administrator hold cleared. Training is pending
-GPU scheduling, and the paired jobs wait for training; check their live states
-before reporting them.
+has exact counts. A brief Delta administrator hold cleared. The full screened-price reference and its paired evaluations have completed;
+see results/screened-price-v1/summary.md. Older queue notes are historical;
+check owner records and live state before proposing another run.
 **November 13 team decision:** For new course-project C1 training and matched
 real/shuffled/no-text comparisons, use
 `splits/manifests/purged_split_c1_date_screen_v1.json` (6,167 train / 2,302
@@ -120,3 +120,10 @@ when a run fails or finds no improvement; do not turn queued work into a result.
 
 For final-paper evidence and writing, start with [results/README.md](results/README.md)
 and [docs/FINAL_DELIVERY_WORKFLOW.md](docs/FINAL_DELIVERY_WORKFLOW.md).
+
+The project is now in controlled experimentation, analysis and final writing;
+read [docs/NEXT_PHASE_PLAN.md](docs/NEXT_PHASE_PLAN.md). Routine screened-data
+preparation is complete. Refer to additional compute publicly only as
+**Nicole's personal GPU resource**. Keep provider/account/reservation details
+and credentials in her local skill/handoff. Do not submit duplicate owner
+campaigns or start an open-ended autonomous research loop.
