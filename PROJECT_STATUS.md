@@ -5,6 +5,13 @@ Routine data preparation is complete. The [research home](https://gs-fuse-resear
 [next-phase plan](docs/NEXT_PHASE_PLAN.md); the experiment register and linked
 result packs are the current evidence index.
 
+**November 18 price evidence.** Both [screened price runs](results/README.md)
+found nearly identical error with matched and shuffled articles. A [paired
+CPU comparison](results/screened-price-v1/persistence.md) found that carrying
+forward last prices beat seed 0 at all three horizons. The [decision
+brief](docs/RESEARCH_DECISION_BRIEF.md) records the approved matched price-only
+training comparisons and timing limits.
+
 **Latest result update:** Nicole's screened-price baseline and both full paired
 evaluations completed on H200. The [result pack](results/screened-price-v1/summary.md)
 contains the measured finding and provenance. Adaeze's frozen-input return campaign

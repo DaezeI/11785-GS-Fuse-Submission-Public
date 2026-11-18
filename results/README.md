@@ -13,6 +13,7 @@ comparison validity and the proposed next batch.
 - [Screened price baseline](screened-price-v1/summary.md): full training and paired
   evaluations completed; seed 0; 2,236 test examples. First verified result pack.
 - [Seed-1 screened price repeat](screened-price-seed1-v1/summary.md): all three forecast lengths again show no clear advantage for correctly matched articles over shuffled articles.
+- [Last-price persistence](screened-price-v1/persistence.md) lowered seed-0 price error at all three horizons on the same 2,236 examples.
 - [Pre-event volatility analysis](price-volatility-v1/summary.md): saved subgroup findings plus CPU block-length sensitivity; no clear matched-text benefit in any volatility group.
 - Adaeze owns the separate R0–R3 return campaign. Await her completed result pack;
   submission or a smoke test is not a full result.

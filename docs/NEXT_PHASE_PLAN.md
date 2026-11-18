@@ -46,11 +46,13 @@ register or paper source. Bring substantive Overleaf changes back into Git.
 
 ## Insights that must survive a new chat
 
-- Correct and shuffled articles have nearly identical MSE for the completed
-  price checkpoint. This is a measured single-seed result, not proof that
-  financial text is generally useless.
-- The two article-free conditions are different inference interventions; they
-  are not separately trained time-series-only models.
+- Correct and shuffled articles had nearly identical MSE on two screened
+  price checkpoints. The [seed-0 last-price comparison](../results/screened-price-v1/persistence.md)
+  also found lower error at all three horizons with the flat reference.
+- Zeroing article tokens and bypassing fusion change prediction-time behavior.
+  The [proposed overnight batch](RESEARCH_DECISION_BRIEF.md#recommended-overnight-batch)
+  would compare the existing news models with independently trained
+  price-only models.
 - Price versus return compares a redesign package. R0→R1, R1→R2 and R2→R3
   isolate the specified return components; architecture comparisons are another
   question and need their own matching reference.
