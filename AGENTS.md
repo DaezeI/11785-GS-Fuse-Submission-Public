@@ -117,3 +117,6 @@ when a run fails or finds no improvement; do not turn queued work into a result.
   does not prove a cause or that text is useless.
 - Update workflow status and link shareable results when completing a handoff.
   Historical README commands and model filenames are not proof of C1 provenance.
+
+For final-paper evidence and writing, start with [results/README.md](results/README.md)
+and [docs/FINAL_DELIVERY_WORKFLOW.md](docs/FINAL_DELIVERY_WORKFLOW.md).

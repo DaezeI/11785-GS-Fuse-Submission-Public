@@ -1,0 +1,47 @@
+{
+  "run_id": "screened-price-v1",
+  "owner": "Nicole",
+  "status": "completed",
+  "question": "Does correctly matched article text reduce error compared with shuffled or article-free inference on the same screened-price checkpoint?",
+  "code_commit": "bb09396881cc92c5e654c4210944ce5c6da17ced",
+  "checkpoint_sha256": "5358bbf48b4061ab325eb2a13390d7acdcb75ad7601f6969d3bb73152a2a2a52",
+  "snapshot_sha256": "049aa089d2eaa77644be5deba3abad3fa33c0a18b4375553664cafc71370c2bf",
+  "manifest_sha256": "1b04373a4361238b09c0b1d952163973403d2d7839dbb9e7215c429af14b23d1",
+  "price_sha256": "6a873b1d72d27f9188c6bf12acb756775916be8ed9ff42d9e9dd98028f68de2a",
+  "counts": {
+    "train": 6167,
+    "validation": 2302,
+    "test": 2236
+  },
+  "task": "price",
+  "units": "training-standardized OHLC price; cumulative prefix MSE",
+  "hardware": "NVIDIA H200, one GPU per job",
+  "seed": 0,
+  "batch_size": 8,
+  "stage_epochs": [
+    2,
+    2,
+    2
+  ],
+  "sw_stride": 10,
+  "fusion": "crossattn",
+  "gate": "softmax",
+  "tf32": true,
+  "four_bit": false,
+  "raw_ts_residual": true,
+  "learnable_last_value": false,
+  "backbones": [
+    "MOMENT-1-large",
+    "Llama-3.2-1B"
+  ],
+  "uncertainty": "1000 date-block bootstrap replicates, block length 20 distinct event dates; conditional on one checkpoint and three shuffle draws",
+  "limitations": [
+    "Retained article publication times remain unverified.",
+    "One training seed; block-length sensitivity not yet checked.",
+    "Shuffled donors can come from later test dates: diagnostic placebo, not a deployable forecast.",
+    "Article-free conditions are inference interventions, not independently trained TS-only models.",
+    "The price-to-return redesign is a package comparison; architecture comparisons require a matching R3 reference on the same hardware/environment.",
+    "Historical-split and standardized-price/return-unit metrics must not be ranked directly."
+  ],
+  "missing_provenance": []
+}
