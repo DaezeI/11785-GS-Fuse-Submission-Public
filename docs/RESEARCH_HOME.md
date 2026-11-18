@@ -17,6 +17,20 @@ follow-up experiments, and the completed [two-seed price-only comparison](../res
 4. Follow the [screened price execution recipe](../scripts/research_cycle/README.md) when repeating the price comparison. For other questions, use the owner’s approved configuration and write a result pack in the same format. Update the registry from verified evidence using `python scripts/research_home.py upsert /path/to/public-record.json`. The live home reads the registry from GitHub main, so result updates need no change to the page or its deployment.
 5. Report status, finding, evidence, limits, decision, and the next action in plain language. Distinguish queued work from results, exploratory analysis from confirmation, and inference interventions from retrained baselines. Preserve the limitation that retained article release times remain unverified.
 
+## Publish a teammate's experiment
+
+Pull GitHub main and open the repository in Codex. Ask
+`Use $gsfuse-result-report to report my experiment <run-id> on the Research Home.`
+Provide the committed config and available evidence. Use the same workflow
+for a run on Delta or on Nicole's personal GPU resource. When Nicole runs a
+teammate's config, keep the teammate as the experiment owner.
+
+The skill prepares the record and validates it with the repository script.
+Include the record, configuration and available evidence in the same PR.
+After it merges to main, reload the Research Home. The
+[shared skill](../.agents/skills/gsfuse-result-report/SKILL.md) also lists the
+commands for contributors who use GitHub without Codex.
+
 ## Where work lives
 
 - **GitHub:** canonical versioned code, configs, research records, results, figures, and paper source. [EXPERIMENTS.md](../EXPERIMENTS.md) indexes runs; [results](../results/README.md) contains evidence packs; [report/final](../report/final) holds paper and presentation source.

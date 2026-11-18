@@ -1,6 +1,6 @@
 # Project instructions for coding agents
 
-For Nicole's research workflow and fresh-chat continuation, start with [RESEARCH_HOME.md](docs/RESEARCH_HOME.md). The current registry and evidence live in GitHub. Use the local `nicole-research-companion` skill when available.
+For Nicole's research workflow and fresh-chat continuation, start with [RESEARCH_HOME.md](docs/RESEARCH_HOME.md). The current registry and evidence live in GitHub. Use the local `nicole-research-companion` skill when available. For team submissions, use the shared [gsfuse-result-report skill](.agents/skills/gsfuse-result-report/SKILL.md) to prepare the record and evidence in one PR.
 
 Read [TEAM_WORKFLOW.md](TEAM_WORKFLOW.md) first. It records the November 4 team
 decision, ownership, implementation gaps, and experiment handoff requirements.
