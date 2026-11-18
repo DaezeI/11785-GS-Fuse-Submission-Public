@@ -1,0 +1,88 @@
+{
+  "events": 2236,
+  "source_code_commit": "e051195ce50f496c8877f724e8dc16a28c0ff6b8",
+  "manifest_sha256": "1b04373a4361238b09c0b1d952163973403d2d7839dbb9e7215c429af14b23d1",
+  "price_sha256": "6a873b1d72d27f9188c6bf12acb756775916be8ed9ff42d9e9dd98028f68de2a",
+  "snapshot_sha256": "049aa089d2eaa77644be5deba3abad3fa33c0a18b4375553664cafc71370c2bf",
+  "scale_population_sha256": "b8d1d475d39bbf95c19a76d6c86a5b93410fb449a91eb45aafdb4a350db83d68",
+  "text_models": {
+    "R0": {
+      "events": 2236,
+      "task_loss": 1.2583494657960475,
+      "magnitude_loss": 1.2583494657960475,
+      "direction_loss": 0.7025644921019594,
+      "weighted_direction_loss": 0.0,
+      "return_mae_bp": 80.91816204099317,
+      "return_mse_bp2": 12992.879144937548,
+      "close_dhr": {
+        "35": {
+          "rate": 0.5232558139534884,
+          "eligible_events": 2236
+        },
+        "70": {
+          "rate": 0.5080645161290323,
+          "eligible_events": 2232
+        },
+        "140": {
+          "rate": 0.5250447227191414,
+          "eligible_events": 2236
+        }
+      }
+    },
+    "R1": {
+      "events": 2236,
+      "task_loss": 1.9590979774011055,
+      "magnitude_loss": 1.2616808088712914,
+      "direction_loss": 0.6974171634650188,
+      "weighted_direction_loss": 0.6974171634650188,
+      "return_mae_bp": 81.07707276825646,
+      "return_mse_bp2": 13056.189953709989,
+      "close_dhr": {
+        "35": {
+          "rate": 0.5049194991055456,
+          "eligible_events": 2236
+        },
+        "70": {
+          "rate": 0.5062724014336918,
+          "eligible_events": 2232
+        },
+        "140": {
+          "rate": 0.5286225402504472,
+          "eligible_events": 2236
+        }
+      }
+    },
+    "R2": {
+      "events": 2236,
+      "task_loss": 1.959059598194252,
+      "magnitude_loss": 1.2617617141528719,
+      "direction_loss": 0.6972978916918869,
+      "weighted_direction_loss": 0.6972978916918869,
+      "return_mae_bp": 81.0801431969307,
+      "return_mse_bp2": 13057.054824812723,
+      "close_dhr": {
+        "35": {
+          "rate": 0.5129695885509838,
+          "eligible_events": 2236
+        },
+        "70": {
+          "rate": 0.507168458781362,
+          "eligible_events": 2232
+        },
+        "140": {
+          "rate": 0.5272808586762076,
+          "eligible_events": 2236
+        }
+      }
+    }
+  },
+  "zero_return": {
+    "all_channel_mae_bp": 80.48726446844441,
+    "all_channel_mse_bp2": 12692.108324527351,
+    "always_up_accuracy": {
+      "35": 0.5326475849731663,
+      "70": 0.524641577060932,
+      "140": 0.5259391771019678
+    }
+  }
+}

@@ -81,3 +81,16 @@ the upsert without changing the real registry, supply `--registry` with a
 copy of the registry outside the repository. Nothing is committed or published.
 The fresh evidence directory remains after failures to preserve diagnostics;
 use a new directory after resolving the cause.
+
+## Independently trained price-only comparison
+
+The [two-seed result](../../results/screened-price-only-v1/summary.md) used
+`train_price_only.py` as a small overlay on the pinned price-model source
+identified in the result JSON. Each seed uses its matching screened news run
+directory, Stage-1 checkpoint and checked fusion-bypass prediction archive.
+Run in a single-GPU allocation using the verified frozen snapshot and MOMENT
+backbone. Use the same command with `--smoke` and a separate fresh output
+directory before full training. The full command trains two epochs, reloads
+the validation-selected checkpoint, pairs the saved forecasts and writes
+a small metrics JSON plus private per-event predictions. The input, output
+and checkpoint paths are supplied by the operator. Use `--help` for arguments.

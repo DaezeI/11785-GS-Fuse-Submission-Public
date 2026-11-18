@@ -1,0 +1,28 @@
+{
+  "smoke": true,
+  "seed": 0,
+  "base_code_commit": "bb09396881cc92c5e654c4210944ce5c6da17ced",
+  "runner_sha256": "c860d9c48c28672037b8626b2ba2943d32a3222bc93ceac098912e584c2f882e",
+  "init_sha256": "261e7d00808109d3de636dec4c87f00f8c096b2cd08fa12f8fb7f3dc64f0c05d",
+  "checkpoint_sha256": "fd4c7de71896f6335a1f0e5c7ecec88fad3b946fa32160cc89916b18e8f4ee55",
+  "reference_checkpoint_sha256": "5358bbf48b4061ab325eb2a13390d7acdcb75ad7601f6969d3bb73152a2a2a52",
+  "reference_archive_sha256": "000274d307ee4e6f952102ffc651c0945356a6413aea8e924752d9b3fa03945c",
+  "snapshot_sha256": "049aa089d2eaa77644be5deba3abad3fa33c0a18b4375553664cafc71370c2bf",
+  "manifest_sha256": "1b04373a4361238b09c0b1d952163973403d2d7839dbb9e7215c429af14b23d1",
+  "price_sha256": "6a873b1d72d27f9188c6bf12acb756775916be8ed9ff42d9e9dd98028f68de2a",
+  "counts": [
+    6167,
+    2302,
+    2236
+  ],
+  "validation_history": [
+    {
+      "epoch": 1,
+      "validation_mse": 0.00020729011646399684
+    }
+  ],
+  "selected_epoch": 1,
+  "events": 16,
+  "hardware": "NVIDIA H200",
+  "reference_parity_max_abs_delta": 0.0
+}

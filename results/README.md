@@ -13,10 +13,10 @@ comparison validity and the proposed next batch.
 - [Screened price baseline](screened-price-v1/summary.md): full training and paired
   evaluations completed; seed 0; 2,236 test examples. First verified result pack.
 - [Seed-1 screened price repeat](screened-price-seed1-v1/summary.md): all three forecast lengths again show no clear advantage for correctly matched articles over shuffled articles.
+- [Trained price-only references](screened-price-only-v1/summary.md) were beaten by the news-trained package in both seeds. The flat last-price forecast beat both trained approaches.
 - [Last-price persistence](screened-price-v1/persistence.md) lowered seed-0 price error at all three horizons on the same 2,236 examples.
 - [Pre-event volatility analysis](price-volatility-v1/summary.md): saved subgroup findings plus CPU block-length sensitivity; no clear matched-text benefit in any volatility group.
-- Adaeze owns the separate R0–R3 return campaign. Await her completed result pack;
-  submission or a smoke test is not a full result.
+- Adaeze’s [R0–R2 results and zero-return benchmark](screened-return-r0-r2-v1/summary.md) cover full training. Her R3 and paired article checks are queued.
 - Jessica owns Q-Former; Joye owns MoE. Historical runs remain historical.
   New architecture comparisons need the same R3 reference, data, seed, budget
   and hardware/environment. This price checkpoint is not that R3 reference.

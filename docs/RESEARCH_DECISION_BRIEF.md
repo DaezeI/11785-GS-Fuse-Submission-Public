@@ -1,9 +1,32 @@
 # Research decision brief
 
-November 18, 2026 · **Approved direction.** Prioritize a
-model trained on prices alone and score it against the two existing news
-models and a simple last-price forecast. This comparison would give the paper
-a direct answer about whether adding articles improved this setup.
+## November 18 group meeting
+
+**Both price-only comparisons are complete.** At the main 140-bar forecast
+length, the news-trained models cut error by **12.5%** and **26.2%** versus
+the separately trained price-only references. The simple rule of carrying the
+last prices forward then beat those news-trained models by **8.2%** and
+**18.2%**. It had the lowest error at every forecast length for both seeds.
+Correct and shuffled articles still gave nearly identical results. The
+evidence supports a difference between the training packages. It leaves the
+incremental value of the particular article unestablished.
+[Side-by-side figure and result](../results/screened-price-only-v1/summary.md)
+
+**Adaeze’s first three return runs are complete.** Changing direction loss
+and the gate target hardly moved overall error, which stayed near 81 basis
+points. A zero-return forecast scored 80.49 basis points on the same examples.
+R3 and Adaeze’s paired article checks were still queued at the final Delta
+check. Keep the result descriptive until those checks are available.
+[Aligned return evidence](../results/screened-return-r0-r2-v1/summary.md)
+
+**Recommended team decision.** Put the simple baselines and the shuffled
+control in the main paper table. After Adaeze’s queued controls come back,
+use a small article model to see whether the text carries information beyond
+prices and event type. This will help decide whether to revisit fusion or
+focus on how the stories were timed and selected.
+
+The sections below record the comparison design and the evidence that
+motivated it.
 
 ## Established findings
 
@@ -206,4 +229,4 @@ expectation is independently available. [Andersen et al.](https://www.federalres
    verified short-horizon test. Leave Q-Former and MoE extensions behind a
    matching screened R3 reference and the respective owners' evidence.
 
-Nicole approved the price-only batch for the November 18 work window. Training and evaluation progress is tracked in the experiment register.
+Nicole approved the price-only batch for November 18. Both runs and their evaluation are complete. [Verified results](../results/screened-price-only-v1/summary.md)
