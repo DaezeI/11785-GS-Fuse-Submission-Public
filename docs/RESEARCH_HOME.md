@@ -2,6 +2,13 @@
 
 Open the [GS-Fuse Research Home](https://gs-fuse-research.twiggydonkey4.chatgpt.site) for the current findings and the latest reported run status. This is the fresh-chat entry point for Nicole's GS-Fuse work. Read the repository's [agent instructions](../AGENTS.md), [team workflow](../TEAM_WORKFLOW.md), [project status](../PROJECT_STATUS.md), [experiment register](../EXPERIMENTS.md), and [results guide](../results/README.md). For a submitted run, recover its private campaign record and job IDs from the top of the local handoff. For private access and continuity, Nicole's local `PROJECT_HANDOFF.md` and `nicole-gpu-research` skill supplement these public records. Current user instructions take precedence over dated plans.
 
+## Latest research decision
+
+The [November 18 decision brief](RESEARCH_DECISION_BRIEF.md) reviews the two
+screened price runs and teammates' available evidence. It includes a new
+[last-price comparison](../results/screened-price-v1/persistence.md), three
+follow-up experiments, and the approved price-only batch.
+
 ## Continue the work
 
 1. Inspect the checkout and current records, including the research registry at [research_home/records.json](../research_home/records.json). Identify owners, existing evidence, open changes, and missing information. Separate the project's authorized scope from what has actually run or been verified.

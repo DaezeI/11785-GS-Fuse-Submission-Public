@@ -1,13 +1,17 @@
 {
   "title": "GS-Fuse Research Home",
   "stage": "Controlled experiments and final writing",
-  "overview": "We are testing whether news adds useful information to price forecasts. The frozen dataset is ready. In two trained versions of the price model, the right article gave nearly the same forecast error as a shuffled article. The next comparisons will test the return-model changes and a model trained using prices alone.",
-  "updated_at": "2026-11-18T05:02:41+00:00",
+  "overview": "Two screened price runs found almost the same forecast error with correct and shuffled articles. On the first run, simply repeating the last observed prices beat the news model at all three forecast lengths. The proposed overnight batch compares the existing news models with models trained on prices alone.",
+  "updated_at": "2026-11-18T18:59:56+00:00",
   "source_url": "https://github.com/DaezeI/11785-GS-Fuse-Submission-Public/blob/main/research_home/records.json",
   "links": [
     {
       "label": "Experiment register",
       "url": "https://github.com/DaezeI/11785-GS-Fuse-Submission-Public/blob/main/EXPERIMENTS.md"
+    },
+    {
+      "label": "Decision brief and sources",
+      "url": "https://github.com/DaezeI/11785-GS-Fuse-Submission-Public/blob/main/docs/RESEARCH_DECISION_BRIEF.md"
     },
     {
       "label": "Paper source",
@@ -24,15 +28,49 @@
   ],
   "next": [
     {
-      "title": "Collect Adaeze’s return results",
-      "reason": "Compare the four versions on the same events to find which choices made a difference."
+      "title": "Train the two approved price-only references",
+      "reason": "Use two seeds and the same test examples. Compare with the existing news models and the simple last-price rule."
     },
     {
-      "title": "Set up a trained price-only reference",
-      "reason": "Compare models trained with and without articles under matching data and evaluation settings."
+      "title": "Collect Adaeze’s remaining return results",
+      "reason": "R0–R2 results are available. R3 and the paired article checks will show what the last-value shortcut and the particular article contribute."
+    },
+    {
+      "title": "Check whether useful news is getting through",
+      "reason": "Try a simple text readout and verify when articles became available before testing for a short-lived benefit."
     }
   ],
   "experiments": [
+    {
+      "id": "screened-price-persistence-v1",
+      "title": "Repeating the last prices beat the first news model",
+      "kind": "Analysis",
+      "status": "completed",
+      "owner": "Nicole",
+      "question": "Could a flat forecast beat the first news model on the exact same test examples?",
+      "configuration": "Reused the saved seed-0 predictions on 2,236 events and 845 dates. Repeated the last value of each price channel. Paired uncertainty groups nearby event dates.",
+      "finding": "The last-price rule had 20.81%, 15.85% and 8.21% lower error at 35, 70 and 140 bars. All paired intervals favored the simple rule. Swapping articles changed predictions by less than 0.5% of the model’s typical forecast error.",
+      "limitations": "This comparison used seed 0. It establishes the result for a simple flat forecast on these examples. The repeat’s full predictions were outside this analysis, and retained article release times remain unverified.",
+      "figure": {
+        "url": "https://raw.githubusercontent.com/DaezeI/11785-GS-Fuse-Submission-Public/main/results/screened-price-v1/persistence.png",
+        "alt": "Repeating the last prices reduced error at all three horizons in seed 0. The whiskers show paired 95% date-block intervals."
+      },
+      "evidence": [
+        {
+          "label": "Method and result",
+          "url": "https://github.com/DaezeI/11785-GS-Fuse-Submission-Public/blob/main/results/screened-price-v1/persistence.md"
+        },
+        {
+          "label": "Metrics and source hashes",
+          "url": "https://github.com/DaezeI/11785-GS-Fuse-Submission-Public/blob/main/results/screened-price-v1/persistence.json"
+        }
+      ],
+      "related": [
+        "screened-price-v1",
+        "screened-price-seed1-v1"
+      ],
+      "updated_at": "2026-11-18T06:13:44+00:00"
+    },
     {
       "id": "screened-price-seed1-v1",
       "title": "A second run found no clear article advantage",
@@ -137,17 +175,25 @@
       "status": "submitted",
       "question": "Which of the three return-model changes improves forecasting under the same conditions?",
       "configuration": "Frozen screened C1. R0→R1 adds a direction term, R1→R2 updates gate supervision, and R2→R3 enables a learnable last-value shortcut.",
-      "finding": "The campaign was submitted. Full results and the current queue state await owner-verified evidence.",
-      "limitations": "Compare adjacent versions on identical examples with common return metrics. Price error and return error use different units.",
+      "finding": "R0, R1 and R2 finished with nearly identical return error, around 81 basis points. R3 and the paired article checks were queued at the November 18 check.",
+      "limitations": "The first three checkpoints use one training seed. Their overall error cannot show how much each model learned from the correct article.",
       "figure": null,
       "evidence": [
         {
           "label": "Assigned runbook",
           "url": "https://github.com/DaezeI/11785-GS-Fuse-Submission-Public/blob/main/docs/ADAEZE_R0_R3_DELTA_RUNBOOK.md"
+        },
+        {
+          "label": "Owner launch and smoke record",
+          "url": "https://github.com/DaezeI/11785-GS-Fuse-Submission-Public/blob/main/docs/updates/2026-11-17-adaeze-r0-r3-launch.md"
+        },
+        {
+          "label": "Owner’s R0–R2 test results",
+          "url": "https://github.com/DaezeI/11785-GS-Fuse-Submission-Public/blob/main/docs/updates/2026-11-18-adaeze-r0-r2-results.md"
         }
       ],
       "related": [],
-      "updated_at": "2026-11-18T04:17:12+00:00"
+      "updated_at": "2026-11-18T18:59:56+00:00"
     },
     {
       "id": "qformer-padding-original-split",
@@ -180,17 +226,46 @@
       "status": "awaiting_evidence",
       "question": "Do routed experts improve return forecasts compared with a matching reference?",
       "configuration": "Requires a matching R3 return reference, same frozen data, training budget, seed, and hardware environment.",
-      "finding": "The current research records have no owner-verified screened comparison to report.",
+      "finding": "In Joye’s historical run, routing varied by event category, while the experts gave text similar weights. A verified screened comparison is still pending.",
       "limitations": "Keep the historical diagnostics separate and use the owner’s configuration before scheduling any new work.",
       "figure": null,
       "evidence": [
         {
           "label": "Architecture comparison rules",
           "url": "https://github.com/DaezeI/11785-GS-Fuse-Submission-Public/blob/main/docs/NEXT_PHASE_PLAN.md"
+        },
+        {
+          "label": "Historical routing diagnostics",
+          "url": "https://github.com/DaezeI/11785-GS-Fuse-Submission-Public/blob/main/figures/interpretability/interpretability_moe.json"
         }
       ],
       "related": [],
-      "updated_at": "2026-11-18T04:17:12+00:00"
+      "updated_at": "2026-11-18T06:13:44+00:00"
+    },
+    {
+      "id": "news-value-overnight-plan",
+      "title": "Would training with articles beat training on prices alone?",
+      "kind": "Proposed comparison",
+      "status": "planned",
+      "owner": "Nicole",
+      "question": "Does adding articles during training improve price forecasts beyond a trained price-only model and a simple last-price forecast?",
+      "configuration": "Proposed two single-GPU chains for independent price-only training, starting from the same price pretraining where verified. Reuse the news checkpoints for seeds 0 and 1 and score identical screened test examples.",
+      "finding": "Nicole approved the two price-only references. Setup and checks are in progress.",
+      "limitations": "The training paths differ in their article and fusion objectives. Interpretation also requires the correct-versus-shuffled comparison on the news checkpoints. The result would apply to the current frozen data and targets.",
+      "figure": null,
+      "evidence": [
+        {
+          "label": "Experiment plan and sources",
+          "url": "https://github.com/DaezeI/11785-GS-Fuse-Submission-Public/blob/main/docs/RESEARCH_DECISION_BRIEF.md#recommended-overnight-batch"
+        }
+      ],
+      "related": [
+        "screened-price-persistence-v1",
+        "screened-price-v1",
+        "screened-price-seed1-v1",
+        "return-r0-r3"
+      ],
+      "updated_at": "2026-11-18T18:59:56+00:00"
     }
   ]
 }
