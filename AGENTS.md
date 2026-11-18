@@ -1,5 +1,7 @@
 # Project instructions for coding agents
 
+For Nicole's research workflow and fresh-chat continuation, start with [RESEARCH_HOME.md](docs/RESEARCH_HOME.md). The current registry and evidence live in GitHub. Use the local `nicole-research-companion` skill when available.
+
 Read [TEAM_WORKFLOW.md](TEAM_WORKFLOW.md) first. It records the November 4 team
 decision, ownership, implementation gaps, and experiment handoff requirements.
 Follow current user instructions when they update this plan.
@@ -125,5 +127,4 @@ The project is now in controlled experimentation, analysis and final writing;
 read [docs/NEXT_PHASE_PLAN.md](docs/NEXT_PHASE_PLAN.md). Routine screened-data
 preparation is complete. Refer to additional compute publicly only as
 **Nicole's personal GPU resource**. Keep provider/account/reservation details
-and credentials in her local skill/handoff. Do not submit duplicate owner
-campaigns or start an open-ended autonomous research loop.
+and credentials in her local skill/handoff. Check each owner's current records and scheduler state before submitting a campaign. Nicole authorizes reasonable bounded follow-up experiments within her project scope, using the frozen dataset and the local GPU skill limits.

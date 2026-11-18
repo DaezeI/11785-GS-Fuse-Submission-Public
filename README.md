@@ -1,5 +1,7 @@
 # GS-Fuse (Customized for CMU 11-785 Intro to Deep Learning)
 
+Open the [GS-Fuse Research Home](https://gs-fuse-research.twiggydonkey4.chatgpt.site) for findings, run status, and next decisions. To pick up work in a fresh chat, start with [RESEARCH_HOME.md](docs/RESEARCH_HOME.md).
+
 For final-paper evidence and writing, start with [results/README.md](results/README.md)
 and [docs/FINAL_DELIVERY_WORKFLOW.md](docs/FINAL_DELIVERY_WORKFLOW.md).
 The [next-phase plan](docs/NEXT_PHASE_PLAN.md) explains what is ready and what to do next.

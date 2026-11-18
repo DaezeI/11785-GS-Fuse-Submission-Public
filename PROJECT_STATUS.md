@@ -1,7 +1,7 @@
 # Project status
 
 **Current phase: controlled experiments, result analysis and final writing.**
-Routine data preparation is complete. Start with the
+Routine data preparation is complete. The [research home](https://gs-fuse-research.twiggydonkey4.chatgpt.site) reads the latest [research records](research_home/records.json) after updates reach GitHub main. Start with the
 [next-phase plan](docs/NEXT_PHASE_PLAN.md); the experiment register and linked
 result packs are the current evidence index.
 

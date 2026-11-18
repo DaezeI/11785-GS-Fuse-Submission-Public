@@ -68,24 +68,14 @@ Nicole launches it in a fresh run directory and returns the resulting metrics,
 provenance and plain-language finding. Teammates do not need her login.
 Keep provider/account/reservation details local; hardware models may be recorded
 for scientific reproducibility. The local operator instructions carry the
-resource limits. No new run is authorized just by appearing in this plan.
+resource limits. Verify current ownership, execution state, and matching inputs before starting a follow-up.
 
-## Optional automation: keep it small
+## Research home and execution
 
-The completed campaign already ran a fixed verification → smoke → training →
-evaluation chain that stopped on failure. Scheduler jobs can run without a
-chat repeatedly checking them. This is execution automation, not an autonomous
-researcher deciding the next hypothesis.
-
-A useful next addition is a lightweight results dashboard generated from
-committed result packs: run state and last update, purpose, owner, dataset/task,
-metrics with units/counts, uncertainty and links to figures/paper evidence.
-Group compatible comparisons; do not create a leaderboard mixing tasks or splits.
-A static HTML report refreshed after an evaluation is enough initially.
-
-This dashboard is a proposal, not an implemented service. Do not build a new
-database/platform, continuously poll with an LLM, or launch open-ended experiments
-before the result inventory is complete. Broad literature/deep research is not
-the first step; use targeted research when an actual analysis or writing gap
-needs it. The next chat should start with the local handoff, current main and
-saved evidence, then propose a bounded run list or small dashboard if useful.
+The [research home](https://gs-fuse-research.twiggydonkey4.chatgpt.site) reads the
+versioned [research registry](../research_home/records.json) from GitHub main.
+Use [the continuation guide](RESEARCH_HOME.md) to run a bounded comparison,
+collect verified evidence, and update the same page from a new record.
+Nicole authorizes reasonable follow-up experiments within the project scope.
+Preserve frozen inputs, keep teammates' existing campaigns intact, and use
+scheduler dependencies and scripts for execution and collection.
