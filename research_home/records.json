@@ -1,8 +1,8 @@
 {
   "title": "GS-Fuse Research Home",
   "stage": "Controlled experiments and final writing",
-  "overview": "We are testing whether news adds useful information to price forecasts. The frozen dataset is ready. With the first trained model, the right article gave nearly the same forecast error as a shuffled article, even when recent prices had been volatile.",
-  "updated_at": "2026-11-18T04:23:36+00:00",
+  "overview": "We are testing whether news adds useful information to price forecasts. The frozen dataset is ready. In two trained versions of the price model, the right article gave nearly the same forecast error as a shuffled article. The next comparisons will test the return-model changes and a model trained using prices alone.",
+  "updated_at": "2026-11-18T05:02:41+00:00",
   "source_url": "https://github.com/DaezeI/11785-GS-Fuse-Submission-Public/blob/main/research_home/records.json",
   "links": [
     {
@@ -24,10 +24,6 @@
   ],
   "next": [
     {
-      "title": "Check whether the text result repeats",
-      "reason": "The seed-1 run changes only the training seed. Compare it with the existing seed-0 result."
-    },
-    {
       "title": "Collect Adaeze’s return results",
       "reason": "Compare the four versions on the same events to find which choices made a difference."
     },
@@ -39,29 +35,36 @@
   "experiments": [
     {
       "id": "screened-price-seed1-v1",
-      "title": "Repeat the price experiment with a new seed",
-      "owner": "Nicole",
+      "title": "A second run found no clear article advantage",
       "kind": "Experiment",
-      "status": "running",
-      "question": "Does using the correct article still make little difference when the model is trained again?",
-      "configuration": "Frozen screened C1 price task, 2,236 test events. MOMENT and Llama backbones, cross-attention, softmax gate, 2 epochs per stage, batch 8, one H200. Three shuffled-article draws and two article-free controls. Training seed 1. Planned change: the training seed only.",
-      "finding": "The smoke check completed successfully and the scheduler reported full training running on Nicole’s personal GPU resource. Both evaluations are waiting for the training checkpoint.",
-      "limitations": "A second seed tests how repeatable the finding is under the same setup. Retained article release times are unverified.",
-      "figure": null,
+      "status": "completed",
+      "owner": "Nicole",
+      "question": "Does the near-zero correct-versus-shuffled text gap persist with a second training seed?",
+      "configuration": "Training seed 1 on the frozen screened dataset. batch 8; two epochs per stage; stride 10; TF32; no 4-bit; cross-attention; softmax gate; raw TS residual; no learnable last value. Evaluated on the same 2,236 test events with three shuffle draws.",
+      "finding": "The correct article showed no clear forecasting advantage at any of the three forecast lengths. At 140 bars, the correct article’s estimated improvement in mean squared error was +0.0085% (95% interval -0.0061% to +0.0244%).",
+      "limitations": "Each interval describes one trained model and three shuffle draws. Training effects can vary across seeds. The release times of retained articles remain unverified. The shuffled article is a diagnostic comparison and can come from later test dates. The article-free controls remove text during prediction. Training a price-only model is a separate comparison.",
+      "figure": {
+        "url": "https://raw.githubusercontent.com/DaezeI/11785-GS-Fuse-Submission-Public/main/results/screened-price-seed1-v1/text-control-gains.png",
+        "alt": "Paired text-control improvements with date-block intervals across three forecast horizons"
+      },
       "evidence": [
         {
-          "label": "Reference configuration and data hashes",
-          "url": "https://github.com/DaezeI/11785-GS-Fuse-Submission-Public/blob/main/results/screened-price-v1/provenance.json"
+          "label": "Result summary",
+          "url": "https://github.com/DaezeI/11785-GS-Fuse-Submission-Public/blob/main/results/screened-price-seed1-v1/summary.md"
         },
         {
-          "label": "How the operator resumes this run",
-          "url": "https://github.com/DaezeI/11785-GS-Fuse-Submission-Public/blob/main/docs/RESEARCH_HOME.md#continue-the-work"
+          "label": "Metrics",
+          "url": "https://github.com/DaezeI/11785-GS-Fuse-Submission-Public/blob/main/results/screened-price-seed1-v1/metrics.csv"
+        },
+        {
+          "label": "Provenance",
+          "url": "https://github.com/DaezeI/11785-GS-Fuse-Submission-Public/blob/main/results/screened-price-seed1-v1/provenance.json"
         }
       ],
       "related": [
         "screened-price-v1"
       ],
-      "updated_at": "2026-11-18T04:23:36+00:00"
+      "updated_at": "2026-11-18T05:02:41.027402Z"
     },
     {
       "id": "screened-price-v1",

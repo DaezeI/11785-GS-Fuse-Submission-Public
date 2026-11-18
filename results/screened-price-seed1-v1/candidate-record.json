@@ -1,0 +1,33 @@
+{
+  "id": "screened-price-seed1-v1",
+  "title": "A second run found no clear article advantage",
+  "kind": "Experiment",
+  "status": "completed",
+  "owner": "Nicole",
+  "question": "Does the near-zero correct-versus-shuffled text gap persist with a second training seed?",
+  "configuration": "Training seed 1 on the frozen screened dataset. batch 8; two epochs per stage; stride 10; TF32; no 4-bit; cross-attention; softmax gate; raw TS residual; no learnable last value. Evaluated on the same 2,236 test events with three shuffle draws.",
+  "finding": "The correct article showed no clear forecasting advantage at any of the three forecast lengths. At 140 bars, the correct article\u2019s estimated improvement in mean squared error was +0.0085% (95% interval -0.0061% to +0.0244%).",
+  "limitations": "Each interval describes one trained model and three shuffle draws. Training effects can vary across seeds. The release times of retained articles remain unverified. The shuffled article is a diagnostic comparison and can come from later test dates. The article-free controls remove text during prediction. Training a price-only model is a separate comparison.",
+  "figure": {
+    "url": "https://raw.githubusercontent.com/DaezeI/11785-GS-Fuse-Submission-Public/main/results/screened-price-seed1-v1/text-control-gains.png",
+    "alt": "Paired text-control improvements with date-block intervals across three forecast horizons"
+  },
+  "evidence": [
+    {
+      "label": "Result summary",
+      "url": "https://github.com/DaezeI/11785-GS-Fuse-Submission-Public/blob/main/results/screened-price-seed1-v1/summary.md"
+    },
+    {
+      "label": "Metrics",
+      "url": "https://github.com/DaezeI/11785-GS-Fuse-Submission-Public/blob/main/results/screened-price-seed1-v1/metrics.csv"
+    },
+    {
+      "label": "Provenance",
+      "url": "https://github.com/DaezeI/11785-GS-Fuse-Submission-Public/blob/main/results/screened-price-seed1-v1/provenance.json"
+    }
+  ],
+  "related": [
+    "screened-price-v1"
+  ],
+  "updated_at": "2026-11-18T05:02:41.027402Z"
+}
