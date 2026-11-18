@@ -19,7 +19,7 @@ Unknown retained publication times remain a scientific limitation.
 ## Owners and experiment handoffs
 
 - Nicole: data provenance, paired text analysis, result consolidation; runs
-  teammates' committed experiments using her privately managed GPU access.
+  teammates' committed experiments using Nicole's personal GPU resource.
 - Adaeze: return objectives and R0–R3 component campaign.
 - Jessica: Q-Former comparisons and query/attention diagnostics.
 - Joye: MoE comparisons and routing/expert diagnostics.
@@ -30,8 +30,8 @@ reference, frozen data identity, seed, precision, budget, resource needs and
 expected outputs. Nicole records execution in a fresh run version and returns
 a result pack. Do not send mutable settings only through WhatsApp.
 
-ABCI architecture experiments require an R3 reference under the same environment
-and hardware. The completed price model is not a matching R3 reference. Existing
+Architecture experiments on Nicole's personal GPU resource require an R3
+reference under the same environment and hardware. The completed price model is not a matching R3 reference. Existing
 Delta campaigns remain separately owned; coordinate before duplicating them.
 
 ## One record per experiment
@@ -73,3 +73,12 @@ team-accessible artifact backup is still pending. Record an archive manifest,
 checksums and access verification when that backup completes; do not call
 artifacts backed up merely because a Drive folder exists. Private account/key
 material is never part of a backup or public result pack.
+
+## Current phase and source map
+
+Use [NEXT_PHASE_PLAN.md](NEXT_PHASE_PLAN.md) for the current phase, exact
+file destinations, first analysis tasks, and the optional small dashboard plan.
+Public documents call the additional compute **Nicole's personal GPU resource**.
+Provider names, account/reservation details and credentials stay in Nicole's
+local operator handoff. The GPU hardware model may be recorded for scientific
+reproducibility without publishing the resource provider's identity.

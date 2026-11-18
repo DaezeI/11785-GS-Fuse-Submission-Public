@@ -2,6 +2,7 @@
 
 For final-paper evidence and writing, start with [results/README.md](results/README.md)
 and [docs/FINAL_DELIVERY_WORKFLOW.md](docs/FINAL_DELIVERY_WORKFLOW.md).
+The [next-phase plan](docs/NEXT_PHASE_PLAN.md) explains what is ready and what to do next.
 ## Event-Driven S&P 500 Market Forecasting via Multimodal Gated Fusion
 
 > **Current team progress:** [PROJECT_STATUS.md](PROJECT_STATUS.md) records

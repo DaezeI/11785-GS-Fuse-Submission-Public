@@ -1,5 +1,10 @@
 # Project status
 
+**Current phase: controlled experiments, result analysis and final writing.**
+Routine data preparation is complete. Start with the
+[next-phase plan](docs/NEXT_PHASE_PLAN.md); the experiment register and linked
+result packs are the current evidence index.
+
 **Latest result update:** Nicole's screened-price baseline and both full paired
 evaluations completed on H200. The [result pack](results/screened-price-v1/summary.md)
 contains the measured finding and provenance. Earlier queue descriptions below
@@ -42,14 +47,14 @@ properly trained model.
 | Work | Current evidence | Next step |
 |---|---|---|
 | C1 implementation | Merged in PR #4; loader audit and focused tests passed. | Use `main` for new work and keep explicit timing/data provenance. |
-| Full C1 text comparison | Old unscreened jobs `23812725`, `23812734`, and `23812735` were canceled. Screened input audit `23835057` **passed** (10,705 events, no exclusions, zero shared bars across splits). Training `23840368` is pending GPU scheduling; paired jobs `23840369`/`23840370` are pending on its completion. No full run has started. See the [audit result](analysis/text_value/c1_date_screen_v1_audit_summary.json) and [handoff](analysis/text_value/ARTICLE_DATE_AUDIT.md). | Monitor training and paired comparisons. |
+| Full C1 text comparison | Nicole's full screened-price reference and both paired evaluations completed on her personal GPU resource. Both evaluations covered all 2,236 test examples with three shuffle draws. Her superseded Delta duplicates were canceled without starting. See the [result pack](results/screened-price-v1/summary.md). | Interpret the paired findings, preserve the large artifacts, and add missing reference analyses before broader claims. |
 | Return-task integration and controls | [PR #8](https://github.com/DaezeI/11785-GS-Fuse-Submission-Public/pull/8) merged to `main` at `f0ac8ef`. Exact head `e0daa50` passed compilation, 30 affected tests, and 25 required text-value checks. Adaeze's smoke `24045929` and replay `24046557` completed, and frozen-input audit `24050520` passed. These validate execution and inputs, not full-model quality. | Launch new return work only from updated `main`, the verified frozen snapshot, and the merged R0–R3 protocol. Do not use eight-event scores as model-quality or text-value evidence. |
 | Publication-time validity | Five source-checked test records have corrected calendar dates but no verified release times. The [evidence ledger](analysis/text_value/c1_article_date_policy_v1.csv) excludes those five and 878 more Reuters candidates; 10,705 retained records still have unknown release times. The screen retains 6,167 / 2,302 / 2,236 train/validation/test events. | Label the dependent run a date-screened sensitivity comparison. Do not claim publication-time-safe C1. |
 | Jessica's padding fix | Merged to `main` in [commit `96cc6d7`](https://github.com/DaezeI/11785-GS-Fuse-Submission-Public/commit/96cc6d7900dedd8b867b39a951045fe3804aa778) with three CPU tests. | Ask for links to any Q-Former analysis missing from GitHub before assigning further work. |
 | Gate, MoE, Q-Former diagnostics | Adaeze, Joye, and Jessica retain their existing streams. The inspected November 11 team job scripts used the earlier split; their outputs are historical diagnostics, not the C1 baseline. | Keep each checkpoint/split identity explicit; use the [owner handoff](TEAM_WORKFLOW.md#9-immediate-next-actions-agent-handoff-for-wednesday-november-11). |
 
-The full C1 training and paired jobs are queued work, **not completed results**.
-At the November 16 check, `23840368` remained pending for priority and
+Historical queue observation before Nicole migrated the price reference:
+at the November 16 check, `23840368` remained pending for priority and
 `23840369`/`23840370` remained pending on dependency; Adaeze did not alter them.
 The prepared [eight-announcement BLS check](analysis/text_value/GOVERNMENT_CHECKED.md)
 has source and price-order evidence, but its paired model comparison `23841902`
@@ -62,8 +67,8 @@ Delta. GitHub holds code, commands, hashes, and shareable derived records.
 Adaeze's separate return jobs `24050724` and `24051590` were submitted from
 pre-merge commits, then user-held with zero elapsed time after the frozen-input
 R0–R3 integration became the source of truth. They produced no result and must
-not be released or described as R0–R3 runs. The merged R0–R3 GPU jobs remain
-planned, not submitted.
+not be released or described as R0–R3 runs. Adaeze subsequently submitted her frozen-input R0–R3 campaign.
+Collect its owner-verified completed result pack; do not submit a duplicate.
 
 ## Declined Expanse exchange
 
@@ -71,18 +76,19 @@ ACCESS declined the proposed request for 100 SDSC Expanse GPU-hours and 200 GB
 of storage on November 16. No Expanse allocation, transfer, or model run
 resulted. Do not describe Expanse as an active execution path or resubmit the
 same queue-wait justification without a materially different provider-appropriate
-case and team agreement. Delta remains the active resource.
+case and team agreement. Delta remains the team's shared execution resource. Nicole's personal GPU
+resource is an additional privately managed execution route.
 
 ## Next team actions
 
-Reconfirm and cancel only Adaeze's two superseded jobs, then follow the
-[Adaeze R0–R3 Delta runbook](docs/ADAEZE_R0_R3_DELTA_RUNBOOK.md). Create its
-permanent Delta checkout from updated `main`, use the verified frozen snapshot,
-and submit the merged protocol only after recording exact job provenance.
-Continue monitoring Nicole's separate price job and its dependent controls.
-Matched gate claims still require a completed full C1 checkpoint. Joye's
-historical jobs must not be relabelled as C1 merely because later C1 code
-merged to `main`.
+Follow [docs/NEXT_PHASE_PLAN.md](docs/NEXT_PHASE_PLAN.md): consolidate existing
+owner-verified results, preserve large artifacts, identify missing matched
+comparisons, and use the same numeric sources for paper and presentation.
+Adaeze's return campaign is already submitted; coordinate and inspect its
+current records before proposing more execution. Jessica's historical runs
+remain historical. New Q-Former/MoE comparisons require a matching R3 reference,
+not Nicole's completed price checkpoint. Routine data prep does not need
+repeating. Provider/access details for Nicole's personal GPU resource stay local.
 
 ## History and maintenance
 

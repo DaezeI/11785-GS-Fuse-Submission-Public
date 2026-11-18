@@ -24,8 +24,8 @@ and controlled R0–R3 protocol. Exact head `e0daa50` passed compilation, 30
 affected tests, and 25 required text-value checks on Delta before merge. The
 [implementation handoff](docs/updates/2026-11-13-return-integration.md) and
 [R0–R3 handoff](docs/updates/2026-11-13-return-ablations.md) define new return
-runs. Full R0–R3 GPU training remains unsubmitted; the queued price run is
-distinct. Adaeze's older jobs `24050724` and `24051590` are user-held with zero
+runs. Adaeze's full R0–R3 campaign has since been submitted; Nicole's completed
+price reference is distinct. Collect owner-verified result packs before claims. Adaeze's older jobs `24050724` and `24051590` are user-held with zero
 elapsed time and must not be treated as the frozen-input R0–R3 runs.
 
 **Recorded November 4, 2026.** This is the starting point for post-midterm work.
@@ -577,3 +577,7 @@ uncertainty by distinct event dates; publish small derived results and exact
 commands, leaving raw articles/prices and weights off GitHub. Bring Wednesday
 the PR link, smoke limitation, and timing questions; do not present the smoke
 MSE as the team's final score.
+
+For the current project phase and where each artifact belongs, use
+[docs/NEXT_PHASE_PLAN.md](docs/NEXT_PHASE_PLAN.md). Nicole's personal GPU
+resource can execute teammate handoffs; access/provider details stay local.
