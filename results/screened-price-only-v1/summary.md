@@ -34,6 +34,34 @@ always-up accuracy was 52.59%, compared with 51.65% and 51.16% for the
 news forecasts. See [seed 0](seed-0.json) and [seed 1](seed-1.json) for
 those secondary metrics and their eligibility counts.
 
+## How many examples were tested?
+
+The frozen screened C1 split has 6,167 training events, 2,302 validation
+events, and 2,236 test events. The test examples are news-event windows
+on 845 dates from January 12, 2021 through April 5, 2024. Each window has
+35 input price bars and 140 target price bars. Reports can share portions
+of the same market path within the test split, so the uncertainty
+calculation groups nearby dates.
+
+The original C1 test split had 2,921 events. The date screen removed 685
+test records and 198 validation records with suspect dates. The emitted
+price windows share zero bars across splits. Retained publication times
+remain unverified. [Article-date audit](../../analysis/text_value/ARTICLE_DATE_AUDIT.md)
+[Frozen split audit](../../analysis/text_value/c1_date_screen_v1_audit_summary.json)
+
+## Runtime on one H200 per seed
+
+| Training seed | Total allocated job time | Full training and evaluation phase |
+| --- | ---: | ---: |
+| 0 | 3 min 8 sec | 1 min 19 sec |
+| 1 | 3 min 0 sec | 1 min 30 sec |
+
+Total times come from scheduler accounting and include setup, smoke,
+training, checkpoint reload, and evaluation. Full-phase times come from
+the run logs and include evaluation. The jobs ran in parallel and reused
+the price-pretraining checkpoints with the MOMENT backbone frozen.
+Each seed ran two additional training epochs.
+
 ## Training design and verification
 
 - The [runner](../../scripts/research_cycle/train_price_only.py) used the

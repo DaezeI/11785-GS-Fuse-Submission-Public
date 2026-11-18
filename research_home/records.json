@@ -2,7 +2,7 @@
   "title": "GS-Fuse Research Home",
   "stage": "Controlled experiments and final writing",
   "overview": "The news-trained models beat a separately trained price-only model in both runs. Repeating the last observed prices still beat every trained forecast, and the right article barely changed error compared with a shuffled one.",
-  "updated_at": "2026-11-18T19:13:23+00:00",
+  "updated_at": "2026-11-18T22:57:31+00:00",
   "source_url": "https://github.com/DaezeI/11785-GS-Fuse-Submission-Public/blob/main/research_home/records.json",
   "links": [
     {
@@ -48,7 +48,7 @@
       "status": "completed",
       "owner": "Nicole",
       "question": "Does adding articles during training improve price forecasts beyond a trained price-only model and a simple last-price forecast?",
-      "configuration": "Two independently trained price-only models started from their matched price-pretraining checkpoints. Both scored the same 2,236 test events at 35, 70 and 140 bars.",
+      "configuration": "Two price-only models started from matching price-pretraining checkpoints and trained for two more epochs. Each single-H200 job took about three minutes including checks and evaluation. Both scored the same 2,236 screened test events across 845 dates.",
       "finding": "At 140 bars, news-trained models had 12.5% and 26.2% lower error than the matched price-only models. Repeating the last prices also had 8.2% and 18.2% lower error than those news-trained models.",
       "limitations": "The training packages differ in their warm-up, fusion and auxiliary objectives. The earlier article swaps showed little advantage for a particular article. Retained publication times remain unverified.",
       "figure": {
@@ -67,6 +67,10 @@
         {
           "label": "Meeting brief",
           "url": "https://github.com/DaezeI/11785-GS-Fuse-Submission-Public/blob/main/docs/RESEARCH_DECISION_BRIEF.md#november-18-group-meeting"
+        },
+        {
+          "label": "Why the test set has 2,236 examples",
+          "url": "https://github.com/DaezeI/11785-GS-Fuse-Submission-Public/blob/main/results/screened-price-only-v1/summary.md#how-many-examples-were-tested"
         }
       ],
       "related": [
@@ -75,7 +79,7 @@
         "screened-price-seed1-v1",
         "return-r0-r3"
       ],
-      "updated_at": "2026-11-18T19:13:23+00:00"
+      "updated_at": "2026-11-18T22:57:31+00:00"
     },
     {
       "id": "screened-price-persistence-v1",
