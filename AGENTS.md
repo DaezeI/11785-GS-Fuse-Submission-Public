@@ -1,5 +1,7 @@
 # Project instructions for coding agents
 
+For Nicole's research workflow and fresh-chat continuation, start with [RESEARCH_HOME.md](docs/RESEARCH_HOME.md). The current registry and evidence live in GitHub. Use the local `nicole-research-companion` skill when available.
+
 Read [TEAM_WORKFLOW.md](TEAM_WORKFLOW.md) first. It records the November 4 team
 decision, ownership, implementation gaps, and experiment handoff requirements.
 Follow current user instructions when they update this plan.
@@ -14,9 +16,9 @@ real-input window audit passes; do not release the old jobs or describe the
 screened subset as publication-time certified.
 The screened real-input audit passed on November 13 with all 10,705 events
 emitted and zero cross-split shared price bars. Its [summary](analysis/text_value/c1_date_screen_v1_audit_summary.json)
-has exact counts. A brief Delta administrator hold cleared. Training is pending
-GPU scheduling, and the paired jobs wait for training; check their live states
-before reporting them.
+has exact counts. A brief Delta administrator hold cleared. The full screened-price reference and its paired evaluations have completed;
+see results/screened-price-v1/summary.md. Older queue notes are historical;
+check owner records and live state before proposing another run.
 **November 13 team decision:** For new course-project C1 training and matched
 real/shuffled/no-text comparisons, use
 `splits/manifests/purged_split_c1_date_screen_v1.json` (6,167 train / 2,302
@@ -117,3 +119,12 @@ when a run fails or finds no improvement; do not turn queued work into a result.
   does not prove a cause or that text is useless.
 - Update workflow status and link shareable results when completing a handoff.
   Historical README commands and model filenames are not proof of C1 provenance.
+
+For final-paper evidence and writing, start with [results/README.md](results/README.md)
+and [docs/FINAL_DELIVERY_WORKFLOW.md](docs/FINAL_DELIVERY_WORKFLOW.md).
+
+The project is now in controlled experimentation, analysis and final writing;
+read [docs/NEXT_PHASE_PLAN.md](docs/NEXT_PHASE_PLAN.md). Routine screened-data
+preparation is complete. Refer to additional compute publicly only as
+**Nicole's personal GPU resource**. Keep provider/account/reservation details
+and credentials in her local skill/handoff. Check each owner's current records and scheduler state before submitting a campaign. Nicole authorizes reasonable bounded follow-up experiments within her project scope, using the frozen dataset and the local GPU skill limits.
