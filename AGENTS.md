@@ -1,6 +1,28 @@
 # Project instructions for coding agents
 
-For Nicole's research workflow and fresh-chat continuation, start with [RESEARCH_HOME.md](docs/RESEARCH_HOME.md). The current registry and evidence live in GitHub. Use the local `nicole-research-companion` skill when available. For team submissions, use the shared [gsfuse-result-report skill](.agents/skills/gsfuse-result-report/SKILL.md) to prepare the record and evidence in one PR.
+For Nicole's research workflow and fresh-chat continuation, start with
+[RESEARCH_HOME.md](docs/RESEARCH_HOME.md). Use the local
+`nicole-research-companion` skill when available.
+
+## Report experiment work by default
+
+When a teammate asks you to prepare a config for execution, submit or resume
+a run, analyze its outputs, or turn a result into a PR, apply
+[gsfuse-result-report](.agents/skills/gsfuse-result-report/SKILL.md) as part of
+the same task. The teammate can describe their work in ordinary language.
+This applies to Delta and Nicole's personal GPU resource.
+
+- Use the existing registry ID and experiment owner for updates. Save a new
+  record when handing off a new runnable config or starting a new attempt.
+- When work changes a run's verified status or produces a finding, update
+  `research_home/records.json` with the registry script and validate it before
+  handing back the task. Link the committed config for a planned or queued run.
+  Attach the summary, metrics, figure, provenance, and limitations for a
+  completed run. Record verified failures too.
+- Include the registry update and available evidence in the same PR as the
+  experiment work. If publication is outside the task's scope, leave the
+  update ready for review in the checkout. The home displays it after the PR
+  merges to GitHub main.
 
 Read [TEAM_WORKFLOW.md](TEAM_WORKFLOW.md) first. It records the November 4 team
 decision, ownership, implementation gaps, and experiment handoff requirements.

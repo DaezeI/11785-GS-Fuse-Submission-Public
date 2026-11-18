@@ -19,17 +19,17 @@ follow-up experiments, and the completed [two-seed price-only comparison](../res
 
 ## Publish a teammate's experiment
 
-Pull GitHub main and open the repository in Codex. Ask
-`Use $gsfuse-result-report to report my experiment <run-id> on the Research Home.`
-Provide the committed config and available evidence. Use the same workflow
-for a run on Delta or on Nicole's personal GPU resource. When Nicole runs a
-teammate's config, keep the teammate as the experiment owner.
+Pull GitHub main and open the repository in Codex. Ask Codex to prepare a
+config, run an experiment, or analyze results as you normally would. The
+[repository instructions](../AGENTS.md#report-experiment-work-by-default) tell
+Codex to prepare the Research Home update as part of the task. They apply to
+Delta and Nicole's personal GPU resource. When Nicole runs a teammate's
+config, the teammate remains the experiment owner.
 
-The skill prepares the record and validates it with the repository script.
-Include the record, configuration and available evidence in the same PR.
-After it merges to main, reload the Research Home. The
-[shared skill](../.agents/skills/gsfuse-result-report/SKILL.md) also lists the
-commands for contributors who use GitHub without Codex.
+The same PR includes the verified record and available evidence. After it
+merges to main, reload the Research Home. Contributors working without Codex
+can use the commands in the
+[shared skill](../.agents/skills/gsfuse-result-report/SKILL.md).
 
 ## Where work lives
 
