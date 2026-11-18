@@ -5,12 +5,12 @@ Routine data preparation is complete. The [research home](https://gs-fuse-resear
 [next-phase plan](docs/NEXT_PHASE_PLAN.md); the experiment register and linked
 result packs are the current evidence index.
 
-**November 18 price evidence.** Both [screened price runs](results/README.md)
-found nearly identical error with matched and shuffled articles. A [paired
-CPU comparison](results/screened-price-v1/persistence.md) found that carrying
-forward last prices beat seed 0 at all three horizons. The [decision
-brief](docs/RESEARCH_DECISION_BRIEF.md) records the approved matched price-only
-training comparisons and timing limits.
+**November 18 price evidence.** Both independently trained price-only runs
+completed. The [matched comparison](results/screened-price-only-v1/summary.md)
+shows a gain for the news-trained package over the corresponding price-only
+reference in both seeds. The last-price forecast had the lowest test error
+at all three horizons. Earlier matched versus shuffled results were nearly
+equal. See the [6 p.m. meeting brief](docs/RESEARCH_DECISION_BRIEF.md#november-18-group-meeting).
 
 **Latest result update:** Nicole's screened-price baseline and both full paired
 evaluations completed on H200. The [result pack](results/screened-price-v1/summary.md)

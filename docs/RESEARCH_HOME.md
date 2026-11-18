@@ -7,7 +7,7 @@ Open the [GS-Fuse Research Home](https://gs-fuse-research.twiggydonkey4.chatgpt.
 The [November 18 decision brief](RESEARCH_DECISION_BRIEF.md) reviews the two
 screened price runs and teammates' available evidence. It includes a new
 [last-price comparison](../results/screened-price-v1/persistence.md), three
-follow-up experiments, and the approved price-only batch.
+follow-up experiments, and the completed [two-seed price-only comparison](../results/screened-price-only-v1/summary.md).
 
 ## Continue the work
 
