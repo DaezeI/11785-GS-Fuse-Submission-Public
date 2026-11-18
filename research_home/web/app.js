@@ -52,7 +52,7 @@ function render(data, fallback) {
     const row = node('article', 'running-row'); const main = node('div'); main.append(node('h3', '', text(e.title, 'Untitled experiment')), node('p', '', text(e.question, 'Question not reported.'))); row.append(node('span', 'pulse ' + e.status, ''), main, node('span', 'status ' + statusType(e.status), statusLabel(e.status))); $('running-list').append(row);
   }); else $('running-list').append(node('p', 'empty', 'No running or queued jobs were reported in the latest update.'));
   const next = Array.isArray(data.next) ? data.next : [];
-  if (next.length) next.forEach((item, i) => { const card = node('article', 'next-item'); card.append(node('span', 'next-number', String(i + 1).padStart(2, '0'))); const body = node('div'); body.append(node('h3', '', text(item.title, 'Next step')), node('p', '', text(item.reason))); card.append(body); $('next-list').append(card); });
+  if (next.length) next.forEach(item => { const card = node('article', 'next-item'); const body = node('div'); body.append(node('h3', '', text(item.title, 'Next step')), node('p', '', text(item.reason))); card.append(body); $('next-list').append(card); });
   else $('next-list').append(node('p', 'empty', 'No next steps have been reported yet.'));
   if (!experiments.length) $('records-list').append(node('p', 'empty', 'No experiment records are available.'));
   const names = new Map(experiments.map(e => [String(e.id), text(e.title, String(e.id))]));
