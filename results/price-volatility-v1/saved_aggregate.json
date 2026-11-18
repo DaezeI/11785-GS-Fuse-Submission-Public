@@ -1,0 +1,680 @@
+{
+  "zeroed_article_tokens": {
+    "source_sha256": "7c195e021187007475bbd55dc17c2e3177fa603be151ecdcee6dc38792ddc9a3",
+    "volatility_train_cutoffs": [
+      0.000411070475820452,
+      0.0006358354003168641
+    ],
+    "groups": {
+      "35": {
+        "volatility:low": {
+          "events": 521,
+          "distinct_dates": 200,
+          "mse": {
+            "real_text": 0.003127626609057188,
+            "zero_text": 0.003057875670492649,
+            "shuffled_text": 0.003129176562651992
+          },
+          "comparisons": {
+            "zero_text": {
+              "real_text_mse_gain_pct": -2.281022071838379,
+              "ci95_pct": [
+                -2.868620499711983,
+                -1.7211173043019607
+              ],
+              "bootstrap_replicates": 1000,
+              "block_event_dates": 20,
+              "note": "conditional on checkpoint and supplied shuffle draws; inspect block-length sensitivity"
+            },
+            "shuffled_text": {
+              "real_text_mse_gain_pct": 0.04953145980834961,
+              "ci95_pct": [
+                -0.04450334522885513,
+                0.12456903745723501
+              ],
+              "bootstrap_replicates": 1000,
+              "block_event_dates": 20,
+              "note": "conditional on checkpoint and supplied shuffle draws; inspect block-length sensitivity"
+            }
+          },
+          "endpoint_close_dhr": {
+            "real_text": 0.46449136276391556,
+            "zero_text": 0.46449136276391556,
+            "always_up": 0.5489443378119002
+          }
+        },
+        "volatility:medium": {
+          "events": 697,
+          "distinct_dates": 275,
+          "mse": {
+            "real_text": 0.004944568499922752,
+            "zero_text": 0.004858395550400019,
+            "shuffled_text": 0.004944153595715761
+          },
+          "comparisons": {
+            "zero_text": {
+              "real_text_mse_gain_pct": -1.773691177368164,
+              "ci95_pct": [
+                -2.1323205473803664,
+                -1.4512683349283169
+              ],
+              "bootstrap_replicates": 1000,
+              "block_event_dates": 20,
+              "note": "conditional on checkpoint and supplied shuffle draws; inspect block-length sensitivity"
+            },
+            "shuffled_text": {
+              "real_text_mse_gain_pct": -0.008392333984375,
+              "ci95_pct": [
+                -0.11287113846345731,
+                0.08376486424645307
+              ],
+              "bootstrap_replicates": 1000,
+              "block_event_dates": 20,
+              "note": "conditional on checkpoint and supplied shuffle draws; inspect block-length sensitivity"
+            }
+          },
+          "endpoint_close_dhr": {
+            "real_text": 0.41893830703012913,
+            "zero_text": 0.4117647058823529,
+            "always_up": 0.5681492109038737
+          }
+        },
+        "volatility:high": {
+          "events": 1018,
+          "distinct_dates": 382,
+          "mse": {
+            "real_text": 0.010024153627455235,
+            "zero_text": 0.009953895583748817,
+            "shuffled_text": 0.010022491216659546
+          },
+          "comparisons": {
+            "zero_text": {
+              "real_text_mse_gain_pct": -0.7058382034301758,
+              "ci95_pct": [
+                -0.9977733989999188,
+                -0.4819204516938458
+              ],
+              "bootstrap_replicates": 1000,
+              "block_event_dates": 20,
+              "note": "conditional on checkpoint and supplied shuffle draws; inspect block-length sensitivity"
+            },
+            "shuffled_text": {
+              "real_text_mse_gain_pct": -0.016582012176513672,
+              "ci95_pct": [
+                -0.05563154493469058,
+                0.014788598082468287
+              ],
+              "bootstrap_replicates": 1000,
+              "block_event_dates": 20,
+              "note": "conditional on checkpoint and supplied shuffle draws; inspect block-length sensitivity"
+            }
+          },
+          "endpoint_close_dhr": {
+            "real_text": 0.5550098231827112,
+            "zero_text": 0.5579567779960707,
+            "always_up": 0.5
+          }
+        }
+      },
+      "70": {
+        "volatility:low": {
+          "events": 521,
+          "distinct_dates": 200,
+          "mse": {
+            "real_text": 0.0032076253555715084,
+            "zero_text": 0.0031451587565243244,
+            "shuffled_text": 0.0032091226894408464
+          },
+          "comparisons": {
+            "zero_text": {
+              "real_text_mse_gain_pct": -1.9861221313476562,
+              "ci95_pct": [
+                -2.58262720351661,
+                -1.3847314298039104
+              ],
+              "bootstrap_replicates": 1000,
+              "block_event_dates": 20,
+              "note": "conditional on checkpoint and supplied shuffle draws; inspect block-length sensitivity"
+            },
+            "shuffled_text": {
+              "real_text_mse_gain_pct": 0.04665851593017578,
+              "ci95_pct": [
+                -0.04883919820122429,
+                0.11996471109405019
+              ],
+              "bootstrap_replicates": 1000,
+              "block_event_dates": 20,
+              "note": "conditional on checkpoint and supplied shuffle draws; inspect block-length sensitivity"
+            }
+          },
+          "endpoint_close_dhr": {
+            "real_text": 0.4932821497120921,
+            "zero_text": 0.5067178502879078,
+            "always_up": 0.4740882917466411
+          }
+        },
+        "volatility:medium": {
+          "events": 697,
+          "distinct_dates": 275,
+          "mse": {
+            "real_text": 0.0051565575413405895,
+            "zero_text": 0.00507825892418623,
+            "shuffled_text": 0.005156354978680611
+          },
+          "comparisons": {
+            "zero_text": {
+              "real_text_mse_gain_pct": -1.5418410301208496,
+              "ci95_pct": [
+                -1.9091578991358875,
+                -1.1628060186085671
+              ],
+              "bootstrap_replicates": 1000,
+              "block_event_dates": 20,
+              "note": "conditional on checkpoint and supplied shuffle draws; inspect block-length sensitivity"
+            },
+            "shuffled_text": {
+              "real_text_mse_gain_pct": -0.003933906555175781,
+              "ci95_pct": [
+                -0.10353526759884268,
+                0.08305399660370943
+              ],
+              "bootstrap_replicates": 1000,
+              "block_event_dates": 20,
+              "note": "conditional on checkpoint and supplied shuffle draws; inspect block-length sensitivity"
+            }
+          },
+          "endpoint_close_dhr": {
+            "real_text": 0.44763271162123386,
+            "zero_text": 0.45050215208034433,
+            "always_up": 0.5796269727403156
+          }
+        },
+        "volatility:high": {
+          "events": 1018,
+          "distinct_dates": 382,
+          "mse": {
+            "real_text": 0.011431789956986904,
+            "zero_text": 0.011367807164788246,
+            "shuffled_text": 0.011429966427385807
+          },
+          "comparisons": {
+            "zero_text": {
+              "real_text_mse_gain_pct": -0.5628466606140137,
+              "ci95_pct": [
+                -0.8322261796044456,
+                -0.3555909450097461
+              ],
+              "bootstrap_replicates": 1000,
+              "block_event_dates": 20,
+              "note": "conditional on checkpoint and supplied shuffle draws; inspect block-length sensitivity"
+            },
+            "shuffled_text": {
+              "real_text_mse_gain_pct": -0.01595020294189453,
+              "ci95_pct": [
+                -0.05312228882755676,
+                0.015775812422183788
+              ],
+              "bootstrap_replicates": 1000,
+              "block_event_dates": 20,
+              "note": "conditional on checkpoint and supplied shuffle draws; inspect block-length sensitivity"
+            }
+          },
+          "endpoint_close_dhr": {
+            "real_text": 0.5068762278978389,
+            "zero_text": 0.5137524557956779,
+            "always_up": 0.5108055009823183
+          }
+        }
+      },
+      "140": {
+        "volatility:low": {
+          "events": 521,
+          "distinct_dates": 200,
+          "mse": {
+            "real_text": 0.004413711838424206,
+            "zero_text": 0.004374691750854254,
+            "shuffled_text": 0.004414670169353485
+          },
+          "comparisons": {
+            "zero_text": {
+              "real_text_mse_gain_pct": -0.8919477462768555,
+              "ci95_pct": [
+                -1.533656975695873,
+                -0.14139525523714916
+              ],
+              "bootstrap_replicates": 1000,
+              "block_event_dates": 20,
+              "note": "conditional on checkpoint and supplied shuffle draws; inspect block-length sensitivity"
+            },
+            "shuffled_text": {
+              "real_text_mse_gain_pct": 0.021708011627197266,
+              "ci95_pct": [
+                -0.05115431399185577,
+                0.08738378825176862
+              ],
+              "bootstrap_replicates": 1000,
+              "block_event_dates": 20,
+              "note": "conditional on checkpoint and supplied shuffle draws; inspect block-length sensitivity"
+            }
+          },
+          "endpoint_close_dhr": {
+            "real_text": 0.43378119001919385,
+            "zero_text": 0.44529750479846447,
+            "always_up": 0.5412667946257198
+          }
+        },
+        "volatility:medium": {
+          "events": 697,
+          "distinct_dates": 275,
+          "mse": {
+            "real_text": 0.008027845993638039,
+            "zero_text": 0.007986404933035374,
+            "shuffled_text": 0.008027147501707077
+          },
+          "comparisons": {
+            "zero_text": {
+              "real_text_mse_gain_pct": -0.5188941955566406,
+              "ci95_pct": [
+                -0.8620485096811187,
+                -0.15371286704329692
+              ],
+              "bootstrap_replicates": 1000,
+              "block_event_dates": 20,
+              "note": "conditional on checkpoint and supplied shuffle draws; inspect block-length sensitivity"
+            },
+            "shuffled_text": {
+              "real_text_mse_gain_pct": -0.008702278137207031,
+              "ci95_pct": [
+                -0.07234453941955599,
+                0.046556925947172915
+              ],
+              "bootstrap_replicates": 1000,
+              "block_event_dates": 20,
+              "note": "conditional on checkpoint and supplied shuffle draws; inspect block-length sensitivity"
+            }
+          },
+          "endpoint_close_dhr": {
+            "real_text": 0.5523672883787661,
+            "zero_text": 0.5480631276901005,
+            "always_up": 0.509325681492109
+          }
+        },
+        "volatility:high": {
+          "events": 1018,
+          "distinct_dates": 382,
+          "mse": {
+            "real_text": 0.01723182015120983,
+            "zero_text": 0.017191139981150627,
+            "shuffled_text": 0.017231659963726997
+          },
+          "comparisons": {
+            "zero_text": {
+              "real_text_mse_gain_pct": -0.23663043975830078,
+              "ci95_pct": [
+                -0.4624141242247831,
+                -0.06424876885316516
+              ],
+              "bootstrap_replicates": 1000,
+              "block_event_dates": 20,
+              "note": "conditional on checkpoint and supplied shuffle draws; inspect block-length sensitivity"
+            },
+            "shuffled_text": {
+              "real_text_mse_gain_pct": -0.0009298324584960938,
+              "ci95_pct": [
+                -0.029606656981507884,
+                0.02421707411292356
+              ],
+              "bootstrap_replicates": 1000,
+              "block_event_dates": 20,
+              "note": "conditional on checkpoint and supplied shuffle draws; inspect block-length sensitivity"
+            }
+          },
+          "endpoint_close_dhr": {
+            "real_text": 0.5343811394891945,
+            "zero_text": 0.5324165029469549,
+            "always_up": 0.5294695481335953
+          }
+        }
+      }
+    }
+  },
+  "fusion_bypass_ts_inst": {
+    "source_sha256": "9a2e5f8eca5ed1ffd036d7f694491637f45c52907dda4673855609c242dc36ed",
+    "volatility_train_cutoffs": [
+      0.000411070475820452,
+      0.0006358354003168641
+    ],
+    "groups": {
+      "35": {
+        "volatility:low": {
+          "events": 521,
+          "distinct_dates": 200,
+          "mse": {
+            "real_text": 0.003127626609057188,
+            "zero_text": 0.0024325877893716097,
+            "shuffled_text": 0.003129176562651992
+          },
+          "comparisons": {
+            "zero_text": {
+              "real_text_mse_gain_pct": -28.571998596191406,
+              "ci95_pct": [
+                -40.90923285334058,
+                -17.8703241856804
+              ],
+              "bootstrap_replicates": 1000,
+              "block_event_dates": 20,
+              "note": "conditional on checkpoint and supplied shuffle draws; inspect block-length sensitivity"
+            },
+            "shuffled_text": {
+              "real_text_mse_gain_pct": 0.04953145980834961,
+              "ci95_pct": [
+                -0.04450334522885513,
+                0.12456903745723501
+              ],
+              "bootstrap_replicates": 1000,
+              "block_event_dates": 20,
+              "note": "conditional on checkpoint and supplied shuffle draws; inspect block-length sensitivity"
+            }
+          },
+          "endpoint_close_dhr": {
+            "real_text": 0.46449136276391556,
+            "zero_text": 0.508637236084453,
+            "always_up": 0.5489443378119002
+          }
+        },
+        "volatility:medium": {
+          "events": 697,
+          "distinct_dates": 275,
+          "mse": {
+            "real_text": 0.004944568499922752,
+            "zero_text": 0.004106424283236265,
+            "shuffled_text": 0.004944153595715761
+          },
+          "comparisons": {
+            "zero_text": {
+              "real_text_mse_gain_pct": -20.410560607910156,
+              "ci95_pct": [
+                -27.650451896477552,
+                -14.283367259116401
+              ],
+              "bootstrap_replicates": 1000,
+              "block_event_dates": 20,
+              "note": "conditional on checkpoint and supplied shuffle draws; inspect block-length sensitivity"
+            },
+            "shuffled_text": {
+              "real_text_mse_gain_pct": -0.008392333984375,
+              "ci95_pct": [
+                -0.11287113846345731,
+                0.08376486424645307
+              ],
+              "bootstrap_replicates": 1000,
+              "block_event_dates": 20,
+              "note": "conditional on checkpoint and supplied shuffle draws; inspect block-length sensitivity"
+            }
+          },
+          "endpoint_close_dhr": {
+            "real_text": 0.41893830703012913,
+            "zero_text": 0.4763271162123386,
+            "always_up": 0.5681492109038737
+          }
+        },
+        "volatility:high": {
+          "events": 1018,
+          "distinct_dates": 382,
+          "mse": {
+            "real_text": 0.010024153627455235,
+            "zero_text": 0.00945389736443758,
+            "shuffled_text": 0.010022491216659546
+          },
+          "comparisons": {
+            "zero_text": {
+              "real_text_mse_gain_pct": -6.031966209411621,
+              "ci95_pct": [
+                -9.614563506759103,
+                -3.4349168662961604
+              ],
+              "bootstrap_replicates": 1000,
+              "block_event_dates": 20,
+              "note": "conditional on checkpoint and supplied shuffle draws; inspect block-length sensitivity"
+            },
+            "shuffled_text": {
+              "real_text_mse_gain_pct": -0.016582012176513672,
+              "ci95_pct": [
+                -0.05563154493469058,
+                0.014788598082468287
+              ],
+              "bootstrap_replicates": 1000,
+              "block_event_dates": 20,
+              "note": "conditional on checkpoint and supplied shuffle draws; inspect block-length sensitivity"
+            }
+          },
+          "endpoint_close_dhr": {
+            "real_text": 0.5550098231827112,
+            "zero_text": 0.5618860510805501,
+            "always_up": 0.5
+          }
+        }
+      },
+      "70": {
+        "volatility:low": {
+          "events": 521,
+          "distinct_dates": 200,
+          "mse": {
+            "real_text": 0.0032076253555715084,
+            "zero_text": 0.002610259223729372,
+            "shuffled_text": 0.0032091226894408464
+          },
+          "comparisons": {
+            "zero_text": {
+              "real_text_mse_gain_pct": -22.88532257080078,
+              "ci95_pct": [
+                -34.7754347786927,
+                -12.511910081502787
+              ],
+              "bootstrap_replicates": 1000,
+              "block_event_dates": 20,
+              "note": "conditional on checkpoint and supplied shuffle draws; inspect block-length sensitivity"
+            },
+            "shuffled_text": {
+              "real_text_mse_gain_pct": 0.04665851593017578,
+              "ci95_pct": [
+                -0.04883919820122429,
+                0.11996471109405019
+              ],
+              "bootstrap_replicates": 1000,
+              "block_event_dates": 20,
+              "note": "conditional on checkpoint and supplied shuffle draws; inspect block-length sensitivity"
+            }
+          },
+          "endpoint_close_dhr": {
+            "real_text": 0.4932821497120921,
+            "zero_text": 0.510556621880998,
+            "always_up": 0.4740882917466411
+          }
+        },
+        "volatility:medium": {
+          "events": 697,
+          "distinct_dates": 275,
+          "mse": {
+            "real_text": 0.0051565575413405895,
+            "zero_text": 0.004423033446073532,
+            "shuffled_text": 0.005156354978680611
+          },
+          "comparisons": {
+            "zero_text": {
+              "real_text_mse_gain_pct": -16.584182739257812,
+              "ci95_pct": [
+                -23.205105483814453,
+                -10.623798944687373
+              ],
+              "bootstrap_replicates": 1000,
+              "block_event_dates": 20,
+              "note": "conditional on checkpoint and supplied shuffle draws; inspect block-length sensitivity"
+            },
+            "shuffled_text": {
+              "real_text_mse_gain_pct": -0.003933906555175781,
+              "ci95_pct": [
+                -0.10353526759884268,
+                0.08305399660370943
+              ],
+              "bootstrap_replicates": 1000,
+              "block_event_dates": 20,
+              "note": "conditional on checkpoint and supplied shuffle draws; inspect block-length sensitivity"
+            }
+          },
+          "endpoint_close_dhr": {
+            "real_text": 0.44763271162123386,
+            "zero_text": 0.5494978479196556,
+            "always_up": 0.5796269727403156
+          }
+        },
+        "volatility:high": {
+          "events": 1018,
+          "distinct_dates": 382,
+          "mse": {
+            "real_text": 0.011431789956986904,
+            "zero_text": 0.010975322686135769,
+            "shuffled_text": 0.011429966427385807
+          },
+          "comparisons": {
+            "zero_text": {
+              "real_text_mse_gain_pct": -4.159033298492432,
+              "ci95_pct": [
+                -7.24885785121622,
+                -1.8707222078048182
+              ],
+              "bootstrap_replicates": 1000,
+              "block_event_dates": 20,
+              "note": "conditional on checkpoint and supplied shuffle draws; inspect block-length sensitivity"
+            },
+            "shuffled_text": {
+              "real_text_mse_gain_pct": -0.01595020294189453,
+              "ci95_pct": [
+                -0.05312228882755676,
+                0.015775812422183788
+              ],
+              "bootstrap_replicates": 1000,
+              "block_event_dates": 20,
+              "note": "conditional on checkpoint and supplied shuffle draws; inspect block-length sensitivity"
+            }
+          },
+          "endpoint_close_dhr": {
+            "real_text": 0.5068762278978389,
+            "zero_text": 0.5225933202357563,
+            "always_up": 0.5108055009823183
+          }
+        }
+      },
+      "140": {
+        "volatility:low": {
+          "events": 521,
+          "distinct_dates": 200,
+          "mse": {
+            "real_text": 0.004413711838424206,
+            "zero_text": 0.0041250851936638355,
+            "shuffled_text": 0.004414670169353485
+          },
+          "comparisons": {
+            "zero_text": {
+              "real_text_mse_gain_pct": -6.996870040893555,
+              "ci95_pct": [
+                -17.00595137709343,
+                2.407806263121303
+              ],
+              "bootstrap_replicates": 1000,
+              "block_event_dates": 20,
+              "note": "conditional on checkpoint and supplied shuffle draws; inspect block-length sensitivity"
+            },
+            "shuffled_text": {
+              "real_text_mse_gain_pct": 0.021708011627197266,
+              "ci95_pct": [
+                -0.05115431399185577,
+                0.08738378825176862
+              ],
+              "bootstrap_replicates": 1000,
+              "block_event_dates": 20,
+              "note": "conditional on checkpoint and supplied shuffle draws; inspect block-length sensitivity"
+            }
+          },
+          "endpoint_close_dhr": {
+            "real_text": 0.43378119001919385,
+            "zero_text": 0.5316698656429942,
+            "always_up": 0.5412667946257198
+          }
+        },
+        "volatility:medium": {
+          "events": 697,
+          "distinct_dates": 275,
+          "mse": {
+            "real_text": 0.008027845993638039,
+            "zero_text": 0.007741598878055811,
+            "shuffled_text": 0.008027147501707077
+          },
+          "comparisons": {
+            "zero_text": {
+              "real_text_mse_gain_pct": -3.697514533996582,
+              "ci95_pct": [
+                -8.450625925535176,
+                0.7187872094144484
+              ],
+              "bootstrap_replicates": 1000,
+              "block_event_dates": 20,
+              "note": "conditional on checkpoint and supplied shuffle draws; inspect block-length sensitivity"
+            },
+            "shuffled_text": {
+              "real_text_mse_gain_pct": -0.008702278137207031,
+              "ci95_pct": [
+                -0.07234453941955599,
+                0.046556925947172915
+              ],
+              "bootstrap_replicates": 1000,
+              "block_event_dates": 20,
+              "note": "conditional on checkpoint and supplied shuffle draws; inspect block-length sensitivity"
+            }
+          },
+          "endpoint_close_dhr": {
+            "real_text": 0.5523672883787661,
+            "zero_text": 0.5509325681492109,
+            "always_up": 0.509325681492109
+          }
+        },
+        "volatility:high": {
+          "events": 1018,
+          "distinct_dates": 382,
+          "mse": {
+            "real_text": 0.01723182015120983,
+            "zero_text": 0.017094066366553307,
+            "shuffled_text": 0.017231659963726997
+          },
+          "comparisons": {
+            "zero_text": {
+              "real_text_mse_gain_pct": -0.8058547973632812,
+              "ci95_pct": [
+                -3.3095894380631363,
+                1.1663109553701212
+              ],
+              "bootstrap_replicates": 1000,
+              "block_event_dates": 20,
+              "note": "conditional on checkpoint and supplied shuffle draws; inspect block-length sensitivity"
+            },
+            "shuffled_text": {
+              "real_text_mse_gain_pct": -0.0009298324584960938,
+              "ci95_pct": [
+                -0.029606656981507884,
+                0.02421707411292356
+              ],
+              "bootstrap_replicates": 1000,
+              "block_event_dates": 20,
+              "note": "conditional on checkpoint and supplied shuffle draws; inspect block-length sensitivity"
+            }
+          },
+          "endpoint_close_dhr": {
+            "real_text": 0.5343811394891945,
+            "zero_text": 0.5127701375245579,
+            "always_up": 0.5294695481335953
+          }
+        }
+      }
+    }
+  }
+}

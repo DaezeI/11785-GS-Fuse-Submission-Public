@@ -7,8 +7,12 @@ team's agreed storage. Overleaf is for final polishing and submission exports.
 
 ## Current evidence
 
+See the [research decision brief](../docs/RESEARCH_DECISION_BRIEF.md) for
+comparison validity and the proposed next batch.
+
 - [Screened price baseline](screened-price-v1/summary.md): full training and paired
   evaluations completed; seed 0; 2,236 test examples. First verified result pack.
+- [Pre-event volatility analysis](price-volatility-v1/summary.md): saved subgroup findings plus CPU block-length sensitivity; no clear matched-text benefit in any volatility group.
 - Adaeze owns the separate R0–R3 return campaign. Await her completed result pack;
   submission or a smoke test is not a full result.
 - Jessica owns Q-Former; Joye owns MoE. Historical runs remain historical.
