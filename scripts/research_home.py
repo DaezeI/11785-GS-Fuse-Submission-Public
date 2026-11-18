@@ -50,16 +50,17 @@ def validate_links(links):
         validate_url(link.get("url"))
 
 
-def validate_timestamp(value):
+def parse_timestamp(value):
     require(has_text(value), "Missing update timestamp")
     parsed = datetime.fromisoformat(value.replace("Z", "+00:00"))
     require(parsed.tzinfo is not None, "Use an ISO timestamp with a timezone")
+    return parsed
 
 
 def validate(registry):
     for key in ("title", "stage", "overview"):
         require(has_text(registry.get(key)), f"Missing workspace {key}")
-    validate_timestamp(registry.get("updated_at"))
+    parse_timestamp(registry.get("updated_at"))
     validate_url(registry.get("source_url"))
     validate_links(registry.get("links"))
     for item in registry["next"]:
@@ -76,7 +77,7 @@ def validate(registry):
         for key in ("title", "kind", "owner", "question", "configuration", "finding", "limitations"):
             require(has_text(record.get(key)), f"{run_id} needs {key}")
         require(record.get("status") in STATUSES, f"{run_id} has an unknown status")
-        validate_timestamp(record.get("updated_at"))
+        parse_timestamp(record.get("updated_at"))
         validate_links(record.get("evidence"))
         figure = record["figure"]
         if figure is not None:
@@ -93,8 +94,10 @@ def validate(registry):
 def upsert(registry, candidate, path):
     records = registry["experiments"]
     previous = next((item for item in records if item["id"] == candidate["id"]), None)
-    require(previous is None or candidate["updated_at"] >= previous["updated_at"],
-            "Refusing to replace a newer record")
+    require(previous is None or parse_timestamp(candidate["updated_at"])
+            >= parse_timestamp(previous["updated_at"]), "Refusing to replace a newer record")
+    require(previous is None or previous["status"] != "completed"
+            or candidate["status"] == "completed", "A completed run needs a new ID for a fresh attempt")
     if previous == candidate:
         validate(registry)
         return
