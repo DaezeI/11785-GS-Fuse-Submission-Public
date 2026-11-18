@@ -39,7 +39,7 @@ def export_saved():
                 c = item['comparisons'][control]
                 rows.append(dict(horizon=int(h), volatility=group, events=z['events'], dates=z['distinct_dates'], control=name, real_mse=z['mse']['real_text'], control_mse=item['mse'][control], gain_pct=c['real_text_mse_gain_pct'], ci_low_pct=c['ci95_pct'][0], ci_high_pct=c['ci95_pct'][1]))
     with (OUT / 'saved_subgroups.csv').open('w', newline='') as f:
-        w = csv.DictWriter(f, fieldnames=rows[0]); w.writeheader(); w.writerows(rows)
+        w = csv.DictWriter(f, fieldnames=rows[0], lineterminator="\n"); w.writeheader(); w.writerows(rows)
     fig, axes = plt.subplots(1, 3, figsize=(11, 4.8)); fig.subplots_adjust(left=.08, right=.98, top=.85, bottom=.32, wspace=.35)
     colors = ['#226c8a', '#d47d30', '#6e598f']
     for ax, control in zip(axes, ('shuffled', 'zeroed tokens', 'fusion bypass')):
@@ -92,7 +92,7 @@ def sensitivity(paths, source):
                             ci=block_bootstrap_improvement(real,loss,data['event_dates'],mask,reps=1000,block=block,seed=23)['ci95_pct']
                             rows.append(dict(horizon=h,volatility=group,control=control,block_dates=block,gain_pct=gain,ci_low_pct=ci[0],ci_high_pct=ci[1]))
     with (OUT/'block_sensitivity.csv').open('w',newline='') as f:
-        w=csv.DictWriter(f,fieldnames=rows[0]); w.writeheader(); w.writerows(rows)
+        w=csv.DictWriter(f,fieldnames=rows[0], lineterminator="\n"); w.writeheader(); w.writerows(rows)
 
 
 def main():
