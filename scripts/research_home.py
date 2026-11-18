@@ -89,6 +89,10 @@ def validate(registry):
     for record in experiments:
         require(all(r in ids and r != record["id"] for r in record["related"]),
                 f"Invalid related record for {record['id']}")
+    for item in registry["next"]:
+        dependency = item.get("until_completed")
+        require(dependency is None or dependency in ids,
+                "A next step must refer to an existing experiment")
 
 
 def upsert(registry, candidate, path):
@@ -105,6 +109,11 @@ def upsert(registry, candidate, path):
         records.insert(0, candidate)
     else:
         records[records.index(previous)] = candidate
+    if candidate["status"] == "completed":
+        registry["next"] = [
+            item for item in registry["next"]
+            if item.get("until_completed") != candidate["id"]
+        ]
     registry["updated_at"] = datetime.now(timezone.utc).isoformat(timespec="seconds")
     validate(registry)
     with tempfile.NamedTemporaryFile("w", dir=path.parent, delete=False, encoding="utf-8") as tmp:

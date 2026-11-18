@@ -1,0 +1,32 @@
+{
+  "run_id": "screened-price-seed1-v1",
+  "status": "completed",
+  "code_commit": "bb09396881cc92c5e654c4210944ce5c6da17ced",
+  "checkpoint_sha256": "e979299c98c2105facfa460cf8790d3aa9e016b62f0ac9bb94a70232a93c0400",
+  "snapshot_sha256": "049aa089d2eaa77644be5deba3abad3fa33c0a18b4375553664cafc71370c2bf",
+  "manifest_sha256": "1b04373a4361238b09c0b1d952163973403d2d7839dbb9e7215c429af14b23d1",
+  "price_sha256": "6a873b1d72d27f9188c6bf12acb756775916be8ed9ff42d9e9dd98028f68de2a",
+  "job_exit_statuses": {
+    "smoke": 0,
+    "full": 0,
+    "zero": 0,
+    "bypass": 0
+  },
+  "seed": 1,
+  "shuffle_seeds": [
+    23,
+    24,
+    25
+  ],
+  "hardware": "NVIDIA H200",
+  "training": "batch 8; two epochs per stage; stride 10; TF32; no 4-bit; cross-attention; softmax gate; raw TS residual; no learnable last value",
+  "events": 2236,
+  "distinct_dates": 845,
+  "uncertainty": "1000 date-block bootstrap replicates, block length 20 distinct dates",
+  "limitations": [
+    "Each interval describes one trained model and three shuffle draws. Training effects can vary across seeds.",
+    "The release times of retained articles remain unverified.",
+    "The shuffled article is a diagnostic comparison and can come from later test dates.",
+    "The article-free controls remove text during prediction. Training a price-only model is a separate comparison."
+  ]
+}

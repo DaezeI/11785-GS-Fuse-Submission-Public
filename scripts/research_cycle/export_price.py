@@ -184,20 +184,34 @@ def main():
     for ext in ("png", "pdf", "svg"):
         fig.savefig(out / f"text-control-gains.{ext}", dpi=180)
     plt.close(fig)
+    svg = out / "text-control-gains.svg"
+    svg.write_text(
+        "\n".join(line.rstrip() for line in svg.read_text().splitlines()) + "\n"
+    )
     h = source["horizons"]["140"]["zeroed_article_tokens"]
     comp = h["comparisons"]["shuffled_text"]
     lo, hi = comp["ci95_pct"]
-    label = "Historical seed-0 replay" if a.historical_replay else "Seed-1 replication"
-    finding = f"{label}: at H140, real-text MSE {h['mse']['real_text']:.8f}, shuffled MSE {h['mse']['shuffled_text']:.8f}, real-text gain {comp['real_text_mse_gain_pct']:.4f}% (95% date-block interval [{lo:.4f}%, {hi:.4f}%])."
-    if lo <= 0 <= hi:
-        finding += " The interval includes zero, so this checkpoint does not establish a text advantage."
+    label = (
+        "Historical seed-0 replay"
+        if a.historical_replay
+        else f"Seed-{a.seed} replication"
+    )
+    shuffled = [row for row in rows if row["control"] == "shuffled_text"]
+    unclear = all(row["ci95_low_pct"] <= 0 <= row["ci95_high_pct"] for row in shuffled)
+    if unclear:
+        explanation = "The correct article showed no clear forecasting advantage at any of the three forecast lengths."
     else:
-        finding += " The interval excludes zero for this checkpoint; this does not establish generality across seeds."
+        explanation = "Correct and shuffled articles gave measurably different errors at one or more forecast lengths for this model."
+    finding = (
+        f"{explanation} At 140 bars, the correct article’s estimated improvement "
+        f"in mean squared error was {comp['real_text_mse_gain_pct']:+.4f}% "
+        f"(95% interval {lo:+.4f}% to {hi:+.4f}%)."
+    )
     limitations = [
-        "Intervals are conditional on one checkpoint and three shuffle draws; two seeds do not establish generality.",
-        "Retained article publication times remain unverified.",
-        "Shuffled donors can come from later test dates; this is a diagnostic placebo.",
-        "Article-free controls are inference interventions, not separately trained baselines.",
+        "Each interval describes one trained model and three shuffle draws. Training effects can vary across seeds.",
+        "The release times of retained articles remain unverified.",
+        "The shuffled article is a diagnostic comparison and can come from later test dates.",
+        "The article-free controls remove text during prediction. Training a price-only model is a separate comparison.",
     ]
     provenance = {
         "run_id": (
@@ -209,6 +223,9 @@ def main():
         "code_commit": "bb09396881cc92c5e654c4210944ce5c6da17ced",
         "checkpoint_sha256": sha,
         "snapshot_sha256": "049aa089d2eaa77644be5deba3abad3fa33c0a18b4375553664cafc71370c2bf",
+        "manifest_sha256": expected_hashes["manifest_sha256"],
+        "price_sha256": expected_hashes["price_sha256"],
+        "job_exit_statuses": completion["stages"],
         "seed": a.seed,
         "shuffle_seeds": [23, 24, 25],
         "hardware": "NVIDIA H200",
@@ -219,20 +236,50 @@ def main():
         "limitations": limitations,
     }
     (out / "provenance.json").write_text(json.dumps(provenance, indent=2) + "\n")
-    (out / "summary.md").write_text(
-        "# " + label + "\n\n" + finding + "\n\n" + " ".join(limitations) + "\n"
-    )
+    lines = [
+        "# " + label,
+        "",
+        finding,
+        "",
+        "Correct-versus-shuffled improvement (positive favors correct text):",
+        "",
+        "| Horizon | Gain | 95% date-block interval |",
+        "|---|---:|---:|",
+    ]
+    for horizon in ("35", "70", "140"):
+        comparison = source["horizons"][horizon]["zeroed_article_tokens"][
+            "comparisons"
+        ]["shuffled_text"]
+        low, high = comparison["ci95_pct"]
+        lines.append(
+            f"| {horizon} | {comparison['real_text_mse_gain_pct']:.4f}% | [{low:.4f}%, {high:.4f}%] |"
+        )
+    lines += [
+        "",
+        "The two article-free controls and all metrics are in [metrics.csv](metrics.csv). Intervals are conditional on this checkpoint, not across-seed confidence intervals.",
+        "",
+        " ".join(limitations),
+    ]
+    (out / "summary.md").write_text("\n".join(lines) + "\n")
     if not a.historical_replay:
         root = f"https://github.com/DaezeI/11785-GS-Fuse-Submission-Public/blob/main/results/screened-price-seed{a.seed}-v1/"
         raw = f"https://raw.githubusercontent.com/DaezeI/11785-GS-Fuse-Submission-Public/main/results/screened-price-seed{a.seed}-v1/"
         record = {
             "id": f"screened-price-seed{a.seed}-v1",
-            "title": f"Screened price seed-{a.seed} replication",
+            "title": (
+                "A second run found no clear article advantage"
+                if unclear and a.seed == 1
+                else f"Screened price replication, seed {a.seed}"
+            ),
             "kind": "Experiment",
             "status": "completed",
             "owner": "Nicole",
             "question": "Does the near-zero correct-versus-shuffled text gap persist with a second training seed?",
-            "configuration": provenance["training"],
+            "configuration": (
+                f"Training seed {a.seed} on the frozen screened dataset. "
+                + provenance["training"]
+                + ". Evaluated on the same 2,236 test events with three shuffle draws."
+            ),
             "finding": finding,
             "limitations": " ".join(limitations),
             "figure": {

@@ -1,6 +1,8 @@
 # Experiment register and reporting rule
 
-This is the index for experiments the team intends to cite in the paper. Keep
+This is the protocol and citation index for team experiments. Use the
+[research registry](research_home/records.json) for current statuses,
+findings and evidence links. The registry feeds the research home. Keep
 planned runs, queued runs, completed runs, and measured findings distinct.
 Large data, predictions, and checkpoints stay on Delta; link their shared paths
 and commit only small run records or summaries here.
