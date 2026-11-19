@@ -4,11 +4,11 @@
   "kind": "Training design",
   "owner": "Adaeze Ilodianya",
   "status": "planned",
-  "updated_at": "2026-11-19T03:14:00+00:00",
+  "updated_at": "2026-11-19T03:34:56+00:00",
   "question": "Can a small price-only causal-convolution model meet laptop resource limits and match a fixed return baseline?",
   "configuration": "model/compact_return.py and scripts/improvement/train_compact.py; width32, L35 initial, H35/70/140 close endpoints, frozen screened C1, training-only scale, Huber training, validation H140 MAE selection. No Llama/MOMENT. Real-input full run pending.",
   "finding": "Prototype has CPU shape, causality, optimization and frozen-price residual checks. No real-market accuracy or CUDA speed result yet.",
-  "limitations": "Laptop hardware detected as RTX4060 Laptop 8GB, but current test PyTorch is CPU-only. Timestamp availability remains unverified. Feature-export and text-control trainer remain future work.",
+  "limitations": "Actual RTX4060 CUDA synthetic execution passed, but no real-market accuracy, T4 execution or raw-article encoding latency is verified. Current shared CUDA packages are reused through a working project-local interpreter; no shared environment was overwritten. Timestamp availability remains unverified.",
   "evidence": [
     {
       "label": "Compact model and audit-first protocol",

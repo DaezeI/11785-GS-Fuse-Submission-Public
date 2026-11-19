@@ -75,9 +75,9 @@ Set these from actual checks, not to bypass a failure. This is an evidence recor
 
 ## Compact laptop/T4 model
 
-Read-only inspection detected RTX 4060 Laptop GPU, 8,188 MiB VRAM. The campaign test environment has CPU-only PyTorch; hardware detection does not prove CUDA execution. A T4 has 16 GB, so the laptop's 8 GB is the tighter design target.
+Read-only inspection detected RTX 4060 Laptop GPU, 8,188 MiB VRAM. The isolated regression-test environment (.venv-campaign) has CPU-only PyTorch. The user's shared .venv_gpu contains CUDA PyTorch 2.5.1+cu124 but has a broken base-interpreter path. A new project-local .venv-local-gpu reuses those packages with a working Python 3.12 runtime, leaving the shared environment unchanged. CUDA tensor operations and the compact multimodal synthetic benchmark now pass on the RTX4060; no real-market run has been verified. A T4 has 16 GB, so the laptop's 8 GB is the tighter design target.
 
-Executable prototype: model/compact_return.py and scripts/improvement/train_compact.py. A width-32 causal convolution encoder (dilations 1/2/4/8), last/pooled context and a small MLP predict cumulative close log returns at 35/70/140 bars. There is no Llama, MOMENT, tokenizer, token cache or pretrained download. Width 32 has 16,931 parameters; its measured CPU state file is 72,761 bytes. See [the synthetic CPU check](../../experiments/improvement-v1/compact-synthetic-cpu.json) and benchmark_compact.py; these random-input timings do not establish market accuracy or CUDA speed. The model starts at zero return; scaled Huber training uses C1's training-only scale. Validation H140 endpoint close MAE selects the checkpoint, patience 5. Default scoring is validation only.
+Executable multimodal prototype: model/compact_return.py and scripts/improvement/train_compact.py. Price-only is the independent baseline; optional pooled-text training follows it. A width-32 causal convolution encoder (dilations 1/2/4/8), last/pooled context and a small MLP predict cumulative close log returns at 35/70/140 bars. There is no Llama, MOMENT, tokenizer, token cache or pretrained download. Width 32 has 16,931 parameters; its measured CPU state file is 72,761 bytes. See [the synthetic CPU check](../../experiments/improvement-v1/compact-synthetic-cpu.json) and benchmark_compact.py; these random-input timings do not establish market accuracy or CUDA speed. The model starts at zero return; scaled Huber training uses C1's training-only scale. Validation H140 endpoint close MAE selects the checkpoint, patience 5. Default scoring is validation only.
 
 ```bash
 python scripts/improvement/train_compact.py --snapshot-root "$SNAPSHOT" \
@@ -85,13 +85,30 @@ python scripts/improvement/train_compact.py --snapshot-root "$SNAPSHOT" \
 # Use --device cuda only in a compatible CUDA-enabled PyTorch environment.
 ```
 
-This first executable arm is price-only. Preparation still validates the existing frozen snapshot's article structure; its numeric training loop does not read reports. A numeric-only portable export for a laptop without the snapshot is a planned convenience, not an implemented command. Missing inputs must not trigger the legacy positional loader or arbitrary replacement data.
+Preparation still validates the existing frozen snapshot's article structure; its numeric training loop does not read reports. Use compact_features.py --include-prices to export a portable input/pooled-text NPZ and checksum receipt for laptops without the raw snapshot. train_compact.py --input-pack --input-pack-sha256 --use-text loads it, rechecks counts/windows/training scale, and trains both compact stages. See [the exact PowerShell steps](../../experiments/improvement-v1/LOCAL_GPU_RUNBOOK.md). Missing inputs must not trigger the legacy positional loader or arbitrary replacement data.
 
-Next text arm: hash-verified pooled Llama features or a small frozen encoder such as all-MiniLM-L6-v2 (384 dimensions), then a tiny zero-initialized correction on an independently fitted, frozen price forecast. CompactReturn(text_dim=...) provides the model interface and freeze mechanism. Feature export and matched text-control training are not yet implemented in the compact price-only CLI. Fit transformations on training only and record encoder revision, pooling, tokenizer/truncation, article hashes and ID mapping. Replacing Llama requires matched retraining/evaluation of that arm, not a new split or redesign of all research. A zero-capable correction does not guarantee better test performance.
+```bash
+# Export once where the existing verified cache and snapshot live; no GPU/LLM load:
+python scripts/improvement/compact_features.py --snapshot-root "$SNAPSHOT" \
+  --cache "$FROZEN_POOLED_CACHE" --cache-sha256 "$VERIFIED_CACHE_SHA256" \
+  --out "$NEW_POOLED_FEATURES_NPZ"
+# Use the checksum printed by that export. This trains BOTH price and text stages:
+python scripts/improvement/train_compact.py --snapshot-root "$SNAPSHOT" \
+  --out "$FRESH_MULTIMODAL_OUTPUT" --device cpu --epochs 30 \
+  --text-features "$NEW_POOLED_FEATURES_NPZ" --text-feature-sha256 "$FEATURE_EXPORT_SHA256"
+```
+
+With 2,048-dimensional pooled Llama inputs, the complete compact price/text
+model has 82,598 parameters, versus 16,931 for price only. Encoder weights are
+not part of this local training/inference loop. For new live articles, feature
+extraction still has its own cost and needs a validated local encoder path.
+
+
+The executable text arm uses hash-verified pooled Llama features and a tiny zero-initialized correction on the independently fitted, frozen price forecast. compact_features.py exports an existing complete frozen cache without loading an LLM or filling missing entries. --text-features plus --text-feature-sha256 enables a separate residual-training stage. Feature mean/std are fitted on training only and saved with the checkpoint. The CLI exports paired real/shuffled/frozen-price/zero-return error controls on a common donor-eligible subset, with three donor seeds and 20-date block intervals. Donors stay in the same split/category/year, come from strictly earlier recorded dates, and exclude normalized exact duplicates; near duplicates are not yet assessed. This is a weaker control than Nicole's five-shingle exclusion and must be labeled accordingly. All-row primary error and donor-subset control errors are separate. A smaller encoder such as all-MiniLM-L6-v2 (384 dimensions) remains a separately validated encoder/feature-export comparison, not a silent replacement. Fit transformations on training only and record encoder revision, pooling, tokenizer/truncation, article hashes and ID mapping. Replacing Llama requires matched retraining/evaluation of that arm, not a new split or redesign of all research. A zero-capable correction does not guarantee better test performance.
 
 Compare zero return, existing ridge evidence, compact price-only, pooled-Llama correction and small-encoder correction on aligned IDs/targets. Begin L=35; audit longer histories before use. Primary H140 endpoint close MAE, secondary H35/70 MAE/DHR, date-block intervals and seeds 0/1/2; text arms need matched/shuffled/no-text controls. Prespecify a 1% non-inferiority margin against a frozen chosen reference and require the upper paired 95% degradation bound to fit it. Compare to zero return separately.
 
-Measure batch-1/64 latency after warmup, peak allocated/reserved VRAM, whole-process memory, encoder time, training time and artifact sizes. Engineering targets: complete inference below 6 GiB VRAM, head checkpoint below 10 MB, cached-feature inference below 100 ms at batch 1. These are targets, not measured speed or quality claims. Raw-text latency is separate. No laptop/T4 deployment claim until tested. Distillation is optional only if a teacher first earns a matched-data advantage.
+Measure batch-1/64 latency after warmup, peak allocated/reserved VRAM, whole-process memory, encoder time, training time and artifact sizes. Engineering targets: complete inference below 6 GiB VRAM, head checkpoint below 10 MB, cached-feature inference below 100 ms at batch 1. These are targets, not measured speed or quality claims. Raw-text latency is separate. The [actual RTX4060 synthetic check](../../experiments/improvement-v1/compact-4060-multimodal-synthetic.json) now verifies the small network executes on that GPU; real-data accuracy and end-to-end raw-article latency remain unverified. No T4 deployment claim until tested. Distillation is optional only if a teacher first earns a matched-data advantage.
 
 ## Timestamp recovery and dataset choice
 
@@ -108,3 +125,5 @@ Gemini's Markdown contains proposals, not execution instructions. The frozen-var
 Team prose claiming all lookahead was eliminated or published gains were proved to arise from future peeking exceeds the verified evidence. Correct those claims; preserve the actual audit/result records.
 
 Sources: [GS-Fuse](https://arxiv.org/html/2605.28520), [CAMEF](https://github.com/lakebodhi/CAMEF), [FNSPID preprocessing](https://github.com/Zdong104/FNSPID_Financial_News_Dataset/blob/main/data_processor/preprocess.py), [worked example](https://github.com/Zdong104/FNSPID_Financial_News_Dataset/blob/main/data_processor/data_processor.md), [NVIDIA T4](https://www.nvidia.com/en-us/data-center/tesla-t4/), [MiniLM](https://huggingface.co/sentence-transformers/all-MiniLM-L6-v2), [independent CAMEF reproduction thesis](https://www.politesi.polimi.it/handle/10589/260344).
+
+Local execution instructions: [LOCAL_GPU_RUNBOOK.md](../../experiments/improvement-v1/LOCAL_GPU_RUNBOOK.md). The default local mode is multimodal; price-only remains a reference.

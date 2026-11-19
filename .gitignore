@@ -27,6 +27,7 @@ outputs/
 
 # Python / runtime
 .venv-campaign/
+.venv-local-gpu/
 .uv-cache/
 campaign-local/
 __pycache__/

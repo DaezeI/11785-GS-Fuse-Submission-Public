@@ -81,3 +81,18 @@ def test_quota_failure_preserves_previous_checkpoint_and_removes_only_own_partia
         atomic_torch_save({"weight": torch.zeros(2)}, path)
     assert path.read_bytes() == before
     assert sorted(p.name for p in tmp_path.iterdir()) == ["best.pth"]
+
+
+def test_frozen_qformer_still_attends_and_padding_mask_changes_attention():
+    from model.variants import QFormerFusion
+    model = QFormerFusion(16, num_queries=4, num_layers=1, num_heads=2, dropout=0).eval()
+    for parameter in model.parameters():
+        parameter.requires_grad_(False)
+    tokens = torch.randn(1, 10, 16)
+    mask = torch.tensor([[False] * 4 + [True] * 6])
+    before = {name: value.clone() for name, value in model.state_dict().items()}
+    _, unmasked = model(tokens, need_weights=True)
+    _, masked = model(tokens, text_mask=mask, need_weights=True)
+    assert unmasked[:, :, 4:].sum() > 0
+    assert masked[:, :, 4:].sum() == 0
+    assert all(torch.equal(before[name], value) for name, value in model.state_dict().items())

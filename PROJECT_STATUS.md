@@ -4,7 +4,7 @@
 [controlled campaign](docs/experiments/IMPROVEMENT_CAMPAIGN_V1.md) for Nicole's
 personal GPU resource: corrected-code reference, text LoRA, longer price
 histories, text budgets and optional fusion variants. The revised default is five one-hour execution smokes; full training requires
-resource/quota/audit readiness. A compact laptop price-only prototype loads
+resource/quota/audit readiness. A compact laptop price/text prototype loads
 no Llama or MOMENT. See [the revised design](docs/experiments/AUDIT_FIRST_AND_COMPACT_V2.md).
 Eleven additional designs require evidence or new code.
 No jobs or new model results are implied. Existing completed results and

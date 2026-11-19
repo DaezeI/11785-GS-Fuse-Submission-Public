@@ -2,7 +2,7 @@
   "title": "GS-Fuse Research Home",
   "stage": "Controlled experiments and final writing",
   "overview": "The last-price rule beat our trained price models. In Adaeze’s completed R3 return run, correct and shuffled articles gave nearly identical results, and predicting zero return had slightly lower error.",
-  "updated_at": "2026-11-19T03:14:06+00:00",
+  "updated_at": "2026-11-19T03:34:57+00:00",
   "source_url": "https://github.com/DaezeI/11785-GS-Fuse-Submission-Public/blob/main/research_home/records.json",
   "links": [
     {
@@ -42,16 +42,55 @@
   ],
   "experiments": [
     {
+      "id": "improvement-v1-compact-pooled-text",
+      "title": "Compact laptop price and pooled-text residual model",
+      "kind": "Training design",
+      "owner": "Adaeze Ilodianya",
+      "status": "planned",
+      "updated_at": "2026-11-19T03:34:57+00:00",
+      "question": "Can pooled article features add useful error reduction to an independently fitted compact price forecast within laptop resource targets?",
+      "configuration": "compact_features.py exports a checksum/signature-verified existing pooled cache without LLM loading; train_compact.py fits price first, freezes it, then fits the tiny text correction. 82598 total parameters for 2048-dimensional text; training-only feature normalization; H35/70/140 endpoints; three past-date donor controls and paired date-block intervals. Portable NPZ with --include-prices plus receipt allows local training without raw articles/backbones; default run_local.ps1 mode is multimodal.",
+      "finding": "Feature integrity/mapping, donor chronology, frozen-price residual fitting and aligned text-control tests passed on synthetic fixtures. Full real-data training/evaluation pending.",
+      "limitations": "Actual RTX4060 CUDA synthetic execution passed, but no real-market accuracy, T4 execution or raw-article encoding latency is verified. Current shared CUDA packages are reused through a working project-local interpreter; no shared environment was overwritten. Timestamp availability remains unverified.",
+      "evidence": [
+        {
+          "label": "Audit-first multimodal laptop protocol",
+          "url": "https://github.com/DaezeI/11785-GS-Fuse-Submission-Public/blob/main/docs/experiments/AUDIT_FIRST_AND_COMPACT_V2.md"
+        },
+        {
+          "label": "Compact price/text trainer",
+          "url": "https://github.com/DaezeI/11785-GS-Fuse-Submission-Public/blob/main/scripts/improvement/train_compact.py"
+        },
+        {
+          "label": "Frozen feature export",
+          "url": "https://github.com/DaezeI/11785-GS-Fuse-Submission-Public/blob/main/scripts/improvement/compact_features.py"
+        },
+        {
+          "label": "Exact local GPU run steps",
+          "url": "https://github.com/DaezeI/11785-GS-Fuse-Submission-Public/blob/main/experiments/improvement-v1/LOCAL_GPU_RUNBOOK.md"
+        },
+        {
+          "label": "Synthetic RTX4060 execution timing, not quality",
+          "url": "https://github.com/DaezeI/11785-GS-Fuse-Submission-Public/blob/main/experiments/improvement-v1/compact-4060-multimodal-synthetic.json"
+        }
+      ],
+      "figure": null,
+      "related": [
+        "improvement-v1-compact-price",
+        "c1-article-readout-v1"
+      ]
+    },
+    {
       "id": "improvement-v1-compact-price",
       "title": "Compact laptop endpoint-return baseline",
       "kind": "Training design",
       "owner": "Adaeze Ilodianya",
       "status": "planned",
-      "updated_at": "2026-11-19T03:14:00+00:00",
+      "updated_at": "2026-11-19T03:34:56+00:00",
       "question": "Can a small price-only causal-convolution model meet laptop resource limits and match a fixed return baseline?",
       "configuration": "model/compact_return.py and scripts/improvement/train_compact.py; width32, L35 initial, H35/70/140 close endpoints, frozen screened C1, training-only scale, Huber training, validation H140 MAE selection. No Llama/MOMENT. Real-input full run pending.",
       "finding": "Prototype has CPU shape, causality, optimization and frozen-price residual checks. No real-market accuracy or CUDA speed result yet.",
-      "limitations": "Laptop hardware detected as RTX4060 Laptop 8GB, but current test PyTorch is CPU-only. Timestamp availability remains unverified. Feature-export and text-control trainer remain future work.",
+      "limitations": "Actual RTX4060 CUDA synthetic execution passed, but no real-market accuracy, T4 execution or raw-article encoding latency is verified. Current shared CUDA packages are reused through a working project-local interpreter; no shared environment was overwritten. Timestamp availability remains unverified.",
       "evidence": [
         {
           "label": "Compact model and audit-first protocol",

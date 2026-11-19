@@ -40,8 +40,14 @@ and GPU skills and private handoff.
    scripts/improvement/train_compact.py load no Llama/MOMENT. Adaeze's target
    is RTX 4060 Laptop 8 GB, with T4 16 GB secondary. Measure actual speed,
    VRAM, artifacts and aligned error against zero return and references.
-   Current compact trainer is price-only. A tiny pooled-text correction is
-   designed/model-supported but still needs feature export/control training.
+   Use compact_features.py to export the existing verified pooled cache once,
+   export with --include-prices and transfer the NPZ plus .receipt.json through
+   agreed private storage so Adaeze can use LOCAL_GPU_RUNBOOK.md and
+   run_local.ps1 on her working local CUDA environment. Then use
+   train_compact.py --text-features --text-feature-sha256 for BOTH price
+   and residual-text stages, with matched/past-donor/frozen-price controls.
+   Price-only is the baseline, not the final objective. Small-encoder export
+   remains a separately validated follow-up.
    Do not promise equal quality or call synthetic checks market results.
 7. Recover raw article timestamps/versions and the price clock in parallel.
    Audit the upstream FNSPID UTC conversion issue without assuming our copy
