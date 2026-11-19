@@ -84,3 +84,7 @@ Use [results/README.md](results/README.md) for linked metric sources, result-pac
 templates and figures; use [report/final](report/final/README.md) for versioned
 final writing. The [delivery workflow](docs/FINAL_DELIVERY_WORKFLOW.md) explains
 owner handoffs and how these feed the paper and presentation.
+
+## Compact direction-loss ablation
+
+**Planned:** [Compact direction-loss context and runbook](experiments/compact-direction-v1/README.md). Fixed L35/H140 price-only; compare magnitude loss with and without a direction term.
