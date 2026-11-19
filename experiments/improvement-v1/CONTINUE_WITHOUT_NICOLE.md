@@ -1,6 +1,6 @@
 # Continue independently on Adaeze's laptop
 
-Latest user direction: minimize Nicole's involvement, use the local GPU, and
+Latest user direction: minimize dependency on Nicole's GPU or DELTA, use the local GPU, and
 continue from another account. Do not request Llama feature exports or launch
 remote jobs as the default next step. This document supersedes the earlier
 recommendation to wait for Nicole's pooled-feature export. It is a handoff,
