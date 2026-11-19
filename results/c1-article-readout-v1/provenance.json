@@ -1,0 +1,36 @@
+{
+  "code_commit": "7e510a35e9eb5c3740dc975384a557a37decfdc9",
+  "data_audit_sha256": "8c202361968ee8f1bc35d1c200bd679b3d7ace7e4feafe2a1b9dcba34e02969f",
+  "embedding_cache_sha256": "4c6817c71013332e00a5f41b319b070eba78debde11c1a33a29a2bf2d0d59b0f",
+  "new_unique_embeddings": 0,
+  "embedding_cache_signature": {
+    "model": "Llama-3.2-1B",
+    "window": 500,
+    "stride": 400,
+    "tf32": true
+  },
+  "embedding_pca_dimensions": 64,
+  "ridge_alphas": [
+    0.1,
+    1.0,
+    10.0,
+    100.0,
+    1000.0
+  ],
+  "donor_seeds": [
+    23,
+    24,
+    25
+  ],
+  "donor_rule": "same split, category and calendar year; strictly earlier recorded date",
+  "duplicate_rule": "normalized exact match or word five-shingle Jaccard at least 0.80",
+  "release_timestamps_verified": false,
+  "snapshot": "c1-screened-return-v1",
+  "snapshot_content_sha256": "049aa089d2eaa77644be5deba3abad3fa33c0a18b4375553664cafc71370c2bf",
+  "manifest_sha256": "1b04373a4361238b09c0b1d952163973403d2d7839dbb9e7215c429af14b23d1",
+  "price_sha256": "6a873b1d72d27f9188c6bf12acb756775916be8ed9ff42d9e9dd98028f68de2a",
+  "timing_policy": "category4_1400_strict_before",
+  "hardware": "Fit and bootstrap on CPU; zero new GPU embeddings",
+  "scheduler_runtime_seconds": 183,
+  "exit_status": 0
+}
