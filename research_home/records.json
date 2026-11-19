@@ -2,7 +2,7 @@
   "title": "GS-Fuse Research Home",
   "stage": "Controlled experiments and final writing",
   "overview": "The last-price rule beat our trained price models. In Adaeze’s completed R3 return run, correct and shuffled articles gave nearly identical results, and predicting zero return had slightly lower error.",
-  "updated_at": "2026-11-19T07:46:46+00:00",
+  "updated_at": "2026-11-19T08:18:05+00:00",
   "source_url": "https://github.com/DaezeI/11785-GS-Fuse-Submission-Public/blob/main/research_home/records.json",
   "links": [
     {
@@ -41,6 +41,32 @@
     }
   ],
   "experiments": [
+    {
+      "id": "compact-direction-v1",
+      "title": "Compact price-only: add endpoint direction loss",
+      "kind": "Controlled experiment",
+      "owner": "Adaeze Ilodianya",
+      "status": "planned",
+      "updated_at": "2026-11-19T08:14:52+00:00",
+      "question": "Does a close-return sign penalty help direction accuracy without sacrificing whole-path MAE?",
+      "configuration": "Screened canonical C1, L35/H140, price-only, paired seeds 0–2. Smooth L1 vs the same loss plus weight-1 sign penalty at the three close horizons. Common whole-path validation-MAE checkpoint selection. No test scoring.",
+      "finding": "No full run or result yet. Smoke results cover execution only.",
+      "limitations": "Weight and horizons are fixed for this attempt. Evaluate MAE and hit rates separately; forecast origins use the existing timing assumption. No claim about text or test performance.",
+      "figure": null,
+      "evidence": [
+        {
+          "label": "Runbook and predeclared comparison",
+          "url": "https://github.com/DaezeI/11785-GS-Fuse-Submission-Public/blob/main/experiments/compact-direction-v1/README.md"
+        },
+        {
+          "label": "Trainer",
+          "url": "https://github.com/DaezeI/11785-GS-Fuse-Submission-Public/blob/main/scripts/improvement/train_compact_direction_ablation.py"
+        }
+      ],
+      "related": [
+        "improvement-v1-compact-raw-path"
+      ]
+    },
     {
       "id": "improvement-v1-compact-raw-path",
       "title": "Compact whole-path baseline and summary residual",
