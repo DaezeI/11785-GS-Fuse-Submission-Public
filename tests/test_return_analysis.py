@@ -38,6 +38,9 @@ def test_aligned_return_report_uses_close_endpoints_and_eligible_counts():
             "full_task_loss": np.zeros(n), "strict_ts_task_loss": np.ones(n),
             "gate_target": np.full(n, .7)}
     result = analyze(blob, reps=20, block=3)
+    assert result["close_endpoint_error"]["35"]["mae_bp"]["real_text"] == 0
+    blob["seqs"] = np.zeros((n, 140, 4))
+    assert analyze(blob, reps=5, block=3)["events"] == n
     assert result["all_channel"]["all"]["conditions"]["real_text"]["mae_bp"] == 0
     assert result["close_endpoint_dhr"]["35"]["all"]["eligible_events"] == 16
     assert result["close_endpoint_dhr"]["35"]["all"]["hit_rate"]["real_text"] == 1

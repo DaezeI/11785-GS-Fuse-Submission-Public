@@ -26,6 +26,9 @@ downloads/
 outputs/
 
 # Python / runtime
+.venv-campaign/
+.uv-cache/
+campaign-local/
 __pycache__/
 *.py[cod]
 .pytest_cache/

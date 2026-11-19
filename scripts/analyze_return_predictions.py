@@ -21,7 +21,8 @@ def analyze(blob, reps=1000, block=20):
     y = np.asarray(blob["targets"], dtype=np.float64)
     n, horizon, channels = y.shape
     if (n == 0 or channels != 4 or len(set(blob["event_ids"].astype(str))) != n or
-            blob["seqs"].shape != (n, 35, 4) or
+            blob["seqs"].ndim != 3 or blob["seqs"].shape[0] != n or
+            blob["seqs"].shape[2] != 4 or not 1 <= blob["seqs"].shape[1] <= 280 or
             blob["anchor_close"].shape != (n,) or
             np.any(blob["anchor_close"] <= 0)):
         raise ValueError("Return prediction population, shape, or close anchors are invalid")
@@ -53,7 +54,7 @@ def analyze(blob, reps=1000, block=20):
     }
     out = {"task": "return_bp", "metadata": meta, "events": n,
            "distinct_dates": len(np.unique(dates)), "shuffles": len(shuffled),
-           "all_channel": {}, "close_endpoint_dhr": {}, "gate": {},
+           "all_channel": {}, "close_endpoint_dhr": {}, "close_endpoint_error": {}, "gate": {},
            "note": "Return errors are in bp/bp²; date-block intervals are conditional on this checkpoint."}
     for group, mask in groups.items():
         rows = {name: {"mae_bp": float(vals["mae"][mask].mean()),
@@ -82,6 +83,15 @@ def analyze(blob, reps=1000, block=20):
         if not 1 <= h <= horizon:
             raise ValueError("Direction horizon is outside saved forecasts")
         actual = y[:, h - 1, close]
+        errors = {name: np.abs(pred[:, h - 1, close] - actual)
+                  for name, pred in conditions.items()}
+        errors["shuffled_text"] = np.abs(shuffled[:, :, h - 1, close] - actual[None]).mean(0)
+        out["close_endpoint_error"][str(h)] = {
+            "mae_bp": {name: float(error.mean()) for name, error in errors.items()},
+            "real_vs_control": {name: block_bootstrap_improvement(
+                errors["real_text"], errors[name], dates, groups["all"], reps=reps, block=block)
+                for name in ("shuffled_text", "zero_text", "zero_return", "strict_ts")},
+        }
         eligible = (actual != 0) & (np.abs(actual) > deadband)
         signs = {name: np.sign(pred[:, h - 1, close]) for name, pred in conditions.items()}
         shuffle_sign = np.sign(shuffled[:, :, h - 1, close])
