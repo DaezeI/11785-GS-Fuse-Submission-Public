@@ -1,5 +1,12 @@
 # Project status
 
+**Latest Adaeze direction:** prioritize a local prices-plus-raw-news model with
+a small trainable text encoder and no Llama feature-export dependency. The
+[continuation handoff](experiments/improvement-v1/CONTINUE_WITHOUT_NICOLE.md)
+records the verified laptop CUDA setup, public data link and remaining work.
+Raw-text encoding is pending; current compact multimodal code uses precomputed
+vectors. No real-data compact accuracy run has completed.
+
 **New planned improvement campaign:** Adaeze prepared a separate
 [controlled campaign](docs/experiments/IMPROVEMENT_CAMPAIGN_V1.md) for Nicole's
 personal GPU resource: corrected-code reference, text LoRA, longer price

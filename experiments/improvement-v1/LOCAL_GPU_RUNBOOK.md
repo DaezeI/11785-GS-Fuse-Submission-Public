@@ -1,5 +1,11 @@
 # Run the compact multimodal experiments on Adaeze's GPU
 
+**Updated user direction:** the preferred next path is independent local
+training from raw news with a small trainable text encoder. See
+[the continuation handoff](CONTINUE_WITHOUT_NICOLE.md). That encoder/loader is
+not implemented yet. The instructions below remain an optional frozen-Llama
+feature route and require a data export; do not wait for that export by default.
+
 The target remains **prices plus news**. Price-only is the baseline. The
 default local runner trains the price branch, freezes it, then trains the
 small news correction and scores matched/shuffled/frozen-price controls.
