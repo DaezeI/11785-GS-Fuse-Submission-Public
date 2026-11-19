@@ -79,6 +79,9 @@ registry. SSH identity and configuration must already be set locally; no
 credentials are stored by the script. `--ssh-config` selects a local SSH configuration file; `--ssh-option` may be repeated. Use `--seed N` for another positive training seed using the same price recipe (the default is 1). To test
 the upsert without changing the real registry, supply `--registry` with a
 copy of the registry outside the repository. Nothing is committed or published.
+After successful collection, complete the
+[standard result delivery](../../docs/RESEARCH_HOME.md#finish-a-completed-experiment)
+in the same task, including the aggregate Drive backup and its readback.
 The fresh evidence directory remains after failures to preserve diagnostics;
 use a new directory after resolving the cause.
 
