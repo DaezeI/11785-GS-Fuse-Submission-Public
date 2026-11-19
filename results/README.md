@@ -18,6 +18,7 @@ comparison validity and the proposed next batch.
 - [Pre-event volatility analysis](price-volatility-v1/summary.md): saved subgroup findings plus CPU block-length sensitivity; no clear matched-text benefit in any volatility group.
 - [Adaeze’s H200 R3 replay](adaeze-screened-r3-h200-v2/summary.md) completed both article checks. Correct and shuffled articles gave virtually identical test error.
 - Adaeze’s [R0–R2 results and zero-return benchmark](screened-return-r0-r2-v1/summary.md) cover full training. Her separate Delta R3 and paired article checks were queued at the latest check.
+- [Jessica’s Q-Former Stage 3 smoke](jessica-r3-qformer-unfreeze-smoke-v1/summary.md) passed. The projection and LayerNorm weights updated after PR #28.
 - Jessica owns Q-Former; Joye owns MoE. Historical runs remain historical.
   New architecture comparisons need the same R3 reference, data, seed, budget
   and hardware/environment. This price checkpoint is not that R3 reference.
