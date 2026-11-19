@@ -106,7 +106,7 @@ def render(args):
             # PBS requires directives before the first executable statement.
             job[1:1] = profile["pbs_directives"]
             script = destination / (task_id + ".pbs")
-            script.write_text("\n".join(job) + "\n", encoding="utf-8")
+            script.write_text("\n".join(job) + "\n", encoding="utf-8", newline="\n")
             tasks.append(dict(id=task_id, script=script.name, sha256=sha(script),
                               task_file=task_path.name, task_sha256=sha(task_path)))
     plan = dict(source_commit=commit, slots=args.slots, tasks=tasks, selection=selection,

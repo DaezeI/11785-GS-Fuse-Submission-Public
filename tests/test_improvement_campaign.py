@@ -33,6 +33,7 @@ def test_screen_renders_linux_paths_and_no_submission(tmp_path):
     assert plan["max_gpu_hours"] == 36
     assert plan["resource_dir"] == "/private/runs/batch"
     text = (args.out / "lora8-s0.pbs").read_text()
+    assert b"\r" not in (args.out / "lora8-s0.pbs").read_bytes()
     assert "\\" not in text
     assert text.index("#PBS") < text.index("set -e")
     assert "/private/code/scripts/improvement/campaign.py" in text
