@@ -23,6 +23,15 @@ This applies to Delta and Nicole's personal GPU resource.
   experiment work. If publication is outside the task's scope, leave the
   update ready for review in the checkout. The home displays it after the PR
   merges to GitHub main.
+- When finishing or collecting a verified run, follow through on the
+  [standard result delivery](docs/RESEARCH_HOME.md#finish-a-completed-experiment):
+  publish the evidence and registry, verify the Research Home source, and
+  back up the aggregate ZIP in Drive’s `01 Results and Evidence` folder.
+  These are part of finishing the experiment. Keep raw predictions,
+  checkpoints, and private execution logs on the agreed compute storage.
+  If a destination is blocked, finish the other steps and record what
+  remains. If asked to stop after launch, record the pending delivery for
+  the next authorized check.
 
 Read [TEAM_WORKFLOW.md](TEAM_WORKFLOW.md) first. It records the November 4 team
 decision, ownership, implementation gaps, and experiment handoff requirements.
