@@ -111,6 +111,11 @@ def parse_args():
 
     p.add_argument("--finetune-ts-last-block", action="store_true", default=False)
     p.add_argument("--finetune-text-last-block", action="store_true", default=False)
+    p.add_argument("--use-lora", action="store_true", help="Enable parameter-efficient LoRA adapters on the text backbone")
+    p.add_argument("--lora-rank", type=int, default=8, help="LoRA decomposition rank")
+    p.add_argument("--lora-alpha", type=float, default=16.0, help="LoRA scaling factor alpha")
+    p.add_argument("--lora-dropout", type=float, default=0.05, help="LoRA adapter dropout")
+    p.add_argument("--lora-lr", type=float, default=5e-5, help="Learning rate for LoRA adapter parameters")
 
     return p.parse_args()
 
@@ -145,6 +150,15 @@ def main():
     gs_fuse_mod.TEXT_CACHE_PATH = args.text_cache
     if args.no_4bit:
         gs_fuse_mod.USE_4BIT = False
+    if args.use_lora:
+        gs_fuse_mod.USE_LORA = True
+        gs_fuse_mod.LORA_RANK = args.lora_rank
+        gs_fuse_mod.LORA_ALPHA = args.lora_alpha
+        gs_fuse_mod.LORA_DROPOUT = args.lora_dropout
+        gs_fuse_mod.TrainingConfig.LORA_LR = args.lora_lr
+        if args.text_cache:
+            print("[LoRA] Warning: LoRA adaptation bypasses the static text cache so adapter gradients update live.")
+            gs_fuse_mod.TEXT_CACHE_PATH = None
     torch.backends.cuda.matmul.allow_tf32 = args.tf32
     torch.backends.cudnn.allow_tf32 = args.tf32
 
