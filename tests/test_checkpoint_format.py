@@ -99,3 +99,36 @@ def test_legacy_llm_entry_remains_loadable(tmp_path):
         target.text_encoder.backbone.bias,
         source.text_encoder.backbone.bias,
     )
+
+
+def test_adapters_roundtrip_and_missing_state_fails_even_nonstrict(tmp_path):
+    import pytest
+    from model.text_encoders import LoRALinear
+
+    def adapted_model():
+        model = _checkpoint_model()
+        model.text_encoder.backbone = LoRALinear(nn.Linear(2, 2), rank=2, alpha=4)
+        model.text_encoder.use_lora = True
+        model.text_encoder.lora_rank = 2
+        model.text_encoder.lora_alpha = 4
+        model._arch_metadata = lambda: dict(forecast_task={"task": "price"},
+                                            use_lora=True, lora_rank=2, lora_alpha=4)
+        return model
+
+    source, target = adapted_model(), adapted_model()
+    with torch.no_grad():
+        source.text_encoder.backbone.lora_B.add_(.7)
+    path = tmp_path / "lora.pth"
+    source.save_model_combined(path)
+    checkpoint = torch.load(path, map_location="cpu")
+    assert "text_encoder" not in checkpoint["state_dicts"]
+    assert set(checkpoint["state_dicts"]["text_adapters"]) == {
+        "backbone.lora_A", "backbone.lora_B"}
+    target.load_model_combined(path, strict=False)
+    assert torch.equal(source.text_encoder.backbone.lora_B, target.text_encoder.backbone.lora_B)
+    with pytest.raises(ValueError, match="LoRA architecture"):
+        _checkpoint_model().load_model_combined(path, strict=False)
+    del checkpoint["state_dicts"]["text_adapters"]
+    torch.save(checkpoint, path)
+    with pytest.raises(ValueError, match="missing trained adapters"):
+        target.load_model_combined(path, strict=False)

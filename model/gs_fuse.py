@@ -868,8 +868,9 @@ class GSFuse(nn.Module):
     def llm(self):
         return self.text_encoder.llm
 
-    @torch.no_grad()
     def text_embedding(self, text: str):
+        if getattr(self.text_encoder, "use_lora", False) or FINETUNE_LLM_LAST_LAYER:
+            return self.text_encoder.encode_instance(text, self.window, self.stride, self.device)
         vec = self.text_inst_cache.get(text)
         if vec is None:
             vec = self.text_encoder.encode_instance(text, self.window, self.stride, self.device)
@@ -877,7 +878,6 @@ class GSFuse(nn.Module):
             return vec
         return vec.to(self.device)
 
-    @torch.no_grad()
     def get_text_tokens_all(self, text: str):
         tok_h, mask = self.text_encoder.encode_tokens(
             text, self.window, self.stride, self.max_text_tokens, self.device
@@ -1333,6 +1333,10 @@ class GSFuse(nn.Module):
             "gate_type": self.gate_type,
             "llm_hidden": llm_hidden,
             "use_4bit": bool(USE_4BIT),
+            "use_lora": bool(getattr(self.text_encoder, "use_lora", False)),
+            "lora_rank": getattr(self.text_encoder, "lora_rank", None),
+            "lora_alpha": getattr(self.text_encoder, "lora_alpha", None),
+            "lora_dropout": getattr(self.text_encoder, "lora_dropout", None),
             "decoder_layers": int(dec_layers) if dec_layers is not None else None,
             "decoder_heads": int(dec_heads) if dec_heads is not None else None,
             "gate_tau": float(getattr(self, "gate_tau", 1.0)),
@@ -1371,6 +1375,11 @@ class GSFuse(nn.Module):
         # learned state. Save it only when this run can change its parameters.
         if FINETUNE_LLM_LAST_LAYER:
             state_dicts["text_encoder"] = self.text_encoder.state_dict()
+        elif getattr(self.text_encoder, "use_lora", False):
+            state_dicts["text_adapters"] = {
+                name: value for name, value in self.text_encoder.state_dict().items()
+                if name.endswith(("lora_A", "lora_B"))
+            }
 
         if USE_MULTI_SCALE_TS:
             state_dicts["multi_scale_extractor"] = self.multi_scale_extractor.state_dict()
@@ -1398,6 +1407,21 @@ class GSFuse(nn.Module):
         ckpt = torch.load(save_path, map_location="cpu")
         sd = ckpt["state_dicts"]
         meta = ckpt.get("metadata", {})
+        adapted = bool(getattr(self.text_encoder, "use_lora", False))
+        if bool(meta.get("use_lora", False)) != adapted:
+            raise ValueError("Checkpoint LoRA architecture differs from the constructed model")
+        if adapted and meta.get("lora_rank") != self.text_encoder.lora_rank:
+            raise ValueError("Checkpoint LoRA rank differs from the constructed model")
+        if adapted and meta.get("lora_alpha") != self.text_encoder.lora_alpha:
+            raise ValueError("Checkpoint LoRA scaling differs from the constructed model")
+        if adapted and "text_adapters" not in sd and "text_encoder" not in sd:
+            raise ValueError("LoRA checkpoint is missing trained adapters")
+        if "text_adapters" in sd:
+            expected = {name for name in self.text_encoder.state_dict()
+                        if name.endswith(("lora_A", "lora_B"))}
+            if set(sd["text_adapters"]) != expected:
+                raise ValueError("Checkpoint adapter keys differ from the constructed model")
+            self.text_encoder.load_state_dict(sd["text_adapters"], strict=False)
         saved_task = meta.get("forecast_task")
         current_task = self.forecast_task_config.task
         saved_task_name = saved_task.get("task") if isinstance(saved_task, dict) else None
@@ -1827,7 +1851,8 @@ def train(model, train_loader, test_loader, vali_loader, num_epochs, output_path
         })
 
     # Add LoRA adapter parameters if enabled
-    if USE_LORA:
+    if getattr(model.text_encoder, "use_lora", False):
+        model.text_encoder.enable_lora_training()
         lora_params = model.text_encoder.lora_parameters()
         if lora_params:
             trainable_groups.append({

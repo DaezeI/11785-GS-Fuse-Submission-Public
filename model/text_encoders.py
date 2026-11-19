@@ -30,11 +30,13 @@ class LoRALinear(nn.Module):
         dropout: float = 0.05,
     ):
         super().__init__()
+        if rank <= 0:
+            raise ValueError("LoRA rank must be positive")
         self.base_layer = base_layer
         self.rank = rank
         self.scaling = alpha / rank
-        self.lora_A = nn.Parameter(torch.empty(base_layer.in_features, rank))
-        self.lora_B = nn.Parameter(torch.zeros(rank, base_layer.out_features))
+        self.lora_A = nn.Parameter(base_layer.weight.new_empty(base_layer.in_features, rank))
+        self.lora_B = nn.Parameter(base_layer.weight.new_zeros(rank, base_layer.out_features))
         self.dropout = nn.Dropout(dropout) if dropout > 0.0 else nn.Identity()
 
         # Kaiming uniform init for A, zeros for B ensures Delta W = 0 at start
@@ -50,6 +52,14 @@ class LoRALinear(nn.Module):
         base_out = self.base_layer(x)
         lora_term = (self.dropout(x) @ self.lora_A) @ self.lora_B * self.scaling
         return base_out + lora_term
+
+    @property
+    def weight(self):
+        return self.base_layer.weight
+
+    @property
+    def bias(self):
+        return self.base_layer.bias
 
 
 def inject_lora_adapters(
@@ -152,15 +162,22 @@ class HuggingFaceTextEncoder(BaseTextEncoder):
         super().__init__()
         self.family = family.lower()
         self._tokenizer, self.backbone = _load_causal_lm(model_path, use_4bit=use_4bit)
+        for parameter in self.backbone.parameters():
+            parameter.requires_grad = False
         cfg = getattr(self.backbone, "config", None)
         self._output_dim = int(getattr(cfg, "hidden_size", 3072))
 
         self.use_lora = use_lora
         self.lora_rank = lora_rank
+        self.lora_alpha = lora_alpha
+        self.lora_dropout = lora_dropout
         if use_lora:
-            self.adapted_params_count = inject_lora_adapters(
-                self.backbone, rank=lora_rank, alpha=lora_alpha, dropout=lora_dropout
-            )
+            # Keep downstream shared-module initialization aligned with the
+            # frozen arm at the same seed despite adapter initialization.
+            with torch.random.fork_rng():
+                self.adapted_params_count = inject_lora_adapters(
+                    self.backbone, rank=lora_rank, alpha=lora_alpha, dropout=lora_dropout
+                )
             print(f"[LoRA] Injected LoRA adapters into text backbone: {self.adapted_params_count:,} trainable parameters.")
         else:
             self.adapted_params_count = 0
@@ -185,7 +202,19 @@ class HuggingFaceTextEncoder(BaseTextEncoder):
         """Return trainable LoRA adapter parameters."""
         if not self.use_lora:
             return []
-        return [p for p in self.parameters() if p.requires_grad]
+        return [p for name, p in self.named_parameters()
+                if name.endswith(("lora_A", "lora_B"))]
+
+    def enable_lora_training(self):
+        """Restore adapters after a stage freezes all model parameters."""
+        self.freeze()
+        for parameter in self.lora_parameters():
+            parameter.requires_grad_(True)
+
+    @property
+    def cache_allowed(self):
+        # Adapted weights change between updates/checkpoints, including eval.
+        return not self.use_lora and not any(p.requires_grad for p in self.backbone.parameters())
 
     def _window_pad_mask(self, text, window, stride, max_text_tokens, device):
         """Padding mask aligned with the windowed hidden states. True = PAD."""
@@ -206,7 +235,8 @@ class HuggingFaceTextEncoder(BaseTextEncoder):
         return pad.unsqueeze(0).to(device)
 
     def _forward_chunk(self, chunk_ids, chunk_mask):
-        grad_context = torch.enable_grad() if (self.training and self.use_lora) else torch.no_grad()
+        live = self.training and any(p.requires_grad for p in self.backbone.parameters())
+        grad_context = torch.enable_grad() if live else torch.no_grad()
         with grad_context:
             out = self.backbone.model(
                 input_ids=chunk_ids,
@@ -220,7 +250,7 @@ class HuggingFaceTextEncoder(BaseTextEncoder):
         h_key = hashlib.md5(text.encode("utf-8", errors="ignore")).hexdigest()
 
         # 1. Check Disk cache (only if NOT training with LoRA)
-        if not (self.training and self.use_lora):
+        if self.cache_allowed:
             disk_path = os.path.join(self.cache_dir, f"{h_key}_inst.pt")
             if os.path.exists(disk_path):
                 try:
@@ -248,7 +278,7 @@ class HuggingFaceTextEncoder(BaseTextEncoder):
             res = torch.mean(torch.cat(embeddings, dim=0), dim=0, keepdim=False).to(device)
 
         # 3. Save to Disk (only if not training with LoRA)
-        if not (self.training and self.use_lora):
+        if self.cache_allowed:
             try:
                 torch.save(res.cpu(), disk_path)
             except Exception:
@@ -266,7 +296,7 @@ class HuggingFaceTextEncoder(BaseTextEncoder):
         h_key = hashlib.md5(f"{text}_{max_text_tokens}".encode("utf-8", errors="ignore")).hexdigest()
 
         # 1. Check Disk cache (only if NOT training with LoRA)
-        if not (self.training and self.use_lora):
+        if self.cache_allowed:
             disk_path = os.path.join(self.cache_dir, f"{h_key}_tok.pt")
             if os.path.exists(disk_path):
                 try:
@@ -313,7 +343,7 @@ class HuggingFaceTextEncoder(BaseTextEncoder):
         mask = self._window_pad_mask(text, window, stride, max_text_tokens, device)
 
         # 3. Save to Disk (only if not training with LoRA)
-        if not (self.training and self.use_lora):
+        if self.cache_allowed:
             try:
                 torch.save({"tok_h": tok_h.cpu(), "mask": mask.cpu()}, disk_path)
             except Exception:
