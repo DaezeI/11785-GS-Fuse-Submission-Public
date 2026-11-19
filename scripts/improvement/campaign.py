@@ -10,6 +10,7 @@ import json
 import os
 from pathlib import Path, PurePosixPath
 import shlex
+import shutil
 import subprocess
 import sys
 
@@ -46,6 +47,21 @@ def resolved(matrix, variant):
     return {**matrix["defaults"], **matrix["variants"][variant]["overrides"]}
 
 
+def validate_readiness(receipt, commit, matrix):
+    if receipt.get("source_commit") != commit or receipt.get("snapshot_sha256") != matrix["snapshot_sha256"]:
+        raise ValueError("Readiness evidence must match this source commit and frozen snapshot")
+    required = ("failure_diagnosed", "disk_and_quota_budget_checked", "window_audits_passed",
+                "stage_handoff_smoke_passed", "gradient_smokes_passed")
+    if any(receipt.get("checks", {}).get(key) is not True for key in required):
+        raise ValueError("Full training requires verified failure, storage, data and model readiness checks")
+    if receipt.get("timing_scope") not in ("date-screened-sensitivity", "publication-verified"):
+        raise ValueError("Declare the timing scope explicitly")
+    if not receipt.get("evidence"):
+        raise ValueError("Readiness receipt needs evidence paths and checksums")
+    if receipt["timing_scope"] == "publication-verified" and not receipt.get("timestamp_ledger_sha256"):
+        raise ValueError("Verified timing requires a versioned timestamp ledger")
+
+
 def render(args):
     matrix, profile = read(MATRIX), read(args.profile)
     required = ("checkout", "python", "snapshot", "moment", "text_model", "run_root",
@@ -54,6 +70,8 @@ def render(args):
         raise ValueError(f"Profile requires {required}")
     if not 0 < profile["walltime_hours"] <= 8:
         raise ValueError("Each job must have a bounded walltime of at most 8 hours")
+    if args.phase == "smoke" and profile["walltime_hours"] > 1:
+        raise ValueError("Audit-first smoke jobs are capped at one hour each")
     # Site directives are private and reviewed by Nicole before submission.
     if not any("walltime=" in line for line in profile["pbs_directives"]):
         raise ValueError("PBS directives must include a walltime")
@@ -83,6 +101,11 @@ def render(args):
     commit = subprocess.check_output(["git", "rev-parse", "HEAD"], cwd=ROOT, text=True).strip()
     if subprocess.check_output(["git", "status", "--porcelain"], cwd=ROOT, text=True).strip():
         raise ValueError("Commit the campaign before rendering a source-pinned batch")
+    readiness = read(args.readiness) if args.readiness else None
+    if args.phase == "full":
+        if readiness is None:
+            raise ValueError("Full training requires --readiness; default phase runs smokes only")
+        validate_readiness(readiness, commit, matrix)
     destination = args.out.resolve()
     destination.mkdir(parents=True, exist_ok=False)
     resource_dir = PurePosixPath(profile["run_root"]) / destination.name
@@ -91,7 +114,7 @@ def render(args):
         for seed in args.seeds:
             config = resolved(matrix, variant)
             task_id = f"{variant}-s{seed}"
-            task = dict(id=task_id, variant=variant, seed=seed, split=args.split,
+            task = dict(id=task_id, variant=variant, seed=seed, split=args.split, phase=args.phase,
                         source_commit=commit, config=config, profile=profile,
                         snapshot_sha256=matrix["snapshot_sha256"],
                         manifest_sha256=matrix["manifest_sha256"],
@@ -110,6 +133,7 @@ def render(args):
             tasks.append(dict(id=task_id, script=script.name, sha256=sha(script),
                               task_file=task_path.name, task_sha256=sha(task_path)))
     plan = dict(source_commit=commit, slots=args.slots, tasks=tasks, selection=selection,
+                phase=args.phase, readiness=readiness,
                 resource_dir=str(resource_dir), matrix_sha256=sha(MATRIX),
                 max_gpu_hours=len(tasks) * profile["walltime_hours"],
                 status="rendered; no jobs submitted")
@@ -144,6 +168,9 @@ def worker(args):
            "WANDB_MODE": "offline", "PYTHONUNBUFFERED": "1"}
     log = output / "execution.log"
     try:
+        minimum_free = float(profile.get("min_free_disk_gib", 20)) * 1024 ** 3
+        if shutil.disk_usage(output).free < minimum_free:
+            raise ValueError("Insufficient output filesystem space for the declared disk budget")
         run([python, "scripts/freeze_c1_inputs.py", "--verify", str(snapshot),
              "--expect-content-sha256", task["snapshot_sha256"]], log, env)
         if sha(snapshot / "manifest.json") != task["manifest_sha256"]:
@@ -163,6 +190,10 @@ def worker(args):
         # Each configuration must pass its own three-stage/reload smoke first.
         run([python, "scripts/improvement/smoke.py", *shared,
              "--output-path", str(output / "smoke")], log, env)
+        if task["phase"] == "smoke":
+            (output / "status.json").write_text(json.dumps(dict(status="smoke_passed",
+                source_commit=commit, note="Execution only; no full model or performance result"), indent=2) + "\n")
+            return
         train = output / "full"
         run([python, "train.py", *shared, "--output-path", str(train)], log, env)
         checkpoint = train / "best_model.pth"
@@ -200,9 +231,11 @@ def main():
     render_parser.add_argument("--out", type=Path, required=True)
     render_parser.add_argument("--variants", nargs="+")
     render_parser.add_argument("--seeds", type=int, nargs="+", default=[0])
-    render_parser.add_argument("--slots", type=int, default=2)
+    render_parser.add_argument("--slots", type=int, default=1)
     render_parser.add_argument("--split", choices=["vali", "test"], default="vali")
     render_parser.add_argument("--selection", type=Path)
+    render_parser.add_argument("--phase", choices=["smoke", "full"], default="smoke")
+    render_parser.add_argument("--readiness", type=Path)
     work_parser = commands.add_parser("worker")
     work_parser.add_argument("--task", type=Path, required=True)
     args = parser.parse_args()

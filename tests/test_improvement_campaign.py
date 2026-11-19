@@ -12,15 +12,15 @@ from scripts.improvement import campaign, submit
 def profile():
     return dict(checkout="/private/code", python="/env/bin/python", snapshot="/data/snapshot",
                 moment="/models/moment", text_model="/models/llama", run_root="/private/runs",
-                pbs_directives=["#PBS -l ngpus=1", "#PBS -l walltime=06:00:00"],
-                setup="source /env/activate", walltime_hours=6)
+                pbs_directives=["#PBS -l ngpus=1", "#PBS -l walltime=01:00:00"],
+                setup="source /env/activate", walltime_hours=1)
 
 
 def arguments(tmp_path, **changes):
     private = tmp_path / "profile.json"
     private.write_text(json.dumps(profile()))
     values = dict(profile=private, out=tmp_path / "batch", variants=None, seeds=[0],
-                  slots=2, split="vali", selection=None)
+                  slots=2, split="vali", selection=None, phase="smoke", readiness=None)
     return argparse.Namespace(**{**values, **changes})
 
 
@@ -29,11 +29,12 @@ def test_screen_renders_linux_paths_and_no_submission(tmp_path):
     with patch.object(campaign.subprocess, "check_output", side_effect=["a" * 40, ""]):
         campaign.render(args)
     plan = json.loads((args.out / "plan.json").read_text())
-    assert len(plan["tasks"]) == 6
-    assert plan["max_gpu_hours"] == 36
+    assert len(plan["tasks"]) == 5
+    assert plan["max_gpu_hours"] == 5
+    assert plan["phase"] == "smoke"
     assert plan["resource_dir"] == "/private/runs/batch"
-    text = (args.out / "lora8-s0.pbs").read_text()
-    assert b"\r" not in (args.out / "lora8-s0.pbs").read_bytes()
+    text = (args.out / "ref-s0.pbs").read_text()
+    assert b"\r" not in (args.out / "ref-s0.pbs").read_bytes()
     assert "\\" not in text
     assert text.index("#PBS") < text.index("set -e")
     assert "/private/code/scripts/improvement/campaign.py" in text
@@ -48,7 +49,7 @@ def test_test_scoring_requires_locked_selection(tmp_path):
 def test_declared_budget_must_match_pbs_walltime(tmp_path):
     args = arguments(tmp_path)
     data = profile()
-    data["walltime_hours"] = 2
+    data["walltime_hours"] = .5
     args.profile.write_text(json.dumps(data))
     with pytest.raises(ValueError, match="walltime matching"):
         campaign.render(args)
@@ -99,7 +100,7 @@ def test_submit_rejects_modified_task_before_any_submission(tmp_path):
 
 def test_matrix_variants_keep_one_change_or_named_package():
     matrix = campaign.read(campaign.MATRIX)
-    assert len(matrix["variants"]) == 13
+    assert len(matrix["variants"]) == 17
     assert len(matrix["gated_designs"]) == 11
     assert campaign.resolved(matrix, "context280")["seq-len"] == 280
     assert campaign.resolved(matrix, "lora8")["use-lora"]
@@ -108,3 +109,25 @@ def test_matrix_variants_keep_one_change_or_named_package():
         config = campaign.resolved(matrix, variant)
         assert config["batch-size"] == 2 and config["pred-len"] == 140
         assert config["no-4bit"] and config["tf32"]
+
+
+def test_full_training_cannot_render_without_readiness(tmp_path):
+    args = arguments(tmp_path, phase="full")
+    with patch.object(campaign.subprocess, "check_output", side_effect=["a" * 40, ""]):
+        with pytest.raises(ValueError, match="requires --readiness"):
+            campaign.render(args)
+    assert not args.out.exists()
+
+
+def test_readiness_is_bound_to_code_snapshot_and_explicit_verified_checks():
+    matrix = campaign.read(campaign.MATRIX)
+    checks = dict.fromkeys(("failure_diagnosed", "disk_and_quota_budget_checked", "window_audits_passed",
+                           "stage_handoff_smoke_passed", "gradient_smokes_passed"), True)
+    record = dict(source_commit="a" * 40, snapshot_sha256=matrix["snapshot_sha256"],
+                  checks=checks, timing_scope="date-screened-sensitivity", evidence=["private receipt + checksum"])
+    campaign.validate_readiness(record, "a" * 40, matrix)
+    with pytest.raises(ValueError, match="source commit"):
+        campaign.validate_readiness(record, "b" * 40, matrix)
+    record["checks"]["disk_and_quota_budget_checked"] = False
+    with pytest.raises(ValueError, match="readiness checks"):
+        campaign.validate_readiness(record, "a" * 40, matrix)
