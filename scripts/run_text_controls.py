@@ -118,6 +118,10 @@ def parse_args():
     p.add_argument("--text-cache")
     p.add_argument("--no-4bit", action="store_true")
     p.add_argument("--tf32", action="store_true")
+    p.add_argument("--use-lora", action="store_true", help="Enable LoRA adapters on text encoder")
+    p.add_argument("--lora-rank", type=int, default=8)
+    p.add_argument("--lora-alpha", type=float, default=16.0)
+    p.add_argument("--lora-dropout", type=float, default=0.05)
     p.add_argument("--out", type=Path, required=True)
     args = p.parse_args()
     if args.batch_size < 1 or args.max_events < 0 or args.shuffles < 1:
@@ -242,6 +246,10 @@ def main():
         use_raw_ts_residual=run_config["use_raw_ts_residual"] if run_config else None,
         use_learnable_last_value=run_config["use_learnable_last_value"] if run_config else None,
         gate_target_objective=run_config.get("gate_target_objective", "task") if run_config else "task",
+        use_lora=run_config.get("use_lora", args.use_lora) if run_config else args.use_lora,
+        lora_rank=run_config.get("lora_rank", args.lora_rank) if run_config else args.lora_rank,
+        lora_alpha=run_config.get("lora_alpha", args.lora_alpha) if run_config else args.lora_alpha,
+        lora_dropout=run_config.get("lora_dropout", args.lora_dropout) if run_config else args.lora_dropout,
         run_provenance=(dict(manifest_sha256=events.audit["manifest_sha256"],
                              price_sha256=events.audit["price_sha256"],
                              scale_population_sha256=events.audit["return_scale_population_sha256"],

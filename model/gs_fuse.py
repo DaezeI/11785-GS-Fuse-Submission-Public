@@ -20,8 +20,12 @@ import numpy as np
 import pandas as pd
 from tqdm import tqdm
 
-from transformers import AutoTokenizer
-from transformers.optimization import get_cosine_schedule_with_warmup
+try:
+    from transformers import AutoTokenizer
+    from transformers.optimization import get_cosine_schedule_with_warmup
+except ImportError:
+    AutoTokenizer = None
+    get_cosine_schedule_with_warmup = None
 
 from model.ts_encoders import build_ts_encoder
 from model.text_encoders import build_text_encoder
@@ -636,6 +640,10 @@ class GSFuse(nn.Module):
             use_raw_ts_residual=None,
             use_learnable_last_value=None,
             gate_target_objective="task",
+            use_lora=None,
+            lora_rank=None,
+            lora_alpha=None,
+            lora_dropout=None,
             # legacy aliases
             llama_name=None,
     ):
@@ -679,15 +687,23 @@ class GSFuse(nn.Module):
         )
         self.fixed_text_gate = None  # inference-only paired control
 
+        if use_lora is not None:
+            self.use_lora = bool(use_lora)
+        else:
+            self.use_lora = bool(USE_LORA)
+        self.lora_rank = int(lora_rank) if lora_rank is not None else LORA_RANK
+        self.lora_alpha = float(lora_alpha) if lora_alpha is not None else LORA_ALPHA
+        self.lora_dropout = float(lora_dropout) if lora_dropout is not None else LORA_DROPOUT
+
         # -------- Text encoder (LLaMA or Phi) --------
         self.text_encoder = build_text_encoder(
             text_backbone,
             text_model_path,
             use_4bit=USE_4BIT,
-            use_lora=USE_LORA,
-            lora_rank=LORA_RANK,
-            lora_alpha=LORA_ALPHA,
-            lora_dropout=LORA_DROPOUT,
+            use_lora=self.use_lora,
+            lora_rank=self.lora_rank,
+            lora_alpha=self.lora_alpha,
+            lora_dropout=self.lora_dropout,
         )
         text_hidden = self.text_encoder.output_dim
 
@@ -1253,9 +1269,9 @@ class GSFuse(nn.Module):
     def variant_modules(self):
         """Name -> module for the optional MoE gate / Q-Former fusion that are active."""
         mods = {}
-        if self.moe_gate is not None:
+        if getattr(self, "moe_gate", None) is not None:
             mods["moe_gate"] = self.moe_gate
-        if self.qformer is not None:
+        if getattr(self, "qformer", None) is not None:
             mods["qformer"] = self.qformer
         return mods
 
@@ -1340,7 +1356,16 @@ class GSFuse(nn.Module):
             "device": str(self.device),
             "forecast_task": self.forecast_task_config.to_dict(),
             "gate_target_objective": self.gate_target_objective,
+            "use_lora": bool(getattr(self, "use_lora", False) or getattr(getattr(self, "text_encoder", None), "use_lora", False)),
+            "lora_rank": int(getattr(self, "lora_rank", 0) or getattr(getattr(self, "text_encoder", None), "lora_rank", 0)),
+            "lora_alpha": float(getattr(self, "lora_alpha", 16.0)),
+            "lora_dropout": float(getattr(self, "lora_dropout", 0.05)),
         }
+
+    def unfreeze_lora(self) -> None:
+        """Ensure LoRA adapters are trainable and base layers are frozen."""
+        if hasattr(self, "text_encoder") and hasattr(self.text_encoder, "unfreeze_lora"):
+            self.text_encoder.unfreeze_lora()
 
     def save_model_combined(self, save_path="model_checkpoint.pth", **kwargs):
         state_dicts = {
@@ -1371,6 +1396,9 @@ class GSFuse(nn.Module):
         # learned state. Save it only when this run can change its parameters.
         if FINETUNE_LLM_LAST_LAYER:
             state_dicts["text_encoder"] = self.text_encoder.state_dict()
+        elif getattr(self.text_encoder, "use_lora", False) or getattr(self, "use_lora", False):
+            if hasattr(self.text_encoder, "lora_state_dict"):
+                state_dicts["lora_adapters"] = self.text_encoder.lora_state_dict()
 
         if USE_MULTI_SCALE_TS:
             state_dicts["multi_scale_extractor"] = self.multi_scale_extractor.state_dict()
@@ -1443,6 +1471,10 @@ class GSFuse(nn.Module):
                     "[load] Skipping incompatible text_encoder state because strict=False. "
                     "Using the text backbone loaded from --text-model-path."
                 )
+        if "lora_adapters" in sd and sd["lora_adapters"] is not None:
+            if hasattr(self.text_encoder, "load_lora_state_dict"):
+                self.text_encoder.load_lora_state_dict(sd["lora_adapters"], strict=False)
+                print(f"[load] Restored {len(sd['lora_adapters'])} LoRA adapter tensors")
         if "llm" in sd and sd["llm"] is not None:
             try:
                 self.text_encoder.llm.load_state_dict(sd["llm"], strict=strict)
@@ -1669,15 +1701,19 @@ def write_return_metrics(path, split, result, model, checkpoint, **metadata):
 
 
 def unfreeze_variant_modules(model):
-    """Let the optional fusion variants (Q-Former, MoE gate) train in stage 3.
+    """Let optional fusion variants and LoRA adapters train in stage 3.
 
     train() freezes every parameter and re-enables a fixed list of modules.
-    The variant modules are added to the optimizer separately, so they must
-    also be unfrozen here, or they stay at their random initialization.
+    Variant modules and LoRA adapters must also be unfrozen here, or they
+    stay frozen at their initialization without receiving gradients.
     """
     for mod in model.variant_modules().values():
         for p in mod.parameters():
             p.requires_grad = True
+    if hasattr(model, "unfreeze_lora"):
+        model.unfreeze_lora()
+    elif hasattr(model, "text_encoder") and hasattr(model.text_encoder, "unfreeze_lora"):
+        model.text_encoder.unfreeze_lora()
 
 
 # ============================= Train / Eval ==================================
@@ -1827,7 +1863,7 @@ def train(model, train_loader, test_loader, vali_loader, num_epochs, output_path
         })
 
     # Add LoRA adapter parameters if enabled
-    if USE_LORA:
+    if getattr(model, "use_lora", False) or getattr(getattr(model, "text_encoder", None), "use_lora", False) or USE_LORA:
         lora_params = model.text_encoder.lora_parameters()
         if lora_params:
             trainable_groups.append({

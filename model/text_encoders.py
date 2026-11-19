@@ -135,6 +135,18 @@ class BaseTextEncoder(nn.Module, ABC):
         for p in self.last_block_parameters():
             p.requires_grad = True
 
+    def lora_parameters(self) -> List[nn.Parameter]:
+        return []
+
+    def unfreeze_lora(self) -> None:
+        pass
+
+    def lora_state_dict(self) -> Dict[str, torch.Tensor]:
+        return {}
+
+    def load_lora_state_dict(self, state_dict: Dict[str, torch.Tensor], strict: bool = False) -> None:
+        pass
+
 
 class HuggingFaceTextEncoder(BaseTextEncoder):
     """Shared chunked hidden-state extraction for causal LM text backbones."""
@@ -182,10 +194,46 @@ class HuggingFaceTextEncoder(BaseTextEncoder):
         return self.backbone
 
     def lora_parameters(self) -> List[nn.Parameter]:
-        """Return trainable LoRA adapter parameters."""
+        """Return LoRA adapter parameters (lora_A, lora_B)."""
         if not self.use_lora:
             return []
-        return [p for p in self.parameters() if p.requires_grad]
+        params = []
+        for m in self.modules():
+            if isinstance(m, LoRALinear):
+                params.extend([m.lora_A, m.lora_B])
+        return params
+
+    def unfreeze_lora(self) -> None:
+        """Ensure LoRA adapters are trainable while base layers stay frozen."""
+        if not self.use_lora:
+            return
+        for p in self.parameters():
+            p.requires_grad = False
+        for m in self.modules():
+            if isinstance(m, LoRALinear):
+                m.lora_A.requires_grad = True
+                m.lora_B.requires_grad = True
+
+    def lora_state_dict(self) -> Dict[str, torch.Tensor]:
+        """Return state dict containing only LoRA adapter parameters."""
+        sd = {}
+        for name, m in self.named_modules():
+            if isinstance(m, LoRALinear):
+                sd[f"{name}.lora_A"] = m.lora_A.data.clone()
+                sd[f"{name}.lora_B"] = m.lora_B.data.clone()
+        return sd
+
+    def load_lora_state_dict(self, state_dict: Dict[str, torch.Tensor], strict: bool = False) -> None:
+        """Load LoRA adapter parameters into LoRALinear modules."""
+        for name, m in self.named_modules():
+            if isinstance(m, LoRALinear):
+                key_A = f"{name}.lora_A"
+                key_B = f"{name}.lora_B"
+                if key_A in state_dict and key_B in state_dict:
+                    m.lora_A.data.copy_(state_dict[key_A])
+                    m.lora_B.data.copy_(state_dict[key_B])
+                elif strict:
+                    raise KeyError(f"Missing LoRA keys {key_A}, {key_B} in state_dict")
 
     def _window_pad_mask(self, text, window, stride, max_text_tokens, device):
         """Padding mask aligned with the windowed hidden states. True = PAD."""
@@ -219,8 +267,8 @@ class HuggingFaceTextEncoder(BaseTextEncoder):
     def encode_instance(self, text: str, window: int, stride: int, device: torch.device) -> torch.Tensor:
         h_key = hashlib.md5(text.encode("utf-8", errors="ignore")).hexdigest()
 
-        # 1. Check Disk cache (only if NOT training with LoRA)
-        if not (self.training and self.use_lora):
+        # 1. Check Disk cache (only if NOT using LoRA)
+        if not self.use_lora:
             disk_path = os.path.join(self.cache_dir, f"{h_key}_inst.pt")
             if os.path.exists(disk_path):
                 try:
@@ -247,8 +295,8 @@ class HuggingFaceTextEncoder(BaseTextEncoder):
         else:
             res = torch.mean(torch.cat(embeddings, dim=0), dim=0, keepdim=False).to(device)
 
-        # 3. Save to Disk (only if not training with LoRA)
-        if not (self.training and self.use_lora):
+        # 3. Save to Disk (only if not using LoRA)
+        if not self.use_lora:
             try:
                 torch.save(res.cpu(), disk_path)
             except Exception:
@@ -265,8 +313,8 @@ class HuggingFaceTextEncoder(BaseTextEncoder):
     ) -> Tuple[torch.Tensor, torch.Tensor]:
         h_key = hashlib.md5(f"{text}_{max_text_tokens}".encode("utf-8", errors="ignore")).hexdigest()
 
-        # 1. Check Disk cache (only if NOT training with LoRA)
-        if not (self.training and self.use_lora):
+        # 1. Check Disk cache (only if NOT using LoRA)
+        if not self.use_lora:
             disk_path = os.path.join(self.cache_dir, f"{h_key}_tok.pt")
             if os.path.exists(disk_path):
                 try:
@@ -312,8 +360,8 @@ class HuggingFaceTextEncoder(BaseTextEncoder):
         tok_h = torch.cat(feats, dim=0).unsqueeze(0)
         mask = self._window_pad_mask(text, window, stride, max_text_tokens, device)
 
-        # 3. Save to Disk (only if not training with LoRA)
-        if not (self.training and self.use_lora):
+        # 3. Save to Disk (only if not using LoRA)
+        if not self.use_lora:
             try:
                 torch.save({"tok_h": tok_h.cpu(), "mask": mask.cpu()}, disk_path)
             except Exception:

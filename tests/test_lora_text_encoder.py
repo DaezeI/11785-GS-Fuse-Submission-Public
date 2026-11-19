@@ -84,6 +84,52 @@ class TestLoRAAdapters(unittest.TestCase):
         out2 = new_lora(x)
         self.assertTrue(torch.allclose(out1, out2, atol=1e-6))
 
+    def test_stage3_unfreeze_and_optimizer_step(self):
+        """Verify that global freeze + unfreeze preserves base freeze and updates only LoRA adapters."""
+        block = DummyAttentionBlock(hidden_dim=32)
+        inject_lora_adapters(block, rank=4, alpha=8.0, dropout=0.0)
+
+        # 1. Global freeze (what train() does at start of Stage 3)
+        for p in block.parameters():
+            p.requires_grad = False
+
+        # 2. Unfreeze LoRA adapters
+        for m in block.modules():
+            if isinstance(m, LoRALinear):
+                m.lora_A.requires_grad = True
+                m.lora_B.requires_grad = True
+
+        # Verify requires_grad status
+        self.assertTrue(block.q_proj.lora_A.requires_grad)
+        self.assertTrue(block.q_proj.lora_B.requires_grad)
+        self.assertFalse(block.q_proj.base_layer.weight.requires_grad)
+
+        # Record initial weights
+        q_base_before = block.q_proj.base_layer.weight.detach().clone()
+        q_lora_A_before = block.q_proj.lora_A.detach().clone()
+        q_lora_B_before = block.q_proj.lora_B.detach().clone()
+
+        # 3. Optimization step
+        optimizer = torch.optim.AdamW([block.q_proj.lora_A, block.q_proj.lora_B], lr=1e-2)
+        x = torch.randn(2, 5, 32)
+        out = block(x)
+        loss = out.sum()
+        loss.backward()
+        optimizer.step()
+
+        # 4. Verify base layer weights are UNCHANGED while LoRA weights CHANGED
+        q_base_after = block.q_proj.base_layer.weight.detach()
+        q_lora_A_after = block.q_proj.lora_A.detach()
+        q_lora_B_after = block.q_proj.lora_B.detach()
+
+        base_delta = (q_base_after - q_base_before).abs().max().item()
+        lora_A_delta = (q_lora_A_after - q_lora_A_before).abs().max().item()
+        lora_B_delta = (q_lora_B_after - q_lora_B_before).abs().max().item()
+
+        self.assertEqual(base_delta, 0.0, "Base linear layer weights changed during optimization!")
+        self.assertGreater(lora_A_delta, 0.0, "LoRA A weights failed to update!")
+        self.assertGreater(lora_B_delta, 0.0, "LoRA B weights failed to update!")
+
 
 if __name__ == "__main__":
     unittest.main()

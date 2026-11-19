@@ -419,6 +419,24 @@ def load_pretrained_model(args, d: int):
     from model.gs_fuse import GSFuse
 
     live_print("[load] Initializing GS-FUSE model and backbones ...")
+    use_lora = getattr(args, "use_lora", None)
+    lora_rank = getattr(args, "lora_rank", None)
+    lora_alpha = getattr(args, "lora_alpha", None)
+    lora_dropout = getattr(args, "lora_dropout", None)
+    if os.path.exists(args.model_path):
+        try:
+            ckpt_meta = torch.load(args.model_path, map_location="cpu").get("metadata", {})
+            if use_lora is None and "use_lora" in ckpt_meta:
+                use_lora = bool(ckpt_meta["use_lora"])
+            if lora_rank is None and "lora_rank" in ckpt_meta:
+                lora_rank = int(ckpt_meta["lora_rank"])
+            if lora_alpha is None and "lora_alpha" in ckpt_meta:
+                lora_alpha = float(ckpt_meta["lora_alpha"])
+            if lora_dropout is None and "lora_dropout" in ckpt_meta:
+                lora_dropout = float(ckpt_meta["lora_dropout"])
+        except Exception:
+            pass
+
     model = GSFuse(
         text_model_path=args.text_model_path,
         ts_backbone=args.ts_backbone,
@@ -446,6 +464,10 @@ def load_pretrained_model(args, d: int):
         use_raw_ts_residual=getattr(args, "use_raw_ts_residual", None),
         use_learnable_last_value=getattr(args, "use_learnable_last_value", None),
         gate_target_objective=getattr(args, "gate_target_objective", "task"),
+        use_lora=use_lora,
+        lora_rank=lora_rank,
+        lora_alpha=lora_alpha,
+        lora_dropout=lora_dropout,
     )
     model.run_provenance = getattr(args, "run_provenance", {})
     live_print("[load] Model initialized. Loading checkpoint weights ...")
