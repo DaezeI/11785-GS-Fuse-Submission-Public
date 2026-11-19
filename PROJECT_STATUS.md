@@ -5,6 +5,12 @@ Routine data preparation is complete. The [research home](https://gs-fuse-resear
 [next-phase plan](docs/NEXT_PHASE_PLAN.md); the experiment register and linked
 result packs are the current evidence index.
 
+**November 18 R3 result.** Nicole ran Adaeze’s exact R3 configuration on her
+personal GPU resource. Training and both full article checks passed. Correct
+and shuffled articles had virtually identical error, and zero return had
+slightly lower mean absolute error. The [R3 result pack](results/adaeze-screened-r3-h200-v2/summary.md)
+separates this H200 result from Adaeze’s pending Delta campaign.
+
 **November 18 price evidence.** Both independently trained price-only runs
 completed. The [matched comparison](results/screened-price-only-v1/summary.md)
 shows a gain for the news-trained package over the corresponding price-only

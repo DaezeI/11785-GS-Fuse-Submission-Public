@@ -1,0 +1,83 @@
+{
+  "run_id": "adaeze-screened-r3-h200-v2",
+  "owner": "Adaeze",
+  "operator": "Nicole",
+  "status": "completed",
+  "completed_at": "2026-11-19T00:15:44+00:00",
+  "hardware": "NVIDIA H200, one GPU",
+  "environment": {
+    "torch": "2.8.0",
+    "transformers": "4.56.1",
+    "momentfm": "0.1.4"
+  },
+  "source_commit": "e051195ce50f496c8877f724e8dc16a28c0ff6b8",
+  "manifest_sha256": "1b04373a4361238b09c0b1d952163973403d2d7839dbb9e7215c429af14b23d1",
+  "price_sha256": "6a873b1d72d27f9188c6bf12acb756775916be8ed9ff42d9e9dd98028f68de2a",
+  "snapshot_content_sha256": "049aa089d2eaa77644be5deba3abad3fa33c0a18b4375553664cafc71370c2bf",
+  "checkpoint_sha256": "9aa4918c67b11f2e5e6c580fb65293f020a05ef5b7ce526edfacf5467f2a62e6",
+  "training_config": {
+    "seed": 0,
+    "batch_size": 8,
+    "sw_stride": 10,
+    "stage1_epochs": 2,
+    "stage2_epochs": 2,
+    "num_epochs": 2,
+    "forecast_task_config": {
+      "task": "return_bp",
+      "anchor": "last_observed_close",
+      "units": "basis_point_log_return",
+      "scale_bp": 48.340354919433594,
+      "huber_delta_bp": 48.340354919433594,
+      "direction_tau_bp": 48.340354919433594,
+      "direction_deadband_bp": 0.0,
+      "direction_weight": 1.0,
+      "direction_horizons": [
+        35,
+        70,
+        140
+      ],
+      "close_channel": 3
+    },
+    "use_raw_ts_residual": true,
+    "use_learnable_last_value": true,
+    "gate_target_objective": "task",
+    "tf32": true,
+    "no_4bit": true,
+    "ts_backbone": "moment",
+    "text_backbone": "llama",
+    "fusion_type": "crossattn",
+    "gate_type": "softmax",
+    "c1_timing_policy": "category4_1400_strict_before"
+  },
+  "pretrained_backbones": [
+    "MOMENT-1-large",
+    "Llama-3.2-1B"
+  ],
+  "event_counts": {
+    "train": 6167,
+    "vali": 2302,
+    "test": 2236
+  },
+  "runtime_seconds": {
+    "scheduler_total": 2735,
+    "main_training_and_selected_evaluation": 1420,
+    "paired_evaluation_and_checksums": 941
+  },
+  "artifact_sha256": {
+    "full/best_model.pth": "9aa4918c67b11f2e5e6c580fb65293f020a05ef5b7ce526edfacf5467f2a62e6",
+    "full/resolved_config.json": "cd75ea287bf6a19c6df1f1860a89b0b69bdd5431ee685b642840a26878b0ef22",
+    "full/selected_test_return_metrics.json": "cf0f9c61b1904d48a2684bc5c03dcbc64658427d6e3775ad4bfc0516b263a4e9",
+    "full/best_validation_return_metrics.json": "a4e05f6ea34d4c25899ae9bf99fc707319ed005dc3c765ec4fbd4d30fc824666",
+    "paired/zeroed_article_tokens.npz": "83d69e4be8c777e4df6fdca63426fc9adad9d88a32e0302f50400ea09e626a9f",
+    "paired/zeroed_article_tokens.analysis.json": "92d7e9f08be02cac94290938bcd18c4a048116d896f36c94d34fddf3642ad841",
+    "paired/fusion_bypass_ts_inst.npz": "704e8e10f569821aa929d8a92b967df89464d9b9955086f5d0cbb4839f14fc90",
+    "paired/fusion_bypass_ts_inst.analysis.json": "0f9542d298d5eb97938581c5e0a750c5f2956a7526d14b455b8afcf29ed8591d"
+  },
+  "verification": {
+    "scheduler_exit_code": 0,
+    "small_smoke_completed": true,
+    "both_paired_checks_completed": true,
+    "source_artifacts_and_archive_hashes_verified": true,
+    "retained_article_release_times_verified": false
+  }
+}
