@@ -2,7 +2,7 @@
   "title": "GS-Fuse Research Home",
   "stage": "Controlled experiments and final writing",
   "overview": "The last-price rule beat our trained price models. In Adaeze’s completed R3 return run, correct and shuffled articles gave nearly identical results, and predicting zero return had slightly lower error.",
-  "updated_at": "2026-11-19T00:34:45+00:00",
+  "updated_at": "2026-11-19T01:37:14+00:00",
   "source_url": "https://github.com/DaezeI/11785-GS-Fuse-Submission-Public/blob/main/research_home/records.json",
   "links": [
     {
@@ -41,6 +41,39 @@
     }
   ],
   "experiments": [
+    {
+      "id": "c1-article-readout-v1",
+      "title": "Did a simple model gain from the correct article?",
+      "owner": "Nicole",
+      "kind": "Controlled experiment",
+      "status": "completed",
+      "question": "Do frozen article embeddings improve 35-bar close-return forecasts over prices and event metadata?",
+      "configuration": "Frozen screened C1. Price and metadata ridge models with matched and reassigned pooled Llama embeddings. All comparisons use the same held-out rows.",
+      "finding": "The matched-article model reached 64.721 bp MAE versus 64.462 bp with prices and metadata alone. Reassigning articles at test time changed MAE by 0.020 bp.",
+      "limitations": "Results cover 2,191 eligible held-out events and one pooled representation at the 35-bar endpoint. Retained article release times are unverified.",
+      "figure": {
+        "url": "https://raw.githubusercontent.com/DaezeI/11785-GS-Fuse-Submission-Public/main/results/c1-article-readout-v1/article-readout.png",
+        "alt": "Relative MAE intervals for matched article forecasts versus price and metadata, a reassigned training control, and a test-time reassignment control."
+      },
+      "evidence": [
+        {
+          "label": "Result summary",
+          "url": "https://github.com/DaezeI/11785-GS-Fuse-Submission-Public/blob/main/results/c1-article-readout-v1/summary.md"
+        },
+        {
+          "label": "Metrics and uncertainty",
+          "url": "https://github.com/DaezeI/11785-GS-Fuse-Submission-Public/blob/main/results/c1-article-readout-v1/metrics.json"
+        },
+        {
+          "label": "Provenance",
+          "url": "https://github.com/DaezeI/11785-GS-Fuse-Submission-Public/blob/main/results/c1-article-readout-v1/provenance.json"
+        }
+      ],
+      "related": [
+        "adaeze-screened-r3-h200-v2"
+      ],
+      "updated_at": "2026-11-19T01:37:14+00:00"
+    },
     {
       "id": "jessica-r3-qformer-unfreeze-smoke-v1",
       "title": "Does the Q-Former update after the Stage 3 fix?",
