@@ -4,13 +4,72 @@
 from __future__ import annotations
 
 import os
+import math
 import hashlib
 from abc import ABC, abstractmethod
-from typing import Optional, Tuple
+from typing import Optional, Tuple, List
 
 import torch
 import torch.nn as nn
-from transformers import AutoModelForCausalLM, AutoTokenizer, BitsAndBytesConfig
+try:
+    from transformers import AutoModelForCausalLM, AutoTokenizer, BitsAndBytesConfig
+except ImportError:
+    AutoModelForCausalLM = None
+    AutoTokenizer = None
+    BitsAndBytesConfig = None
+
+
+class LoRALinear(nn.Module):
+    """Parameter-efficient low-rank adaptation layer wrapping a frozen linear base."""
+
+    def __init__(
+        self,
+        base_layer: nn.Linear,
+        rank: int = 8,
+        alpha: float = 16.0,
+        dropout: float = 0.05,
+    ):
+        super().__init__()
+        self.base_layer = base_layer
+        self.rank = rank
+        self.scaling = alpha / rank
+        self.lora_A = nn.Parameter(torch.empty(base_layer.in_features, rank))
+        self.lora_B = nn.Parameter(torch.zeros(rank, base_layer.out_features))
+        self.dropout = nn.Dropout(dropout) if dropout > 0.0 else nn.Identity()
+
+        # Kaiming uniform init for A, zeros for B ensures Delta W = 0 at start
+        nn.init.kaiming_uniform_(self.lora_A, a=math.sqrt(5))
+        nn.init.zeros_(self.lora_B)
+
+        # Freeze base linear layer
+        self.base_layer.weight.requires_grad = False
+        if self.base_layer.bias is not None:
+            self.base_layer.bias.requires_grad = False
+
+    def forward(self, x: torch.Tensor) -> torch.Tensor:
+        base_out = self.base_layer(x)
+        lora_term = (self.dropout(x) @ self.lora_A) @ self.lora_B * self.scaling
+        return base_out + lora_term
+
+
+def inject_lora_adapters(
+    model: nn.Module,
+    rank: int = 8,
+    alpha: float = 16.0,
+    dropout: float = 0.05,
+    target_modules: Tuple[str, ...] = ("q_proj", "v_proj"),
+) -> int:
+    """Inject LoRALinear into named submodules of a causal LM. Returns adapted parameter count."""
+    adapted_count = 0
+    for name, module in model.named_modules():
+        for target in target_modules:
+            if hasattr(module, target):
+                sub = getattr(module, target)
+                if isinstance(sub, nn.Linear) and not isinstance(sub, LoRALinear):
+                    wrapped = LoRALinear(sub, rank=rank, alpha=alpha, dropout=dropout)
+                    setattr(module, target, wrapped)
+                    adapted_count += (wrapped.lora_A.numel() + wrapped.lora_B.numel())
+    return adapted_count
 
 
 def _load_causal_lm(name: str, use_4bit: bool = False):
@@ -80,13 +139,32 @@ class BaseTextEncoder(nn.Module, ABC):
 class HuggingFaceTextEncoder(BaseTextEncoder):
     """Shared chunked hidden-state extraction for causal LM text backbones."""
 
-    def __init__(self, model_path: str, family: str = "llama", use_4bit: bool = False):
+    def __init__(
+        self,
+        model_path: str,
+        family: str = "llama",
+        use_4bit: bool = False,
+        use_lora: bool = False,
+        lora_rank: int = 8,
+        lora_alpha: float = 16.0,
+        lora_dropout: float = 0.05,
+    ):
         super().__init__()
         self.family = family.lower()
         self._tokenizer, self.backbone = _load_causal_lm(model_path, use_4bit=use_4bit)
         cfg = getattr(self.backbone, "config", None)
         self._output_dim = int(getattr(cfg, "hidden_size", 3072))
-        
+
+        self.use_lora = use_lora
+        self.lora_rank = lora_rank
+        if use_lora:
+            self.adapted_params_count = inject_lora_adapters(
+                self.backbone, rank=lora_rank, alpha=lora_alpha, dropout=lora_dropout
+            )
+            print(f"[LoRA] Injected LoRA adapters into text backbone: {self.adapted_params_count:,} trainable parameters.")
+        else:
+            self.adapted_params_count = 0
+
         # Persistent disk cache directory (RAM dictionaries omitted to avoid memory exhaustion)
         self.cache_dir = os.path.join("data", f"cache_{self.family}_emb")
         os.makedirs(self.cache_dir, exist_ok=True)
@@ -102,6 +180,12 @@ class HuggingFaceTextEncoder(BaseTextEncoder):
     @property
     def llm(self):
         return self.backbone
+
+    def lora_parameters(self) -> List[nn.Parameter]:
+        """Return trainable LoRA adapter parameters."""
+        if not self.use_lora:
+            return []
+        return [p for p in self.parameters() if p.requires_grad]
 
     def _window_pad_mask(self, text, window, stride, max_text_tokens, device):
         """Padding mask aligned with the windowed hidden states. True = PAD."""
@@ -121,28 +205,29 @@ class HuggingFaceTextEncoder(BaseTextEncoder):
         pad = torch.cat(pieces) == 0
         return pad.unsqueeze(0).to(device)
 
-    @torch.no_grad()
     def _forward_chunk(self, chunk_ids, chunk_mask):
-        out = self.backbone.model(
-            input_ids=chunk_ids,
-            attention_mask=chunk_mask,
-            output_hidden_states=True,
-            use_cache=False,
-        )
-        return out.hidden_states[-1][0].float()
+        grad_context = torch.enable_grad() if (self.training and self.use_lora) else torch.no_grad()
+        with grad_context:
+            out = self.backbone.model(
+                input_ids=chunk_ids,
+                attention_mask=chunk_mask,
+                output_hidden_states=True,
+                use_cache=False,
+            )
+            return out.hidden_states[-1][0].float()
 
-    @torch.no_grad()
     def encode_instance(self, text: str, window: int, stride: int, device: torch.device) -> torch.Tensor:
         h_key = hashlib.md5(text.encode("utf-8", errors="ignore")).hexdigest()
 
-        # 1. Check Disk cache
-        disk_path = os.path.join(self.cache_dir, f"{h_key}_inst.pt")
-        if os.path.exists(disk_path):
-            try:
-                emb = torch.load(disk_path, map_location=device, weights_only=True)
-                return emb.to(device)
-            except Exception:
-                pass
+        # 1. Check Disk cache (only if NOT training with LoRA)
+        if not (self.training and self.use_lora):
+            disk_path = os.path.join(self.cache_dir, f"{h_key}_inst.pt")
+            if os.path.exists(disk_path):
+                try:
+                    emb = torch.load(disk_path, map_location=device, weights_only=True)
+                    return emb.to(device)
+                except Exception:
+                    pass
 
         # 2. Compute via LLM
         ids = self._tokenizer(text, return_tensors="pt", truncation=False, add_special_tokens=True)
@@ -162,14 +247,14 @@ class HuggingFaceTextEncoder(BaseTextEncoder):
         else:
             res = torch.mean(torch.cat(embeddings, dim=0), dim=0, keepdim=False).to(device)
 
-        # 3. Save to Disk
-        try:
-            torch.save(res.cpu(), disk_path)
-        except Exception:
-            pass
+        # 3. Save to Disk (only if not training with LoRA)
+        if not (self.training and self.use_lora):
+            try:
+                torch.save(res.cpu(), disk_path)
+            except Exception:
+                pass
         return res
 
-    @torch.no_grad()
     def encode_tokens(
         self,
         text: str,
@@ -180,22 +265,23 @@ class HuggingFaceTextEncoder(BaseTextEncoder):
     ) -> Tuple[torch.Tensor, torch.Tensor]:
         h_key = hashlib.md5(f"{text}_{max_text_tokens}".encode("utf-8", errors="ignore")).hexdigest()
 
-        # 1. Check Disk cache
-        disk_path = os.path.join(self.cache_dir, f"{h_key}_tok.pt")
-        if os.path.exists(disk_path):
-            try:
-                # Cached masks were saved as all False; rebuild the real one from the tokenizer.
-                data = torch.load(disk_path, map_location=device, weights_only=True)
-                tok_h = data["tok_h"].to(device)
-                mask = self._window_pad_mask(text, window, stride, max_text_tokens, device)
-                if mask.size(1) != tok_h.size(1):
-                    raise ValueError(
-                        f"Cached tokens ({tok_h.size(1)}) and rebuilt mask ({mask.size(1)}) "
-                        "have different lengths; the cache may be stale."
-                    )
-                return tok_h, mask
-            except Exception as e:
-                print(f"[text cache] Ignoring cached tokens for {h_key}: {e}")
+        # 1. Check Disk cache (only if NOT training with LoRA)
+        if not (self.training and self.use_lora):
+            disk_path = os.path.join(self.cache_dir, f"{h_key}_tok.pt")
+            if os.path.exists(disk_path):
+                try:
+                    # Cached masks were saved as all False; rebuild the real one from the tokenizer.
+                    data = torch.load(disk_path, map_location=device, weights_only=True)
+                    tok_h = data["tok_h"].to(device)
+                    mask = self._window_pad_mask(text, window, stride, max_text_tokens, device)
+                    if mask.size(1) != tok_h.size(1):
+                        raise ValueError(
+                            f"Cached tokens ({tok_h.size(1)}) and rebuilt mask ({mask.size(1)}) "
+                            "have different lengths; the cache may be stale."
+                        )
+                    return tok_h, mask
+                except Exception as e:
+                    print(f"[text cache] Ignoring cached tokens for {h_key}: {e}")
 
         # 2. Compute via LLM
         ids = self._tokenizer(
@@ -226,11 +312,12 @@ class HuggingFaceTextEncoder(BaseTextEncoder):
         tok_h = torch.cat(feats, dim=0).unsqueeze(0)
         mask = self._window_pad_mask(text, window, stride, max_text_tokens, device)
 
-        # 3. Save to Disk
-        try:
-            torch.save({"tok_h": tok_h.cpu(), "mask": mask.cpu()}, disk_path)
-        except Exception:
-            pass
+        # 3. Save to Disk (only if not training with LoRA)
+        if not (self.training and self.use_lora):
+            try:
+                torch.save({"tok_h": tok_h.cpu(), "mask": mask.cpu()}, disk_path)
+            except Exception:
+                pass
 
         return tok_h, mask
 
@@ -287,19 +374,73 @@ class HuggingFaceTextEncoder(BaseTextEncoder):
 
 
 class LlamaTextEncoder(HuggingFaceTextEncoder):
-    def __init__(self, model_path: str, use_4bit: bool = False):
-        super().__init__(model_path, family="llama", use_4bit=use_4bit)
+    def __init__(
+        self,
+        model_path: str,
+        use_4bit: bool = False,
+        use_lora: bool = False,
+        lora_rank: int = 8,
+        lora_alpha: float = 16.0,
+        lora_dropout: float = 0.05,
+    ):
+        super().__init__(
+            model_path,
+            family="llama",
+            use_4bit=use_4bit,
+            use_lora=use_lora,
+            lora_rank=lora_rank,
+            lora_alpha=lora_alpha,
+            lora_dropout=lora_dropout,
+        )
 
 
 class PhiTextEncoder(HuggingFaceTextEncoder):
-    def __init__(self, model_path: str, use_4bit: bool = False):
-        super().__init__(model_path, family="phi", use_4bit=use_4bit)
+    def __init__(
+        self,
+        model_path: str,
+        use_4bit: bool = False,
+        use_lora: bool = False,
+        lora_rank: int = 8,
+        lora_alpha: float = 16.0,
+        lora_dropout: float = 0.05,
+    ):
+        super().__init__(
+            model_path,
+            family="phi",
+            use_4bit=use_4bit,
+            use_lora=use_lora,
+            lora_rank=lora_rank,
+            lora_alpha=lora_alpha,
+            lora_dropout=lora_dropout,
+        )
 
 
-def build_text_encoder(backbone: str, model_path: str, use_4bit: bool = False) -> BaseTextEncoder:
+def build_text_encoder(
+    backbone: str,
+    model_path: str,
+    use_4bit: bool = False,
+    use_lora: bool = False,
+    lora_rank: int = 8,
+    lora_alpha: float = 16.0,
+    lora_dropout: float = 0.05,
+) -> BaseTextEncoder:
     backbone = backbone.lower()
     if backbone == "llama":
-        return LlamaTextEncoder(model_path, use_4bit=use_4bit)
+        return LlamaTextEncoder(
+            model_path,
+            use_4bit=use_4bit,
+            use_lora=use_lora,
+            lora_rank=lora_rank,
+            lora_alpha=lora_alpha,
+            lora_dropout=lora_dropout,
+        )
     if backbone == "phi":
-        return PhiTextEncoder(model_path, use_4bit=use_4bit)
+        return PhiTextEncoder(
+            model_path,
+            use_4bit=use_4bit,
+            use_lora=use_lora,
+            lora_rank=lora_rank,
+            lora_alpha=lora_alpha,
+            lora_dropout=lora_dropout,
+        )
     raise ValueError(f"Unknown text_backbone: {backbone}")

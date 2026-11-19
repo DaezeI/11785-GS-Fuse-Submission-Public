@@ -107,6 +107,12 @@ FINETUNE_LLM_LAST_LAYER = False  # Keep LLM frozen per paper specification & 4-b
 FINETUNE_TS_LAST_BLOCK = False  # Optional partial unfreeze for MOMENT/Kronos
 LLM_FINETUNE_LR = 1e-6  # Very low LR for LLM (10x lower than base)
 
+# ============== LoRA Parameter-Efficient Adaptation ==============
+USE_LORA = False
+LORA_RANK = 8
+LORA_ALPHA = 16.0
+LORA_DROPOUT = 0.05
+
 
 # ============== Training Configuration ==============
 class TrainingConfig:
@@ -116,6 +122,7 @@ class TrainingConfig:
     LLM_PROJ_LR = 1e-5
     DECODER_LR = 1e-5
     LLM_LAST_LAYER_LR = 1e-6  # Very low LR for LLM fine-tuning
+    LORA_LR = 5e-5  # Learning rate for parameter-efficient LoRA adapters
 
     # Gradient clipping
     GRAD_CLIP_NORM = 0.5
@@ -673,7 +680,15 @@ class GSFuse(nn.Module):
         self.fixed_text_gate = None  # inference-only paired control
 
         # -------- Text encoder (LLaMA or Phi) --------
-        self.text_encoder = build_text_encoder(text_backbone, text_model_path, use_4bit=USE_4BIT)
+        self.text_encoder = build_text_encoder(
+            text_backbone,
+            text_model_path,
+            use_4bit=USE_4BIT,
+            use_lora=USE_LORA,
+            lora_rank=LORA_RANK,
+            lora_alpha=LORA_ALPHA,
+            lora_dropout=LORA_DROPOUT,
+        )
         text_hidden = self.text_encoder.output_dim
 
         signature = cache_signature(text_model_path, window, stride, torch.backends.cuda.matmul.allow_tf32,
@@ -1797,6 +1812,17 @@ def train(model, train_loader, test_loader, vali_loader, num_epochs, output_path
             'lr': LLM_FINETUNE_LR,  # Very low LR (1e-6 by default)
             'weight_decay': 0.01
         })
+
+    # Add LoRA adapter parameters if enabled
+    if USE_LORA:
+        lora_params = model.text_encoder.lora_parameters()
+        if lora_params:
+            trainable_groups.append({
+                'params': lora_params,
+                'lr': TrainingConfig.LORA_LR,
+                'weight_decay': 0.01,
+            })
+            print(f"[CONFIG] Added {len(lora_params)} LoRA parameter tensors ({sum(p.numel() for p in lora_params):,} params) to optimizer at lr={TrainingConfig.LORA_LR}")
 
     optimizer = optim.AdamW(trainable_groups, betas=(0.9, 0.999), eps=1e-8)
     num_training_steps = num_epochs * len(train_loader)
