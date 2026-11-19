@@ -8,6 +8,8 @@ description: Use when a GS-Fuse contributor wants to register an experiment, rep
 Read the repository's AGENTS.md and the current record in
 `research_home/records.json`. Use `results/TEMPLATE.md` for scientific
 evidence and `docs/RESEARCH_HOME.md` for the team workflow.
+Before editing, follow the [team branch and PR preflight](../../../TEAM_WORKFLOW.md#team-branch-and-pr-preflight).
+
 
 1. Identify the owner, stable run ID, question, reference run, exact commit
    and config, and what changed. Reuse the run ID for status updates. Use a
