@@ -87,4 +87,4 @@ owner handoffs and how these feed the paper and presentation.
 
 ## Compact direction-loss ablation
 
-**Planned:** [Compact direction-loss context and runbook](experiments/compact-direction-v1/README.md). Fixed L35/H140 price-only; compare magnitude loss with and without a direction term.
+**Completed, validation only:** [Compact direction-loss ablation](results/compact-direction-v1/summary.md). The penalty did not improve MAE or H140 direction accuracy; Smooth L1 remains the default.

@@ -1,0 +1,37 @@
+{
+  "id": "compact-direction-v1",
+  "title": "Compact price-only: endpoint direction-loss ablation",
+  "kind": "Controlled experiment",
+  "owner": "Adaeze Ilodianya",
+  "status": "completed",
+  "updated_at": "2026-11-19T08:33:23+00:00",
+  "question": "Does an endpoint close-return sign penalty improve direction without worse whole-path MAE?",
+  "configuration": "Canonical screened C1; 6,167 train / 2,302 validation; L35/H140 and matched seeds 0, 1, 2 on RTX 4060. Same Smooth L1 loss with or without a weight-1 sign penalty at close H35/H70/H140. Validation whole-path MAE selects both arms.",
+  "finding": "Penalty raised path MAE from 82.626 to 82.674 bp and lowered H140 direction hit rate by 1.173 percentage points. Both effects had the same sign in every seed; H35/H70 direction barely changed. Keep Smooth L1 as the default.",
+  "limitations": "Validation only, no text or test scoring; one loss form, weight, set of horizons and checkpoint selector; no paired uncertainty interval.",
+  "figure": {
+    "url": "https://raw.githubusercontent.com/DaezeI/11785-GS-Fuse-Submission-Public/main/results/compact-direction-v1/direction-changes.png",
+    "alt": "With the sign penalty, mean validation direction accuracy moved −0.043, +0.043 and −1.173 percentage points at H35, H70 and H140."
+  },
+  "evidence": [
+    {
+      "label": "Summary",
+      "url": "https://github.com/DaezeI/11785-GS-Fuse-Submission-Public/blob/main/results/compact-direction-v1/summary.md"
+    },
+    {
+      "label": "Numeric validation metrics",
+      "url": "https://github.com/DaezeI/11785-GS-Fuse-Submission-Public/blob/main/results/compact-direction-v1/metrics.json"
+    },
+    {
+      "label": "Provenance",
+      "url": "https://github.com/DaezeI/11785-GS-Fuse-Submission-Public/blob/main/results/compact-direction-v1/provenance.json"
+    },
+    {
+      "label": "Runbook",
+      "url": "https://github.com/DaezeI/11785-GS-Fuse-Submission-Public/blob/main/experiments/compact-direction-v1/README.md"
+    }
+  ],
+  "related": [
+    "improvement-v1-compact-raw-path"
+  ]
+}

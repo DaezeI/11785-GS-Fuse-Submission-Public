@@ -1,0 +1,41 @@
+{
+  "run_id": "compact-direction-v1",
+  "owner": "Adaeze Ilodianya",
+  "status": "completed",
+  "source_commit": "4a426e7e2fb12d73e214d767e25a230996952eb6",
+  "source_dirty_reported": true,
+  "source_sha256": {
+    "scripts/improvement/train_compact_direction_ablation.py": "ea698c904648d7a86332b2cf6a652eccf39f3c52408f393a171fa2101b7d3caa",
+    "scripts/improvement/train_compact_path.py": "a69d72141499330c60aa0d4f4b4efea4a34b79152b5822d28923efed837c0b50",
+    "scripts/improvement/train_compact_raw.py": "9226975861d5ce1ac4eb7adc7d4c1006e2f46113a93454a72de2f11e92a61c86",
+    "scripts/improvement/compact_path_metrics.py": "6fafc4dfedb41c452eb1b8d524b47744811860c4acf0dfd8c7285663b3a9df3c",
+    "scripts/improvement/prepare_raw_inputs.py": "74c58c28e7d96f9d1f062bce53141ab437e5edb7e0281ae08d6f6f11727b5df0",
+    "scripts/freeze_c1_inputs.py": "e2b07df4f23bc61520d91a6881257973a7ab882803e507a274fb68036a55d08b",
+    "data/c1_protocol.py": "e896c780efd6406cbb362c862f1f222ff86bba68e2b22f2c3961a055628b73fb",
+    "data/forecast_task.py": "793edfb045908fd612eae57831791b4579f6a2312cff275d957c8a71614734e1",
+    "model/compact_return.py": "7c1bcb87361d9805e074b3da5347b1fd7db228300bf97742e35a091c804cc559"
+  },
+  "compute": "RTX 4060 Laptop GPU; Windows PowerShell; no scheduler job",
+  "torch": "2.5.1+cu124",
+  "snapshot_content_sha256": "049aa089d2eaa77644be5deba3abad3fa33c0a18b4375553664cafc71370c2bf",
+  "manifest_sha256": "1b04373a4361238b09c0b1d952163973403d2d7839dbb9e7215c429af14b23d1",
+  "price_csv_sha256": "6a873b1d72d27f9188c6bf12acb756775916be8ed9ff42d9e9dd98028f68de2a",
+  "validation_event_ids_sha256": "d6e4fe6cb3b6840b6ebc014e93d1087c70c69b423e8c42dda2cd13ca5def878e",
+  "train_event_ids_sha256": "b8d1d475d39bbf95c19a76d6c86a5b93410fb449a91eb45aafdb4a350db83d68",
+  "timing_policy": "category4_1400_strict_before",
+  "release_timestamps_verified": false,
+  "article_input": "none",
+  "command": "& '.\\scripts\\improvement\\run_local_direction_ablation.ps1'",
+  "artifact_root": "$HOME/gs-fuse-runs/compact-direction-v1/validation",
+  "checkpoint_sha256": {
+    "smooth_l1-seed-0.pt": "162e566e4bd02d3766fc9da833728373b632ddc79c06a2d31c61a1b1032cfb88",
+    "smooth_l1_plus_direction-seed-0.pt": "c388193b3928ba6d91ecbe9fbb15711e2ffe581cc22fc1ebd92c6fcf80379e3b",
+    "smooth_l1-seed-1.pt": "fbdf5d8f593edc4b4e62ab713ac6b2be374a02134cb75fef8552b63d9632e01b",
+    "smooth_l1_plus_direction-seed-1.pt": "2ef62c837e39d8709e724b60dead164a9899c13b5cc73ec6448f642ec987d7a8",
+    "smooth_l1-seed-2.pt": "875a53d8860b59a3706af24f2f7423bc088f7ee259fff48154033d712b2a60dd",
+    "smooth_l1_plus_direction-seed-2.pt": "d638a4d496a5ee8b896adfb1df4e9ec3e4eaa9204d955523a7fdbc408d3da4fc"
+  },
+  "original_uploaded_metrics_sha256": "16a592c87647a71955bb146fe4f9f267edd25b3037090a1f43e85939634e2f38",
+  "metrics_sha256": "91ce2f3b2d47f4944971bc06518e2f6f16e754fe861192e5d40ab5098c661024",
+  "private_artifacts": "Retained locally; shared-storage copy and aggregate Drive backup pending."
+}
