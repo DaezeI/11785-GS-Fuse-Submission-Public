@@ -16,7 +16,8 @@ comparison validity and the proposed next batch.
 - [Trained price-only references](screened-price-only-v1/summary.md) were beaten by the news-trained package in both seeds. The flat last-price forecast beat both trained approaches.
 - [Last-price persistence](screened-price-v1/persistence.md) lowered seed-0 price error at all three horizons on the same 2,236 examples.
 - [Pre-event volatility analysis](price-volatility-v1/summary.md): saved subgroup findings plus CPU block-length sensitivity; no clear matched-text benefit in any volatility group.
-- Adaeze’s [R0–R2 results and zero-return benchmark](screened-return-r0-r2-v1/summary.md) cover full training. Her R3 and paired article checks are queued.
+- [Adaeze’s H200 R3 replay](adaeze-screened-r3-h200-v2/summary.md) completed both article checks. Correct and shuffled articles gave virtually identical test error.
+- Adaeze’s [R0–R2 results and zero-return benchmark](screened-return-r0-r2-v1/summary.md) cover full training. Her separate Delta R3 and paired article checks were queued at the latest check.
 - Jessica owns Q-Former; Joye owns MoE. Historical runs remain historical.
   New architecture comparisons need the same R3 reference, data, seed, budget
   and hardware/environment. This price checkpoint is not that R3 reference.
