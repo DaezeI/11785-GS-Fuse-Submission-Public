@@ -1,0 +1,15 @@
+{
+  "code_commit": "7e510a35e9eb5c3740dc975384a557a37decfdc9",
+  "snapshot": "c1-screened-return-v1",
+  "snapshot_content_sha256": "049aa089d2eaa77644be5deba3abad3fa33c0a18b4375553664cafc71370c2bf",
+  "manifest_sha256": "1b04373a4361238b09c0b1d952163973403d2d7839dbb9e7215c429af14b23d1",
+  "price_sha256": "6a873b1d72d27f9188c6bf12acb756775916be8ed9ff42d9e9dd98028f68de2a",
+  "hardware": "1 NVIDIA H200",
+  "gpu_walltime_seconds": 163,
+  "exit_status": 0,
+  "seed": 0,
+  "checkpoint_sha256": {
+    "stage2_best_model.pth": "7ffc5fce40099e7596392f6486ac2e6dade0eac0bce282fb3c0042c5da11acdc",
+    "best_model.pth": "f50deb5e86ca7864f6dbb0b95a8f53f6452700b07742b1f834ab62363c21398d"
+  }
+}

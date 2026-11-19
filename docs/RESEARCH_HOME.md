@@ -31,6 +31,39 @@ merges to main, reload the Research Home. Contributors working without Codex
 can use the commands in the
 [shared skill](../.agents/skills/gsfuse-result-report/SKILL.md).
 
+## Finish a completed experiment
+
+A request to run an experiment through completion or collect its results
+includes delivery to the standard project destinations. Start as soon as
+the run and its required evaluations are verified.
+
+1. Save the curated result pack under `results/<run-id>/` and publish it
+   with the experiment register and registry update in a focused GitHub PR.
+   Read back the merged record on `main`. The existing Research Home reads
+   that record on refresh.
+2. Archive the reviewed result pack from the published commit. For example,
+
+   ```sh
+   git archive --format=zip --output "$RESULT_ZIP" "$PUBLISHED_COMMIT" -- "results/$RUN_ID"
+   unzip -tq "$RESULT_ZIP"
+   ```
+
+   Upload the aggregate ZIP to **Final Deliverables → 01 Results and
+   Evidence**. Reuse a verified backup of the same version when it already
+   exists. Read back the uploaded file in the folder and record its link
+   and size in the run handoff. The ZIP contains the shareable summary,
+   metrics, figures and scientific provenance. Checkpoints, per-event
+   predictions, raw data and operational logs stay in their existing
+   approved storage.
+3. Hand back the finding and the verified GitHub and Drive links. If either
+   destination is blocked, complete the other and record the remaining
+   step and reason. Keep a verified local ZIP ready for the upload.
+
+The scheduler can finish training and write outputs while Codex is away.
+Collection and publication run in the active task. When a task stops
+after launch, resume from the recorded job and allow the verified
+completion to trigger this delivery during the next requested check.
+
 ## Where work lives
 
 - **GitHub:** canonical versioned code, configs, research records, results, figures, and paper source. [EXPERIMENTS.md](../EXPERIMENTS.md) indexes runs; [results](../results/README.md) contains evidence packs; [report/final](../report/final) holds paper and presentation source.
