@@ -1,0 +1,41 @@
+{
+  "id": "improvement-v1-compact-raw-path",
+  "title": "Compact whole-path baseline and summary residual",
+  "kind": "Controlled experiment",
+  "owner": "Adaeze Ilodianya",
+  "status": "completed",
+  "updated_at": "2026-11-19T07:40:48+00:00",
+  "question": "Does an independently trained summary encoder improve the same lightweight price model on R3's full OHLC return target?",
+  "configuration": "RTX 4060; canonical screened C1; 35 observed and 140 future OHLC bars; seeds 0–2. The price + summary residual holds its same-seed price model fixed. All six checkpoints were selected by validation whole-path MAE and evaluated with a locked test configuration.",
+  "finding": "Price + summary improved validation (82.403 vs. 82.626 bp) but not locked test (80.341 vs. 80.295 bp price-only, 80.487 zero; 2,236 events). Keep compact price-only as the forward baseline and evaluate further variants on validation.",
+  "limitations": "Archive summaries, not original articles; forecast-time availability and near duplicates remain unverified. Test effects were mixed across seeds and no uncertainty interval was estimated. R3's published result is context only; per-event pairing and superiority over R3 were not independently established.",
+  "figure": {
+    "url": "https://raw.githubusercontent.com/DaezeI/11785-GS-Fuse-Submission-Public/main/experiments/improvement-v1/raw-path-validation.png",
+    "alt": "Across three validation seeds, adding event summaries lowered average full-path MAE from 82.626 to 82.403 basis points. The zero-return baseline was 83.636."
+  },
+  "evidence": [
+    {
+      "label": "Locked test scores, provenance, and limits",
+      "url": "https://github.com/DaezeI/11785-GS-Fuse-Submission-Public/blob/main/experiments/improvement-v1/RAW_PATH_TEST_RESULTS.md"
+    },
+    {
+      "label": "Exact locked test summary",
+      "url": "https://github.com/DaezeI/11785-GS-Fuse-Submission-Public/blob/main/experiments/improvement-v1/metrics/compact-path-test-summary.json"
+    },
+    {
+      "label": "Validation scores, provenance, and limits",
+      "url": "https://github.com/DaezeI/11785-GS-Fuse-Submission-Public/blob/main/experiments/improvement-v1/RAW_PATH_VALIDATION.md"
+    },
+    {
+      "label": "Whole-path experiment runbook",
+      "url": "https://github.com/DaezeI/11785-GS-Fuse-Submission-Public/blob/main/experiments/improvement-v1/RAW_PATH_RUNBOOK.md"
+    },
+    {
+      "label": "Existing R3 reference result",
+      "url": "https://github.com/DaezeI/11785-GS-Fuse-Submission-Public/blob/main/results/adaeze-screened-r3-h200-v2/summary.md"
+    }
+  ],
+  "related": [
+    "adaeze-screened-r3-h200-v2"
+  ]
+}
