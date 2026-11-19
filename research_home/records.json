@@ -2,7 +2,7 @@
   "title": "GS-Fuse Research Home",
   "stage": "Controlled experiments and final writing",
   "overview": "The last-price rule beat our trained price models. In Adaeze’s completed R3 return run, correct and shuffled articles gave nearly identical results, and predicting zero return had slightly lower error.",
-  "updated_at": "2026-11-19T08:18:05+00:00",
+  "updated_at": "2026-11-19T08:35:12+00:00",
   "source_url": "https://github.com/DaezeI/11785-GS-Fuse-Submission-Public/blob/main/research_home/records.json",
   "links": [
     {
@@ -43,24 +43,35 @@
   "experiments": [
     {
       "id": "compact-direction-v1",
-      "title": "Compact price-only: add endpoint direction loss",
+      "title": "Compact price-only: endpoint direction-loss ablation",
       "kind": "Controlled experiment",
       "owner": "Adaeze Ilodianya",
-      "status": "planned",
-      "updated_at": "2026-11-19T08:14:52+00:00",
-      "question": "Does a close-return sign penalty help direction accuracy without sacrificing whole-path MAE?",
-      "configuration": "Screened canonical C1, L35/H140, price-only, paired seeds 0–2. Smooth L1 vs the same loss plus weight-1 sign penalty at the three close horizons. Common whole-path validation-MAE checkpoint selection. No test scoring.",
-      "finding": "No full run or result yet. Smoke results cover execution only.",
-      "limitations": "Weight and horizons are fixed for this attempt. Evaluate MAE and hit rates separately; forecast origins use the existing timing assumption. No claim about text or test performance.",
-      "figure": null,
+      "status": "completed",
+      "updated_at": "2026-11-19T08:33:23+00:00",
+      "question": "Does an endpoint close-return sign penalty improve direction without worse whole-path MAE?",
+      "configuration": "Canonical screened C1; 6,167 train / 2,302 validation; L35/H140 and matched seeds 0, 1, 2 on RTX 4060. Same Smooth L1 loss with or without a weight-1 sign penalty at close H35/H70/H140. Validation whole-path MAE selects both arms.",
+      "finding": "Penalty raised path MAE from 82.626 to 82.674 bp and lowered H140 direction hit rate by 1.173 percentage points. Both effects had the same sign in every seed; H35/H70 direction barely changed. Keep Smooth L1 as the default.",
+      "limitations": "Validation only, no text or test scoring; one loss form, weight, set of horizons and checkpoint selector; no paired uncertainty interval.",
+      "figure": {
+        "url": "https://raw.githubusercontent.com/DaezeI/11785-GS-Fuse-Submission-Public/main/results/compact-direction-v1/direction-changes.png",
+        "alt": "With the sign penalty, mean validation direction accuracy moved −0.043, +0.043 and −1.173 percentage points at H35, H70 and H140."
+      },
       "evidence": [
         {
-          "label": "Runbook and predeclared comparison",
-          "url": "https://github.com/DaezeI/11785-GS-Fuse-Submission-Public/blob/main/experiments/compact-direction-v1/README.md"
+          "label": "Summary",
+          "url": "https://github.com/DaezeI/11785-GS-Fuse-Submission-Public/blob/main/results/compact-direction-v1/summary.md"
         },
         {
-          "label": "Trainer",
-          "url": "https://github.com/DaezeI/11785-GS-Fuse-Submission-Public/blob/main/scripts/improvement/train_compact_direction_ablation.py"
+          "label": "Numeric validation metrics",
+          "url": "https://github.com/DaezeI/11785-GS-Fuse-Submission-Public/blob/main/results/compact-direction-v1/metrics.json"
+        },
+        {
+          "label": "Provenance",
+          "url": "https://github.com/DaezeI/11785-GS-Fuse-Submission-Public/blob/main/results/compact-direction-v1/provenance.json"
+        },
+        {
+          "label": "Runbook",
+          "url": "https://github.com/DaezeI/11785-GS-Fuse-Submission-Public/blob/main/experiments/compact-direction-v1/README.md"
         }
       ],
       "related": [

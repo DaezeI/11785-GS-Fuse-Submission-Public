@@ -33,3 +33,9 @@ invoke the same Python trainer directly, first with `--seeds 0 --epochs 1` and
 a fresh output folder, then with `--seeds 0 1 2 --epochs 30` and a different
 fresh folder. Use `--device cpu` for a CPU smoke. See the
 [portable setup](../improvement-v1/COMPACT_PORTABLE_RUNBOOK.md).
+
+## Completed result
+
+The original run completed on RTX 4060. See the
+[paired validation result and limits](../../results/compact-direction-v1/summary.md).
+Keep Smooth L1 as the default for this configuration.

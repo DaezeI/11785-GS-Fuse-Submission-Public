@@ -1,0 +1,279 @@
+{
+  "schema": "gs-fuse-compact-direction-ablation-v1",
+  "task": "c1-ohlc-return-path-v1",
+  "context_bars": 35,
+  "forecast_bars": 140,
+  "channels": [
+    "open",
+    "high",
+    "low",
+    "close"
+  ],
+  "horizons": [
+    35,
+    70,
+    140
+  ],
+  "width": 32,
+  "snapshot_content_sha256": "049aa089d2eaa77644be5deba3abad3fa33c0a18b4375553664cafc71370c2bf",
+  "manifest_sha256": "1b04373a4361238b09c0b1d952163973403d2d7839dbb9e7215c429af14b23d1",
+  "timing_policy": "category4_1400_strict_before",
+  "device": "cuda",
+  "torch_version": "2.5.1+cu124",
+  "batch_size": 32,
+  "max_epochs": 30,
+  "optimizer": "AdamW",
+  "learning_rate": 0.001,
+  "weight_decay": 0.001,
+  "gradient_clip": 1.0,
+  "patience": 5,
+  "scale_bp": 48.340354919433594,
+  "scale_fit": "canonical training targets only",
+  "source_commit": "4a426e7e2fb12d73e214d767e25a230996952eb6",
+  "source_dirty": true,
+  "source_sha256": {
+    "scripts/improvement/train_compact_direction_ablation.py": "ea698c904648d7a86332b2cf6a652eccf39f3c52408f393a171fa2101b7d3caa",
+    "scripts/improvement/train_compact_path.py": "a69d72141499330c60aa0d4f4b4efea4a34b79152b5822d28923efed837c0b50",
+    "scripts/improvement/train_compact_raw.py": "9226975861d5ce1ac4eb7adc7d4c1006e2f46113a93454a72de2f11e92a61c86",
+    "scripts/improvement/compact_path_metrics.py": "6fafc4dfedb41c452eb1b8d524b47744811860c4acf0dfd8c7285663b3a9df3c",
+    "scripts/improvement/prepare_raw_inputs.py": "74c58c28e7d96f9d1f062bce53141ab437e5edb7e0281ae08d6f6f11727b5df0",
+    "scripts/freeze_c1_inputs.py": "e2b07df4f23bc61520d91a6881257973a7ab882803e507a274fb68036a55d08b",
+    "data/c1_protocol.py": "e896c780efd6406cbb362c862f1f222ff86bba68e2b22f2c3961a055628b73fb",
+    "data/forecast_task.py": "793edfb045908fd612eae57831791b4579f6a2312cff275d957c8a71614734e1",
+    "model/compact_return.py": "7c1bcb87361d9805e074b3da5347b1fd7db228300bf97742e35a091c804cc559"
+  },
+  "reporting_units": "basis-point log return relative to last observed close",
+  "direction_logits": "endpoint prediction in train-scale units; temperature is scale_bp",
+  "direction_weight": 1.0,
+  "direction_loss": "mean per-event softplus(-sign(actual)*logit), excluding zero actuals",
+  "selection": "minimum validation full-path OHLC return MAE, epoch 0 eligible",
+  "release_timestamps_verified": false,
+  "validation_only": true,
+  "test_scored": false,
+  "uses_text": false,
+  "train_events": 6167,
+  "validation_events": 2302,
+  "validation_event_ids_sha256": "d6e4fe6cb3b6840b6ebc014e93d1087c70c69b423e8c42dda2cd13ca5def878e",
+  "train_event_ids_sha256": "b8d1d475d39bbf95c19a76d6c86a5b93410fb449a91eb45aafdb4a350db83d68",
+  "seeds": [
+    0,
+    1,
+    2
+  ],
+  "runs": [
+    {
+      "mode": "smooth_l1",
+      "seed": 0,
+      "epochs_run": 6,
+      "best_epoch": 1,
+      "elapsed_seconds": 9.536161099968012,
+      "cuda_peak_allocated_bytes": 20547072,
+      "checkpoint_sha256": "162e566e4bd02d3766fc9da833728373b632ddc79c06a2d31c61a1b1032cfb88"
+    },
+    {
+      "mode": "smooth_l1_plus_direction",
+      "seed": 0,
+      "epochs_run": 6,
+      "best_epoch": 1,
+      "elapsed_seconds": 8.15437970001949,
+      "cuda_peak_allocated_bytes": 20475904,
+      "checkpoint_sha256": "c388193b3928ba6d91ecbe9fbb15711e2ffe581cc22fc1ebd92c6fcf80379e3b"
+    },
+    {
+      "mode": "smooth_l1",
+      "seed": 1,
+      "epochs_run": 7,
+      "best_epoch": 2,
+      "elapsed_seconds": 7.384170099976473,
+      "cuda_peak_allocated_bytes": 20547072,
+      "checkpoint_sha256": "fbdf5d8f593edc4b4e62ab713ac6b2be374a02134cb75fef8552b63d9632e01b"
+    },
+    {
+      "mode": "smooth_l1_plus_direction",
+      "seed": 1,
+      "epochs_run": 7,
+      "best_epoch": 2,
+      "elapsed_seconds": 11.516193700022995,
+      "cuda_peak_allocated_bytes": 20475904,
+      "checkpoint_sha256": "2ef62c837e39d8709e724b60dead164a9899c13b5cc73ec6448f642ec987d7a8"
+    },
+    {
+      "mode": "smooth_l1",
+      "seed": 2,
+      "epochs_run": 6,
+      "best_epoch": 1,
+      "elapsed_seconds": 19.080718600016553,
+      "cuda_peak_allocated_bytes": 20547072,
+      "checkpoint_sha256": "875a53d8860b59a3706af24f2f7423bc088f7ee259fff48154033d712b2a60dd"
+    },
+    {
+      "mode": "smooth_l1_plus_direction",
+      "seed": 2,
+      "epochs_run": 6,
+      "best_epoch": 1,
+      "elapsed_seconds": 22.842777399986517,
+      "cuda_peak_allocated_bytes": 20475904,
+      "checkpoint_sha256": "d638a4d496a5ee8b896adfb1df4e9ec3e4eaa9204d955523a7fdbc408d3da4fc"
+    }
+  ],
+  "comparisons": [
+    {
+      "seed": 0,
+      "smooth_l1": {
+        "path_mae_bp": 82.51069477727934,
+        "close_endpoint_mae_bp": [
+          67.82016174715469,
+          77.37948378386521,
+          108.21626441234757
+        ],
+        "close_endpoint_direction_hit_rate": [
+          0.5912250217202433,
+          0.5651607298001737,
+          0.6151172893136403
+        ]
+      },
+      "smooth_l1_plus_direction": {
+        "path_mae_bp": 82.55565845848177,
+        "close_endpoint_mae_bp": [
+          67.96027757647204,
+          77.37698257618707,
+          108.7630202433177
+        ],
+        "close_endpoint_direction_hit_rate": [
+          0.5920938314509122,
+          0.5651607298001737,
+          0.5986099044309297
+        ]
+      },
+      "improvement_bp": -0.044963681202432326,
+      "direction_hit_rate_change_pp": [
+        0.08688097306689402,
+        0.0,
+        -1.650738488271064
+      ],
+      "direction_eligible": [
+        2302,
+        2302,
+        2302
+      ]
+    },
+    {
+      "seed": 1,
+      "smooth_l1": {
+        "path_mae_bp": 82.31275560320408,
+        "close_endpoint_mae_bp": [
+          67.8535927688075,
+          76.99902964192407,
+          108.51760271020706
+        ],
+        "close_endpoint_direction_hit_rate": [
+          0.575152041702867,
+          0.5543006081668115,
+          0.6064291920069504
+        ]
+      },
+      "smooth_l1_plus_direction": {
+        "path_mae_bp": 82.40543780495307,
+        "close_endpoint_mae_bp": [
+          67.97114364042649,
+          77.17352537981694,
+          108.34433183499607
+        ],
+        "close_endpoint_direction_hit_rate": [
+          0.5773240660295396,
+          0.5551694178974804,
+          0.603388357949609
+        ]
+      },
+      "improvement_bp": -0.09268220174898545,
+      "direction_hit_rate_change_pp": [
+        0.2172024326672517,
+        0.08688097306689402,
+        -0.3040834057341457
+      ],
+      "direction_eligible": [
+        2302,
+        2302,
+        2302
+      ]
+    },
+    {
+      "seed": 2,
+      "smooth_l1": {
+        "path_mae_bp": 83.05439078111728,
+        "close_endpoint_mae_bp": [
+          68.25786013737175,
+          77.77655200977513,
+          108.76836776695693
+        ],
+        "close_endpoint_direction_hit_rate": [
+          0.5225890529973936,
+          0.5013032145960035,
+          0.6072980017376195
+        ]
+      },
+      "smooth_l1_plus_direction": {
+        "path_mae_bp": 83.06029232181722,
+        "close_endpoint_mae_bp": [
+          68.2007536614677,
+          77.74693977472079,
+          109.03098739294512
+        ],
+        "close_endpoint_direction_hit_rate": [
+          0.5182450043440486,
+          0.501737619461338,
+          0.5916594265855778
+        ]
+      },
+      "improvement_bp": -0.005901540699937868,
+      "direction_hit_rate_change_pp": [
+        -0.4344048653344923,
+        0.04344048653345256,
+        -1.56385751520417
+      ],
+      "direction_eligible": [
+        2302,
+        2302,
+        2302
+      ]
+    }
+  ],
+  "means": {
+    "smooth_l1": {
+      "path_mae_bp": 82.62594705386691,
+      "close_endpoint_direction_hit_rate": [
+        0.5629887054735013,
+        0.5402548508543296,
+        0.6096148276860701
+      ]
+    },
+    "smooth_l1_plus_direction": {
+      "path_mae_bp": 82.67379619508402,
+      "close_endpoint_direction_hit_rate": [
+        0.5625543006081668,
+        0.5406892557196641,
+        0.5978858963220389
+      ]
+    },
+    "improvement_bp": -0.04784914121711855,
+    "direction_hit_rate_change_pp": [
+      -0.04344048653344886,
+      0.04344048653344886,
+      -1.1728931364031265
+    ]
+  },
+  "validation_zero": {
+    "path_mae_bp": 83.63572402678969,
+    "close_endpoint_mae_bp": [
+      68.35110842136523,
+      77.84209046690206,
+      110.00569367599387
+    ],
+    "close_endpoint_direction_hit_rate": [
+      0.0,
+      0.0,
+      0.0
+    ]
+  },
+  "elapsed_seconds": 244.42660359997535
+}
