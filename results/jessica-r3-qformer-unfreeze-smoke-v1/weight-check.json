@@ -1,0 +1,8 @@
+{
+  "result": "PASS",
+  "stage2_cond_proj_weight_norm": 0.0,
+  "stage3_cond_proj_weight_norm": 0.02358575758353168,
+  "stage2_ln_self_weight_all_ones": true,
+  "stage3_ln_self_weight_all_ones": false,
+  "ln_self_weight_max_abs_change": 4.011392593383789e-05
+}

@@ -2,7 +2,7 @@
   "title": "GS-Fuse Research Home",
   "stage": "Controlled experiments and final writing",
   "overview": "The last-price rule beat our trained price models. In Adaeze’s completed R3 return run, correct and shuffled articles gave nearly identical results, and predicting zero return had slightly lower error.",
-  "updated_at": "2026-11-19T00:25:25+00:00",
+  "updated_at": "2026-11-19T00:34:45+00:00",
   "source_url": "https://github.com/DaezeI/11785-GS-Fuse-Submission-Public/blob/main/research_home/records.json",
   "links": [
     {
@@ -41,6 +41,48 @@
     }
   ],
   "experiments": [
+    {
+      "id": "jessica-r3-qformer-unfreeze-smoke-v1",
+      "title": "Does the Q-Former update after the Stage 3 fix?",
+      "owner": "Jessica",
+      "kind": "Execution check",
+      "status": "completed",
+      "question": "Do the Q-Former projection and LayerNorm weights change during Stage 3 after PR #28?",
+      "configuration": "R3 return flags with Q-Former and a softmax gate on frozen screened C1. Seed 0, one epoch per stage, batch 2, 16 training events and 8 per evaluation split. One H200 on Nicole’s personal GPU resource.",
+      "finding": "The smoke passed. The projection norm moved from zero to 0.02359 and the LayerNorm weights changed during Stage 3.",
+      "limitations": "Small execution smoke on a single seed. Forecasting performance requires a matched full evaluation.",
+      "figure": {
+        "url": "https://raw.githubusercontent.com/DaezeI/11785-GS-Fuse-Submission-Public/main/results/jessica-r3-qformer-unfreeze-smoke-v1/weight-change.png",
+        "alt": "Projection norm increased from zero to 0.02359. LayerNorm weights changed by up to 0.0000401."
+      },
+      "evidence": [
+        {
+          "label": "Verified smoke result and settings",
+          "url": "https://github.com/DaezeI/11785-GS-Fuse-Submission-Public/blob/main/results/jessica-r3-qformer-unfreeze-smoke-v1/summary.md"
+        },
+        {
+          "label": "Weight-check values",
+          "url": "https://github.com/DaezeI/11785-GS-Fuse-Submission-Public/blob/main/results/jessica-r3-qformer-unfreeze-smoke-v1/weight-check.json"
+        },
+        {
+          "label": "Checkpoint checker",
+          "url": "https://github.com/DaezeI/11785-GS-Fuse-Submission-Public/blob/main/results/jessica-r3-qformer-unfreeze-smoke-v1/check-checkpoints.py"
+        },
+        {
+          "label": "Checkpoint provenance",
+          "url": "https://github.com/DaezeI/11785-GS-Fuse-Submission-Public/blob/main/results/jessica-r3-qformer-unfreeze-smoke-v1/provenance.json"
+        },
+        {
+          "label": "Stage 3 fix",
+          "url": "https://github.com/DaezeI/11785-GS-Fuse-Submission-Public/pull/28"
+        }
+      ],
+      "related": [
+        "qformer-padding-original-split",
+        "return-r0-r3"
+      ],
+      "updated_at": "2026-11-19T00:32:06+00:00"
+    },
     {
       "id": "adaeze-screened-r3-h200-v2",
       "title": "R3 got almost the same result with shuffled news",
