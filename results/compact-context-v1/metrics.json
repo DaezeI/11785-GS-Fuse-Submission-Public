@@ -1,0 +1,277 @@
+{
+  "schema": "gs-fuse-c1-price-context-ablation-v1",
+  "validation_only": true,
+  "test_scored": false,
+  "forecast_bars": 140,
+  "channels": [
+    "open",
+    "high",
+    "low",
+    "close"
+  ],
+  "device": "cuda",
+  "torch_version": "2.5.1+cu124",
+  "timing_policy": "category4_1400_strict_before",
+  "release_timestamps_verified": false,
+  "snapshot_content_sha256": "049aa089d2eaa77644be5deba3abad3fa33c0a18b4375553664cafc71370c2bf",
+  "manifest_sha256": "1b04373a4361238b09c0b1d952163973403d2d7839dbb9e7215c429af14b23d1",
+  "price_timeline": {
+    "raw_rows": 331256,
+    "clean_rows": 331094,
+    "exact_duplicate_rows": 162
+  },
+  "scale_bp": 48.340354919433594,
+  "scale_fit": "retained training rows only",
+  "seeds": [
+    0,
+    1,
+    2
+  ],
+  "batch_size": 32,
+  "max_epochs": 30,
+  "width": 32,
+  "source_commit": "98078039f83f601ec0e3c8e7357bc9deb54f39fb",
+  "source_dirty": true,
+  "source_sha256": {
+    "scripts/improvement/train_compact_context_ablation.py": "0ad91042ccb52447597cf9b3f228dad37c47453be43629e1091af0b6fbf1444e",
+    "model/compact_return.py": "7c1bcb87361d9805e074b3da5347b1fd7db228300bf97742e35a091c804cc559",
+    "scripts/improvement/train_compact_path.py": "a69d72141499330c60aa0d4f4b4efea4a34b79152b5822d28923efed837c0b50",
+    "scripts/improvement/compact_path_metrics.py": "6fafc4dfedb41c452eb1b8d524b47744811860c4acf0dfd8c7285663b3a9df3c",
+    "scripts/improvement/train_compact_raw.py": "9226975861d5ce1ac4eb7adc7d4c1006e2f46113a93454a72de2f11e92a61c86",
+    "scripts/freeze_c1_inputs.py": "e2b07df4f23bc61520d91a6881257973a7ab882803e507a274fb68036a55d08b",
+    "data/c1_protocol.py": "e896c780efd6406cbb362c862f1f222ff86bba68e2b22f2c3961a055628b73fb",
+    "data/forecast_task.py": "793edfb045908fd612eae57831791b4579f6a2312cff275d957c8a71614734e1"
+  },
+  "cohort_sha256": "7b8ba65582908f1eaf5f5827f0cf521b9cb42077e2f9384ba0d231c4103a726e",
+  "cohort": {
+    "rule": "Protect all original L35+H140 bars of every other role, keep complete L140 histories with no collision, and use the exact same retained rows for both contexts.",
+    "canonical_counts": {
+      "train": 6167,
+      "vali": 2302,
+      "test": 2236
+    },
+    "retained": {
+      "train": 6167,
+      "vali": 2302
+    },
+    "excluded_counts": {
+      "train": 0,
+      "vali": 0
+    },
+    "excluded_reason_counts": {
+      "train": {},
+      "vali": {}
+    },
+    "event_ids_sha256": {
+      "train": "b8d1d475d39bbf95c19a76d6c86a5b93410fb449a91eb45aafdb4a350db83d68",
+      "vali": "d6e4fe6cb3b6840b6ebc014e93d1087c70c69b423e8c42dda2cd13ca5def878e"
+    },
+    "canonical_shared_bars": {
+      "train/vali": 0,
+      "train/test": 0,
+      "vali/test": 0
+    },
+    "matched_context_shared_bars": {
+      "L35": {
+        "train/vali": 0,
+        "train/test": 0,
+        "vali/test": 0
+      },
+      "L140": {
+        "train/vali": 0,
+        "train/test": 0,
+        "vali/test": 0
+      }
+    },
+    "matched_context_covered_bars": {
+      "L35": {
+        "train": 180151,
+        "vali": 65573,
+        "test": 63577
+      },
+      "L140": {
+        "train": 191228,
+        "vali": 65746,
+        "test": 63577
+      }
+    },
+    "scope": "Matched eligible subset of canonical C1; not necessarily the full canonical population.",
+    "test_protection": "All 2,236 canonical L35+H140 test windows are protected. No test samples or targets were constructed and no test score was computed."
+  },
+  "run_selection": "minimum validation whole-path OHLC log-return MAE; epoch 0 eligible",
+  "forecast_origin": "same last observed close and target window in both paired contexts",
+  "reporting_units": "basis-point log return relative to last observed close",
+  "validation_zero": {
+    "path_mae_bp": 83.63572402272386,
+    "close_endpoint_mae_bp": [
+      68.3511084758755,
+      77.84209040724564,
+      110.00569381299134
+    ],
+    "close_endpoint_direction_hit_rate": [
+      0.0,
+      0.0,
+      0.0
+    ]
+  },
+  "runs": [
+    {
+      "seed": 0,
+      "context_bars": 35,
+      "epochs_run": 6,
+      "best_epoch": 1,
+      "validation": {
+        "path_mae_bp": 82.51069468677962,
+        "close_endpoint_mae_bp": [
+          67.82016356591843,
+          77.37948529070792,
+          108.21626287254365
+        ],
+        "close_endpoint_direction_hit_rate": [
+          0.5912250217202433,
+          0.5651607298001737,
+          0.6151172893136403
+        ]
+      },
+      "elapsed_seconds": 25.137534700043034,
+      "cuda_peak_allocated_bytes": 20547072,
+      "checkpoint_sha256": "f9a38c5a503129739a3461bf3efe107cd5d21010d22429c9054bb094e343e033"
+    },
+    {
+      "seed": 0,
+      "context_bars": 140,
+      "epochs_run": 6,
+      "best_epoch": 1,
+      "validation": {
+        "path_mae_bp": 82.40936521583617,
+        "close_endpoint_mae_bp": [
+          67.90929843002297,
+          77.26800551740607,
+          108.02359614494401
+        ],
+        "close_endpoint_direction_hit_rate": [
+          0.5799304952215465,
+          0.5651607298001737,
+          0.6151172893136403
+        ]
+      },
+      "elapsed_seconds": 18.939125199976843,
+      "cuda_peak_allocated_bytes": 25784320,
+      "checkpoint_sha256": "0723d557dcd088d54b16038cd2e52bcf89572ae28b1d9bf5a26653a2247b1ef3"
+    },
+    {
+      "seed": 1,
+      "context_bars": 35,
+      "epochs_run": 7,
+      "best_epoch": 2,
+      "validation": {
+        "path_mae_bp": 82.31276964360967,
+        "close_endpoint_mae_bp": [
+          67.8535924593147,
+          76.9990316239824,
+          108.51765019477035
+        ],
+        "close_endpoint_direction_hit_rate": [
+          0.575152041702867,
+          0.5543006081668115,
+          0.6064291920069504
+        ]
+      },
+      "elapsed_seconds": 22.067478200013284,
+      "cuda_peak_allocated_bytes": 20547072,
+      "checkpoint_sha256": "a27fe89570a51c937a8b05eed02f7a186ad7eba3dd6affd5d9536f5e514a0bde"
+    },
+    {
+      "seed": 1,
+      "context_bars": 140,
+      "epochs_run": 7,
+      "best_epoch": 2,
+      "validation": {
+        "path_mae_bp": 82.33938089254032,
+        "close_endpoint_mae_bp": [
+          67.77289586527262,
+          77.33744608041151,
+          107.78977066351928
+        ],
+        "close_endpoint_direction_hit_rate": [
+          0.5899218071242398,
+          0.5582102519548219,
+          0.6151172893136403
+        ]
+      },
+      "elapsed_seconds": 19.57928050000919,
+      "cuda_peak_allocated_bytes": 25784320,
+      "checkpoint_sha256": "b45b5172bf5f3b5c1fb769bc345838d2bab5ed4d819c01dd85c7c4ba776f4685"
+    },
+    {
+      "seed": 2,
+      "context_bars": 35,
+      "epochs_run": 6,
+      "best_epoch": 1,
+      "validation": {
+        "path_mae_bp": 83.05439247865907,
+        "close_endpoint_mae_bp": [
+          68.25786099849365,
+          77.77655243973243,
+          108.76837222150678
+        ],
+        "close_endpoint_direction_hit_rate": [
+          0.5225890529973936,
+          0.5013032145960035,
+          0.6072980017376195
+        ]
+      },
+      "elapsed_seconds": 19.072027699963655,
+      "cuda_peak_allocated_bytes": 20547072,
+      "checkpoint_sha256": "cb4eca934f2bfac39d897fc106d6cf8d82d2cf6ad39c54b989c7eedf7999a2bb"
+    },
+    {
+      "seed": 2,
+      "context_bars": 140,
+      "epochs_run": 7,
+      "best_epoch": 2,
+      "validation": {
+        "path_mae_bp": 82.50195807431854,
+        "close_endpoint_mae_bp": [
+          68.12585931743267,
+          77.5084616247614,
+          108.04530338932324
+        ],
+        "close_endpoint_direction_hit_rate": [
+          0.5712423979148566,
+          0.5421372719374457,
+          0.6151172893136403
+        ]
+      },
+      "elapsed_seconds": 21.6530598999816,
+      "cuda_peak_allocated_bytes": 25784320,
+      "checkpoint_sha256": "b1798991c5b457d8ce309a672e2d4a784dca01513ad2df4e7570e0e5f4c80c86"
+    }
+  ],
+  "comparisons": [
+    {
+      "seed": 0,
+      "l35_mae_bp": 82.51069468677962,
+      "l140_mae_bp": 82.40936521583617,
+      "improvement_bp": 0.10132947094344047
+    },
+    {
+      "seed": 1,
+      "l35_mae_bp": 82.31276964360967,
+      "l140_mae_bp": 82.33938089254032,
+      "improvement_bp": -0.026611248930649367
+    },
+    {
+      "seed": 2,
+      "l35_mae_bp": 83.05439247865907,
+      "l140_mae_bp": 82.50195807431854,
+      "improvement_bp": 0.5524344043405307
+    }
+  ],
+  "means": {
+    "l35_mae_bp": 82.62595226968278,
+    "l140_mae_bp": 82.41690139423169,
+    "improvement_bp": 0.20905087545110726
+  },
+  "elapsed_seconds": 299.8863950999803
+}

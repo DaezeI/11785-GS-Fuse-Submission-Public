@@ -1,0 +1,58 @@
+{
+  "run_id": "compact-context-v1",
+  "owner": "Adaeze Ilodianya",
+  "status": "completed",
+  "compute": "NVIDIA RTX 4060 Laptop GPU; Windows PowerShell; no scheduler job",
+  "source_base_commit": "98078039f83f601ec0e3c8e7357bc9deb54f39fb",
+  "source_dirty_during_run": true,
+  "source_sha256": {
+    "scripts/improvement/train_compact_context_ablation.py": "0ad91042ccb52447597cf9b3f228dad37c47453be43629e1091af0b6fbf1444e",
+    "model/compact_return.py": "7c1bcb87361d9805e074b3da5347b1fd7db228300bf97742e35a091c804cc559",
+    "scripts/improvement/train_compact_path.py": "a69d72141499330c60aa0d4f4b4efea4a34b79152b5822d28923efed837c0b50",
+    "scripts/improvement/compact_path_metrics.py": "6fafc4dfedb41c452eb1b8d524b47744811860c4acf0dfd8c7285663b3a9df3c",
+    "scripts/improvement/train_compact_raw.py": "9226975861d5ce1ac4eb7adc7d4c1006e2f46113a93454a72de2f11e92a61c86",
+    "scripts/freeze_c1_inputs.py": "e2b07df4f23bc61520d91a6881257973a7ab882803e507a274fb68036a55d08b",
+    "data/c1_protocol.py": "e896c780efd6406cbb362c862f1f222ff86bba68e2b22f2c3961a055628b73fb",
+    "data/forecast_task.py": "793edfb045908fd612eae57831791b4579f6a2312cff275d957c8a71614734e1"
+  },
+  "metrics_file_sha256": "4f525cd7ea8a410e5f09303c13826dbf246322f7b720873aec3053a92a26ef72",
+  "snapshot_content_sha256": "049aa089d2eaa77644be5deba3abad3fa33c0a18b4375553664cafc71370c2bf",
+  "manifest_sha256": "1b04373a4361238b09c0b1d952163973403d2d7839dbb9e7215c429af14b23d1",
+  "price_csv_sha256": "6a873b1d72d27f9188c6bf12acb756775916be8ed9ff42d9e9dd98028f68de2a",
+  "cohort_audit_sha256": "7b8ba65582908f1eaf5f5827f0cf521b9cb42077e2f9384ba0d231c4103a726e",
+  "cohort_event_ids_sha256": {
+    "train": "b8d1d475d39bbf95c19a76d6c86a5b93410fb449a91eb45aafdb4a350db83d68",
+    "vali": "d6e4fe6cb3b6840b6ebc014e93d1087c70c69b423e8c42dda2cd13ca5def878e"
+  },
+  "timing_policy": "category4_1400_strict_before",
+  "release_timestamps_verified": false,
+  "article_input": "none",
+  "device": "cuda",
+  "torch_version": "2.5.1+cu124",
+  "launch_command": "& '.\\scripts\\improvement\\run_local_context_ablation.ps1'",
+  "full_cli_arguments": [
+    "--snapshot-root",
+    "$HOME/gs-fuse-runs/raw-snapshot-v1",
+    "--out",
+    "$HOME/gs-fuse-runs/compact-context-v1/validation",
+    "--device",
+    "cuda",
+    "--seeds",
+    "0",
+    "1",
+    "2",
+    "--epochs",
+    "30"
+  ],
+  "local_output_root": "$HOME/gs-fuse-runs/compact-context-v1",
+  "checkpoint_sha256": {
+    "l35-seed-0.pt": "f9a38c5a503129739a3461bf3efe107cd5d21010d22429c9054bb094e343e033",
+    "l140-seed-0.pt": "0723d557dcd088d54b16038cd2e52bcf89572ae28b1d9bf5a26653a2247b1ef3",
+    "l35-seed-1.pt": "a27fe89570a51c937a8b05eed02f7a186ad7eba3dd6affd5d9536f5e514a0bde",
+    "l140-seed-1.pt": "b45b5172bf5f3b5c1fb769bc345838d2bab5ed4d819c01dd85c7c4ba776f4685",
+    "l35-seed-2.pt": "cb4eca934f2bfac39d897fc106d6cf8d82d2cf6ad39c54b989c7eedf7999a2bb",
+    "l140-seed-2.pt": "b1798991c5b457d8ce309a672e2d4a784dca01513ad2df4e7570e0e5f4c80c86"
+  },
+  "artifact_scope": "Aggregate validation evidence only; paired window IDs, predictions, checkpoints and logs stay in approved team storage.",
+  "original_uploaded_metrics_sha256": "92923f80bc1cfb69beb86ff863fde1c36a7569b58893cfff077f9ba8c2a086e3"
+}

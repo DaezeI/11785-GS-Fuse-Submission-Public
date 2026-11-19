@@ -84,3 +84,7 @@ Use [results/README.md](results/README.md) for linked metric sources, result-pac
 templates and figures; use [report/final](report/final/README.md) for versioned
 final writing. The [delivery workflow](docs/FINAL_DELIVERY_WORKFLOW.md) explains
 owner handoffs and how these feed the paper and presentation.
+
+## Compact price-history ablation
+
+**Completed, validation only:** [Compact L35 vs. L140](results/compact-context-v1/summary.md) changed only price context length. Keep L35 as the reference; no test score was computed.
