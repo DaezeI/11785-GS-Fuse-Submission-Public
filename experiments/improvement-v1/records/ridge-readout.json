@@ -4,10 +4,10 @@
   "kind": "Evidence or implementation gated design",
   "owner": "Adaeze Ilodianya",
   "status": "planned",
-  "updated_at": "2026-11-19T01:51:03+00:00",
+  "updated_at": "2026-11-19T03:14:00+00:00",
   "question": "Evaluate the prespecified ridge-readout hypothesis in the controlled improvement design.",
-  "configuration": "Design only. See named protocol section for comparison, fixed settings, metrics, implementation/evidence gate and acceptance checks. No executable config or submission yet.",
-  "finding": "No execution or measured finding. Intended executor: Nicole Lyu on Nicole’s personal GPU resource.",
+  "configuration": "Nicole completed c1-article-readout-v1 at H35 on 2191 donor-eligible test events. Reuse that result. This planned design now covers a new H140 endpoint or explicitly different encoder with a new matched population, not a duplicate H35 attempt.",
+  "finding": "No execution or measured finding. Intended executor: Nicole Lyu on Nicole\u00e2\u20ac\u2122s personal GPU resource.",
   "limitations": "Intraday publication times remain unverified. CPU code checks do not certify full-backbone GPU execution or performance. No benefit is assumed; new attempts require exact compute/input provenance.",
   "evidence": [
     {
@@ -21,6 +21,7 @@
   ],
   "figure": null,
   "related": [
-    "improvement-v1-ref"
+    "improvement-v1-ref",
+    "c1-article-readout-v1"
   ]
 }

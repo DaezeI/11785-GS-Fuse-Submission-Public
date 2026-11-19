@@ -1,4 +1,4 @@
-# Controlled improvement campaign v1
+# Controlled improvement campaign v1 — audit-first revision
 
 Owner: Adaeze Ilodianya. Executor: Nicole Lyu. Prepared November 18, 2026.
 State: **planned; no remote jobs submitted and no performance results**.
@@ -6,9 +6,11 @@ Config: [matrix.json](../../experiments/improvement-v1/matrix.json).
 Launch code: [campaign.py](../../scripts/improvement/campaign.py).
 Operator prompt: [NICOLE_PROMPT.md](../../experiments/improvement-v1/NICOLE_PROMPT.md).
 
+**Current execution order:** [Audit-first and compact-model revision](AUDIT_FIRST_AND_COMPACT_V2.md) supersedes the original immediate full-run screen. The default is five one-hour smokes, followed by evidence-gated full comparisons. There are now 17 existing-pipeline configurations plus the separate compact price-only prototype.
+
 ## What the repository establishes
 
-This design starts from main `dd03d59`, after PR #32 added native q/v LoRA.
+The original design started from main `dd03d59`; this revision also incorporates Nicole's new CPU article-readout result from PR #33 (`88eaaec`).
 The original statement that Llama must remain frozen is now out of date as an
 implementation description. The new path still needed end-to-end repairs:
 Stage 3 froze adapters before gathering optimizer parameters; the outer token
@@ -63,7 +65,7 @@ last-price/zero-return references remain essential. See the existing
   checkpoint before full training. A failure stops that scheduler lane.
   No silent batch-size, precision, tokenizer or loss changes after OOM.
 
-## Thirteen executable configurations
+## Architecture configurations (deferred until audit readiness)
 
 Every row has a machine-readable override, reference and intended change.
 Rank variants keep alpha/r=2, dropout=.05, q/v targets, and adapter LR=5e-5
@@ -94,9 +96,12 @@ GPU smokes must verify its actual patch/position behavior at every length.
 
 ## Selection, controls and claims
 
-The default screen submits six seed-0 tasks: ref, lora8, context140,
-context280, tokens2048, and lora8-context140. Optional arms are prepared
-but are not an instruction to exhaust every combination.
+The former six-full-run screen is superseded. The current default submits only
+five seed-0 smokes: ref, no-contrastive, no-invariance, clean-anchor and
+text-warmup. Their exact one-factor changes are in the revised design and
+matrix. Source/snapshot-bound readiness evidence is required for full runs;
+begin with at most ref plus one hypothesis, capped at 12 GPU-hours total.
+LoRA/context/token/fusion configurations below remain optional later work.
 
 For each validation-selected checkpoint save real text, three seeded shuffled
 assignments (23/24/25), zeroed article tokens and fusion bypass, with aligned
@@ -314,73 +319,22 @@ does not prove more semantic text use; repeat text controls on the ensemble.
 
 ## Execution, budget and result delivery
 
-Use a separate pinned checkout and fresh outputs outside it. The renderer
-uses a private JSON profile containing absolute resource paths, PBS
-single-GPU/memory/CPU directives, a walltime directive and environment setup.
-Example schema (replace placeholders locally; never commit operational details):
+Use [the revised workflow](AUDIT_FIRST_AND_COMPACT_V2.md) and
+[updated Nicole prompt](../../experiments/improvement-v1/NICOLE_PROMPT.md).
+Default rendering produces five SMOKE jobs, one-hour cap each, starting with
+one lane. Full jobs require --phase full and an evidence-backed --readiness
+receipt. No automatic promotion or broad model search is requested. Respect
+the global two-job ceiling and actual disk/project quota budgets.
 
-```json
-{
-  "checkout": "/ABSOLUTE/PINNED/CHECKOUT",
-  "python": "/ABSOLUTE/ENV/bin/python",
-  "snapshot": "/ABSOLUTE/c1-screened-return-v1",
-  "moment": "/ABSOLUTE/MOMENT-1-large",
-  "text_model": "/ABSOLUTE/Llama-3.2-1B",
-  "run_root": "/ABSOLUTE/PRIVATE/RUNS/improvement-v1",
-  "pbs_directives": ["#PBS -l YOUR_SINGLE_GPU_RESOURCE", "#PBS -l walltime=06:00:00"],
-  "setup": "source /ABSOLUTE/ENV/ACTIVATE",
-  "walltime_hours": 6
-}
-```
+Keep the frozen snapshot and fresh private outputs. Run emitted-window audits
+before scheduling, verify stage-best handoff/gradients, and preserve the exact
+error/accounting for any failed attempt. The previous 36-hour six-full-run
+launch is historical, not the current instruction. CPU readout c1-article-readout-v1
+has completed and must be reused, not duplicated. New timestamp-rich cohorts
+require explicit versioning and paired retraining. No publication-time safety
+or model improvement is assumed.
 
-```bash
-# In an appropriate CPU allocation, before rendering/submitting GPU work:
-for L in 35 140 280; do
-  python scripts/audit_c1_protocol.py --snapshot-root "$SNAPSHOT" \
-    --forecast-task return_bp --timing-policy category4_1400_strict_before \
-    --seq-len "$L" --pred-len 140 \
-    --out "$FRESH_PRIVATE_AUDIT_ROOT/L${L}.json" \
-    --windows-csv "$FRESH_PRIVATE_AUDIT_ROOT/L${L}-windows.csv" || exit 1
-done
-# Verify all emitted counts and identical origins/targets before continuing.
-python scripts/improvement/campaign.py render --profile "$PRIVATE_PROFILE" \
-  --out "$PRIVATE_PACKAGE_ROOT/screen-v1" --slots 2
-# Install the rendered directory at the printed resource_dir, inspect scripts,
-# check all current owner jobs, then submit from that directory:
-python submit.py --available-slots 2
-```
-
-Render/submit **once**, not one campaign per variant. PBS dependencies create
-two serial lanes; a failed task blocks successors in that lane. If one slot
-is already occupied, use one available lane and keep the other job unchanged.
-The submitter journals every scheduler response and refuses duplicate starts.
-Existing active jobs must fit the global two-job limit; don't release old
-Delta jobs or cancel another owner's work. There is no automatic resubmission.
-For partial submission or lane failure inspect the queue/journal, collect the
-failure, cancel only campaign-owned blocked descendants if appropriate, and
-create a new named attempt with remaining work. Never delete the journal.
-
-Default six-task screen at a 6-hour job cap: **at most 36 GPU-hours** including
-audit, smoke, training and evaluations. No measured speed claim is made.
-If up to two candidates are promoted, ref plus two candidates at seeds 1/2
-add at most six jobs/36 GPU-hours. Locked seed-0 test re-evaluation needs an
-explicit separate bounded job. Optional arms have no default compute
-authorization from this file; choose a named bounded batch after inspecting
-screen evidence and the operator's current resource limits. The renderer
-caps batches at 18 tasks and jobs at 8 declared hours. Stop on systematic
-failure instead of burning the rest of a lane.
-
-Each worker verifies hashes, emits a real-input audit and windows, runs the
-smoke, trains to a new output directory, and exports both paired controls and
-return analyses. It marks execution pending scientific review. Complete the
-provenance with scheduler ID/accounting, elapsed/peak VRAM, dependency list,
-exact command, environment and backbone revisions/hashes, adapter/projection
-gradient evidence, checkpoint hash and all artifact checksums. For every
-completed/failed attempt update its registry ID using the existing reporting
-skill. Publish small results/metrics/figures in a focused PR and the Research
-Home registry; verify main after merge, then archive the reviewed aggregate
-pack in Drive's `Final Deliverables / 01 Results and Evidence` and read back
-the receipt. Keep checkpoints, raw predictions and private logs off GitHub.
-
-These designs are hypotheses. No arm is promised to improve performance,
-and no calendar-time assumption is presented as verified availability.
+Finish each verified attempt with its result pack, registry update, focused PR,
+Research Home/main readback, and reviewed aggregate ZIP backup/readback in
+Drive's Final Deliverables / 01 Results and Evidence. Raw predictions,
+checkpoints and private execution logs remain on agreed compute storage.

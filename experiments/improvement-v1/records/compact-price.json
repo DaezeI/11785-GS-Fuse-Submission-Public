@@ -1,0 +1,27 @@
+{
+  "id": "improvement-v1-compact-price",
+  "title": "Compact laptop endpoint-return baseline",
+  "kind": "Training design",
+  "owner": "Adaeze Ilodianya",
+  "status": "planned",
+  "updated_at": "2026-11-19T03:14:00+00:00",
+  "question": "Can a small price-only causal-convolution model meet laptop resource limits and match a fixed return baseline?",
+  "configuration": "model/compact_return.py and scripts/improvement/train_compact.py; width32, L35 initial, H35/70/140 close endpoints, frozen screened C1, training-only scale, Huber training, validation H140 MAE selection. No Llama/MOMENT. Real-input full run pending.",
+  "finding": "Prototype has CPU shape, causality, optimization and frozen-price residual checks. No real-market accuracy or CUDA speed result yet.",
+  "limitations": "Laptop hardware detected as RTX4060 Laptop 8GB, but current test PyTorch is CPU-only. Timestamp availability remains unverified. Feature-export and text-control trainer remain future work.",
+  "evidence": [
+    {
+      "label": "Compact model and audit-first protocol",
+      "url": "https://github.com/DaezeI/11785-GS-Fuse-Submission-Public/blob/main/docs/experiments/AUDIT_FIRST_AND_COMPACT_V2.md"
+    },
+    {
+      "label": "Executable price-only trainer",
+      "url": "https://github.com/DaezeI/11785-GS-Fuse-Submission-Public/blob/main/scripts/improvement/train_compact.py"
+    }
+  ],
+  "figure": null,
+  "related": [
+    "improvement-v1-ref",
+    "c1-article-readout-v1"
+  ]
+}

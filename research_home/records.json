@@ -2,7 +2,7 @@
   "title": "GS-Fuse Research Home",
   "stage": "Controlled experiments and final writing",
   "overview": "The last-price rule beat our trained price models. In Adaeze’s completed R3 return run, correct and shuffled articles gave nearly identical results, and predicting zero return had slightly lower error.",
-  "updated_at": "2026-11-19T01:37:14+00:00",
+  "updated_at": "2026-11-19T03:14:06+00:00",
   "source_url": "https://github.com/DaezeI/11785-GS-Fuse-Submission-Public/blob/main/research_home/records.json",
   "links": [
     {
@@ -41,6 +41,828 @@
     }
   ],
   "experiments": [
+    {
+      "id": "improvement-v1-compact-price",
+      "title": "Compact laptop endpoint-return baseline",
+      "kind": "Training design",
+      "owner": "Adaeze Ilodianya",
+      "status": "planned",
+      "updated_at": "2026-11-19T03:14:00+00:00",
+      "question": "Can a small price-only causal-convolution model meet laptop resource limits and match a fixed return baseline?",
+      "configuration": "model/compact_return.py and scripts/improvement/train_compact.py; width32, L35 initial, H35/70/140 close endpoints, frozen screened C1, training-only scale, Huber training, validation H140 MAE selection. No Llama/MOMENT. Real-input full run pending.",
+      "finding": "Prototype has CPU shape, causality, optimization and frozen-price residual checks. No real-market accuracy or CUDA speed result yet.",
+      "limitations": "Laptop hardware detected as RTX4060 Laptop 8GB, but current test PyTorch is CPU-only. Timestamp availability remains unverified. Feature-export and text-control trainer remain future work.",
+      "evidence": [
+        {
+          "label": "Compact model and audit-first protocol",
+          "url": "https://github.com/DaezeI/11785-GS-Fuse-Submission-Public/blob/main/docs/experiments/AUDIT_FIRST_AND_COMPACT_V2.md"
+        },
+        {
+          "label": "Executable price-only trainer",
+          "url": "https://github.com/DaezeI/11785-GS-Fuse-Submission-Public/blob/main/scripts/improvement/train_compact.py"
+        }
+      ],
+      "figure": null,
+      "related": [
+        "improvement-v1-ref",
+        "c1-article-readout-v1"
+      ]
+    },
+    {
+      "id": "improvement-v1-text-warmup",
+      "title": "Improvement v1: text-warmup",
+      "kind": "Training design",
+      "owner": "Adaeze Ilodianya",
+      "status": "planned",
+      "updated_at": "2026-11-19T03:14:00+00:00",
+      "question": "Remove all past-price inputs from Stage-2 warmup only",
+      "configuration": "Committed variant text-warmup; reference=ref. All new runs restore validation-best Stage-1/2 weights. Five default configurations are SMOKE ONLY (one-hour caps); full training requires source/snapshot-bound resource, quota, audit and gradient evidence. LoRA/context search is deferred.",
+      "finding": "No new full execution or measured quality finding. Updated audit-first design and testable controls; intended executor Nicole Lyu.",
+      "limitations": "Intraday publication times remain unverified. CPU code checks do not certify full-backbone GPU execution or performance. No benefit is assumed; new attempts require exact compute/input provenance.",
+      "evidence": [
+        {
+          "label": "Committed configuration matrix",
+          "url": "https://github.com/DaezeI/11785-GS-Fuse-Submission-Public/blob/main/experiments/improvement-v1/matrix.json"
+        },
+        {
+          "label": "Full design and acceptance gates",
+          "url": "https://github.com/DaezeI/11785-GS-Fuse-Submission-Public/blob/main/docs/experiments/IMPROVEMENT_CAMPAIGN_V1.md"
+        },
+        {
+          "label": "Audit-first and laptop model revision",
+          "url": "https://github.com/DaezeI/11785-GS-Fuse-Submission-Public/blob/main/docs/experiments/AUDIT_FIRST_AND_COMPACT_V2.md"
+        }
+      ],
+      "figure": null,
+      "related": [
+        "improvement-v1-ref"
+      ]
+    },
+    {
+      "id": "improvement-v1-clean-anchor",
+      "title": "Improvement v1: clean-anchor",
+      "kind": "Training design",
+      "owner": "Adaeze Ilodianya",
+      "status": "planned",
+      "updated_at": "2026-11-19T03:14:00+00:00",
+      "question": "Use pre-attention TS instance as contrastive anchor only",
+      "configuration": "Committed variant clean-anchor; reference=ref. All new runs restore validation-best Stage-1/2 weights. Five default configurations are SMOKE ONLY (one-hour caps); full training requires source/snapshot-bound resource, quota, audit and gradient evidence. LoRA/context search is deferred.",
+      "finding": "No new full execution or measured quality finding. Updated audit-first design and testable controls; intended executor Nicole Lyu.",
+      "limitations": "Intraday publication times remain unverified. CPU code checks do not certify full-backbone GPU execution or performance. No benefit is assumed; new attempts require exact compute/input provenance.",
+      "evidence": [
+        {
+          "label": "Committed configuration matrix",
+          "url": "https://github.com/DaezeI/11785-GS-Fuse-Submission-Public/blob/main/experiments/improvement-v1/matrix.json"
+        },
+        {
+          "label": "Full design and acceptance gates",
+          "url": "https://github.com/DaezeI/11785-GS-Fuse-Submission-Public/blob/main/docs/experiments/IMPROVEMENT_CAMPAIGN_V1.md"
+        },
+        {
+          "label": "Audit-first and laptop model revision",
+          "url": "https://github.com/DaezeI/11785-GS-Fuse-Submission-Public/blob/main/docs/experiments/AUDIT_FIRST_AND_COMPACT_V2.md"
+        }
+      ],
+      "figure": null,
+      "related": [
+        "improvement-v1-ref"
+      ]
+    },
+    {
+      "id": "improvement-v1-no-invariance",
+      "title": "Improvement v1: no-invariance",
+      "kind": "Training design",
+      "owner": "Adaeze Ilodianya",
+      "status": "planned",
+      "updated_at": "2026-11-19T03:14:00+00:00",
+      "question": "Disable counterfactual invariance loss only",
+      "configuration": "Committed variant no-invariance; reference=ref. All new runs restore validation-best Stage-1/2 weights. Five default configurations are SMOKE ONLY (one-hour caps); full training requires source/snapshot-bound resource, quota, audit and gradient evidence. LoRA/context search is deferred.",
+      "finding": "No new full execution or measured quality finding. Updated audit-first design and testable controls; intended executor Nicole Lyu.",
+      "limitations": "Intraday publication times remain unverified. CPU code checks do not certify full-backbone GPU execution or performance. No benefit is assumed; new attempts require exact compute/input provenance.",
+      "evidence": [
+        {
+          "label": "Committed configuration matrix",
+          "url": "https://github.com/DaezeI/11785-GS-Fuse-Submission-Public/blob/main/experiments/improvement-v1/matrix.json"
+        },
+        {
+          "label": "Full design and acceptance gates",
+          "url": "https://github.com/DaezeI/11785-GS-Fuse-Submission-Public/blob/main/docs/experiments/IMPROVEMENT_CAMPAIGN_V1.md"
+        },
+        {
+          "label": "Audit-first and laptop model revision",
+          "url": "https://github.com/DaezeI/11785-GS-Fuse-Submission-Public/blob/main/docs/experiments/AUDIT_FIRST_AND_COMPACT_V2.md"
+        }
+      ],
+      "figure": null,
+      "related": [
+        "improvement-v1-ref"
+      ]
+    },
+    {
+      "id": "improvement-v1-no-contrastive",
+      "title": "Improvement v1: no-contrastive",
+      "kind": "Training design",
+      "owner": "Adaeze Ilodianya",
+      "status": "planned",
+      "updated_at": "2026-11-19T03:14:00+00:00",
+      "question": "Disable instance contrastive loss only",
+      "configuration": "Committed variant no-contrastive; reference=ref. All new runs restore validation-best Stage-1/2 weights. Five default configurations are SMOKE ONLY (one-hour caps); full training requires source/snapshot-bound resource, quota, audit and gradient evidence. LoRA/context search is deferred.",
+      "finding": "No new full execution or measured quality finding. Updated audit-first design and testable controls; intended executor Nicole Lyu.",
+      "limitations": "Intraday publication times remain unverified. CPU code checks do not certify full-backbone GPU execution or performance. No benefit is assumed; new attempts require exact compute/input provenance.",
+      "evidence": [
+        {
+          "label": "Committed configuration matrix",
+          "url": "https://github.com/DaezeI/11785-GS-Fuse-Submission-Public/blob/main/experiments/improvement-v1/matrix.json"
+        },
+        {
+          "label": "Full design and acceptance gates",
+          "url": "https://github.com/DaezeI/11785-GS-Fuse-Submission-Public/blob/main/docs/experiments/IMPROVEMENT_CAMPAIGN_V1.md"
+        },
+        {
+          "label": "Audit-first and laptop model revision",
+          "url": "https://github.com/DaezeI/11785-GS-Fuse-Submission-Public/blob/main/docs/experiments/AUDIT_FIRST_AND_COMPACT_V2.md"
+        }
+      ],
+      "figure": null,
+      "related": [
+        "improvement-v1-ref"
+      ]
+    },
+    {
+      "id": "improvement-v1-volatility-gate",
+      "title": "Improvement v1: volatility-gate",
+      "kind": "Evidence or implementation gated design",
+      "owner": "Adaeze Ilodianya",
+      "status": "planned",
+      "updated_at": "2026-11-19T01:51:05+00:00",
+      "question": "Evaluate the prespecified volatility-gate hypothesis in the controlled improvement design.",
+      "configuration": "Design only. See named protocol section for comparison, fixed settings, metrics, implementation/evidence gate and acceptance checks. No executable config or submission yet.",
+      "finding": "No execution or measured finding. Intended executor: Nicole Lyu on Nicole’s personal GPU resource.",
+      "limitations": "Intraday publication times remain unverified. CPU code checks do not certify full-backbone GPU execution or performance. No benefit is assumed; new attempts require exact compute/input provenance.",
+      "evidence": [
+        {
+          "label": "Committed configuration matrix",
+          "url": "https://github.com/DaezeI/11785-GS-Fuse-Submission-Public/blob/main/experiments/improvement-v1/matrix.json"
+        },
+        {
+          "label": "Full design and acceptance gates",
+          "url": "https://github.com/DaezeI/11785-GS-Fuse-Submission-Public/blob/main/docs/experiments/IMPROVEMENT_CAMPAIGN_V1.md"
+        }
+      ],
+      "figure": null,
+      "related": [
+        "improvement-v1-ref"
+      ]
+    },
+    {
+      "id": "improvement-v1-verified-clock-delay",
+      "title": "Improvement v1: verified-clock-delay",
+      "kind": "Evidence or implementation gated design",
+      "owner": "Adaeze Ilodianya",
+      "status": "planned",
+      "updated_at": "2026-11-19T01:51:02+00:00",
+      "question": "Evaluate the prespecified verified-clock-delay hypothesis in the controlled improvement design.",
+      "configuration": "Design only. See named protocol section for comparison, fixed settings, metrics, implementation/evidence gate and acceptance checks. No executable config or submission yet.",
+      "finding": "No execution or measured finding. Intended executor: Nicole Lyu on Nicole’s personal GPU resource.",
+      "limitations": "Intraday publication times remain unverified. CPU code checks do not certify full-backbone GPU execution or performance. No benefit is assumed; new attempts require exact compute/input provenance.",
+      "evidence": [
+        {
+          "label": "Committed configuration matrix",
+          "url": "https://github.com/DaezeI/11785-GS-Fuse-Submission-Public/blob/main/experiments/improvement-v1/matrix.json"
+        },
+        {
+          "label": "Full design and acceptance gates",
+          "url": "https://github.com/DaezeI/11785-GS-Fuse-Submission-Public/blob/main/docs/experiments/IMPROVEMENT_CAMPAIGN_V1.md"
+        }
+      ],
+      "figure": null,
+      "related": [
+        "improvement-v1-ref"
+      ]
+    },
+    {
+      "id": "improvement-v1-train-shuffled",
+      "title": "Improvement v1: train-shuffled",
+      "kind": "Evidence or implementation gated design",
+      "owner": "Adaeze Ilodianya",
+      "status": "planned",
+      "updated_at": "2026-11-19T01:51:04+00:00",
+      "question": "Evaluate the prespecified train-shuffled hypothesis in the controlled improvement design.",
+      "configuration": "Design only. See named protocol section for comparison, fixed settings, metrics, implementation/evidence gate and acceptance checks. No executable config or submission yet.",
+      "finding": "No execution or measured finding. Intended executor: Nicole Lyu on Nicole’s personal GPU resource.",
+      "limitations": "Intraday publication times remain unverified. CPU code checks do not certify full-backbone GPU execution or performance. No benefit is assumed; new attempts require exact compute/input provenance.",
+      "evidence": [
+        {
+          "label": "Committed configuration matrix",
+          "url": "https://github.com/DaezeI/11785-GS-Fuse-Submission-Public/blob/main/experiments/improvement-v1/matrix.json"
+        },
+        {
+          "label": "Full design and acceptance gates",
+          "url": "https://github.com/DaezeI/11785-GS-Fuse-Submission-Public/blob/main/docs/experiments/IMPROVEMENT_CAMPAIGN_V1.md"
+        }
+      ],
+      "figure": null,
+      "related": [
+        "improvement-v1-ref"
+      ]
+    },
+    {
+      "id": "improvement-v1-tokens256",
+      "title": "Improvement v1: tokens256",
+      "kind": "Training design",
+      "owner": "Adaeze Ilodianya",
+      "status": "planned",
+      "updated_at": "2026-11-19T03:14:00+00:00",
+      "question": "Token fusion budget 256; pooled instance pathway unchanged",
+      "configuration": "Committed variant tokens256; reference=ref. All new runs restore validation-best Stage-1/2 weights. Five default configurations are SMOKE ONLY (one-hour caps); full training requires source/snapshot-bound resource, quota, audit and gradient evidence. LoRA/context search is deferred.",
+      "finding": "No new full execution or measured quality finding. Updated audit-first design and testable controls; intended executor Nicole Lyu.",
+      "limitations": "Intraday publication times remain unverified. CPU code checks do not certify full-backbone GPU execution or performance. No benefit is assumed; new attempts require exact compute/input provenance.",
+      "evidence": [
+        {
+          "label": "Committed configuration matrix",
+          "url": "https://github.com/DaezeI/11785-GS-Fuse-Submission-Public/blob/main/experiments/improvement-v1/matrix.json"
+        },
+        {
+          "label": "Full design and acceptance gates",
+          "url": "https://github.com/DaezeI/11785-GS-Fuse-Submission-Public/blob/main/docs/experiments/IMPROVEMENT_CAMPAIGN_V1.md"
+        },
+        {
+          "label": "Audit-first and laptop model revision",
+          "url": "https://github.com/DaezeI/11785-GS-Fuse-Submission-Public/blob/main/docs/experiments/AUDIT_FIRST_AND_COMPACT_V2.md"
+        }
+      ],
+      "figure": null,
+      "related": [
+        "improvement-v1-ref"
+      ]
+    },
+    {
+      "id": "improvement-v1-tokens2048",
+      "title": "Improvement v1: tokens2048",
+      "kind": "Training design",
+      "owner": "Adaeze Ilodianya",
+      "status": "planned",
+      "updated_at": "2026-11-19T03:14:00+00:00",
+      "question": "Token fusion budget 2048; pooled instance pathway unchanged",
+      "configuration": "Committed variant tokens2048; reference=ref. All new runs restore validation-best Stage-1/2 weights. Five default configurations are SMOKE ONLY (one-hour caps); full training requires source/snapshot-bound resource, quota, audit and gradient evidence. LoRA/context search is deferred.",
+      "finding": "No new full execution or measured quality finding. Updated audit-first design and testable controls; intended executor Nicole Lyu.",
+      "limitations": "Intraday publication times remain unverified. CPU code checks do not certify full-backbone GPU execution or performance. No benefit is assumed; new attempts require exact compute/input provenance.",
+      "evidence": [
+        {
+          "label": "Committed configuration matrix",
+          "url": "https://github.com/DaezeI/11785-GS-Fuse-Submission-Public/blob/main/experiments/improvement-v1/matrix.json"
+        },
+        {
+          "label": "Full design and acceptance gates",
+          "url": "https://github.com/DaezeI/11785-GS-Fuse-Submission-Public/blob/main/docs/experiments/IMPROVEMENT_CAMPAIGN_V1.md"
+        },
+        {
+          "label": "Audit-first and laptop model revision",
+          "url": "https://github.com/DaezeI/11785-GS-Fuse-Submission-Public/blob/main/docs/experiments/AUDIT_FIRST_AND_COMPACT_V2.md"
+        }
+      ],
+      "figure": null,
+      "related": [
+        "improvement-v1-ref"
+      ]
+    },
+    {
+      "id": "improvement-v1-ridge-readout",
+      "title": "Improvement v1: ridge-readout",
+      "kind": "Evidence or implementation gated design",
+      "owner": "Adaeze Ilodianya",
+      "status": "planned",
+      "updated_at": "2026-11-19T03:14:00+00:00",
+      "question": "Evaluate the prespecified ridge-readout hypothesis in the controlled improvement design.",
+      "configuration": "Nicole completed c1-article-readout-v1 at H35 on 2191 donor-eligible test events. Reuse that result. This planned design now covers a new H140 endpoint or explicitly different encoder with a new matched population, not a duplicate H35 attempt.",
+      "finding": "No execution or measured finding. Intended executor: Nicole Lyu on Nicoleâ€™s personal GPU resource.",
+      "limitations": "Intraday publication times remain unverified. CPU code checks do not certify full-backbone GPU execution or performance. No benefit is assumed; new attempts require exact compute/input provenance.",
+      "evidence": [
+        {
+          "label": "Committed configuration matrix",
+          "url": "https://github.com/DaezeI/11785-GS-Fuse-Submission-Public/blob/main/experiments/improvement-v1/matrix.json"
+        },
+        {
+          "label": "Full design and acceptance gates",
+          "url": "https://github.com/DaezeI/11785-GS-Fuse-Submission-Public/blob/main/docs/experiments/IMPROVEMENT_CAMPAIGN_V1.md"
+        }
+      ],
+      "figure": null,
+      "related": [
+        "improvement-v1-ref",
+        "c1-article-readout-v1"
+      ]
+    },
+    {
+      "id": "improvement-v1-return-only",
+      "title": "Improvement v1: return-only",
+      "kind": "Evidence or implementation gated design",
+      "owner": "Adaeze Ilodianya",
+      "status": "planned",
+      "updated_at": "2026-11-19T01:51:04+00:00",
+      "question": "Evaluate the prespecified return-only hypothesis in the controlled improvement design.",
+      "configuration": "Design only. See named protocol section for comparison, fixed settings, metrics, implementation/evidence gate and acceptance checks. No executable config or submission yet.",
+      "finding": "No execution or measured finding. Intended executor: Nicole Lyu on Nicole’s personal GPU resource.",
+      "limitations": "Intraday publication times remain unverified. CPU code checks do not certify full-backbone GPU execution or performance. No benefit is assumed; new attempts require exact compute/input provenance.",
+      "evidence": [
+        {
+          "label": "Committed configuration matrix",
+          "url": "https://github.com/DaezeI/11785-GS-Fuse-Submission-Public/blob/main/experiments/improvement-v1/matrix.json"
+        },
+        {
+          "label": "Full design and acceptance gates",
+          "url": "https://github.com/DaezeI/11785-GS-Fuse-Submission-Public/blob/main/docs/experiments/IMPROVEMENT_CAMPAIGN_V1.md"
+        }
+      ],
+      "figure": null,
+      "related": [
+        "improvement-v1-ref"
+      ]
+    },
+    {
+      "id": "improvement-v1-qformer8",
+      "title": "Improvement v1: qformer8",
+      "kind": "Training design",
+      "owner": "Adaeze Ilodianya",
+      "status": "planned",
+      "updated_at": "2026-11-19T03:14:00+00:00",
+      "question": "Q-Former fusion package, 8 queries and 2 layers",
+      "configuration": "Committed variant qformer8; reference=ref. All new runs restore validation-best Stage-1/2 weights. Five default configurations are SMOKE ONLY (one-hour caps); full training requires source/snapshot-bound resource, quota, audit and gradient evidence. LoRA/context search is deferred.",
+      "finding": "No new full execution or measured quality finding. Updated audit-first design and testable controls; intended executor Nicole Lyu.",
+      "limitations": "Intraday publication times remain unverified. CPU code checks do not certify full-backbone GPU execution or performance. No benefit is assumed; new attempts require exact compute/input provenance.",
+      "evidence": [
+        {
+          "label": "Committed configuration matrix",
+          "url": "https://github.com/DaezeI/11785-GS-Fuse-Submission-Public/blob/main/experiments/improvement-v1/matrix.json"
+        },
+        {
+          "label": "Full design and acceptance gates",
+          "url": "https://github.com/DaezeI/11785-GS-Fuse-Submission-Public/blob/main/docs/experiments/IMPROVEMENT_CAMPAIGN_V1.md"
+        },
+        {
+          "label": "Audit-first and laptop model revision",
+          "url": "https://github.com/DaezeI/11785-GS-Fuse-Submission-Public/blob/main/docs/experiments/AUDIT_FIRST_AND_COMPACT_V2.md"
+        }
+      ],
+      "figure": null,
+      "related": [
+        "improvement-v1-ref"
+      ]
+    },
+    {
+      "id": "improvement-v1-past-donors",
+      "title": "Improvement v1: past-donors",
+      "kind": "Evidence or implementation gated design",
+      "owner": "Adaeze Ilodianya",
+      "status": "planned",
+      "updated_at": "2026-11-19T01:51:03+00:00",
+      "question": "Evaluate the prespecified past-donors hypothesis in the controlled improvement design.",
+      "configuration": "Design only. See named protocol section for comparison, fixed settings, metrics, implementation/evidence gate and acceptance checks. No executable config or submission yet.",
+      "finding": "No execution or measured finding. Intended executor: Nicole Lyu on Nicole’s personal GPU resource.",
+      "limitations": "Intraday publication times remain unverified. CPU code checks do not certify full-backbone GPU execution or performance. No benefit is assumed; new attempts require exact compute/input provenance.",
+      "evidence": [
+        {
+          "label": "Committed configuration matrix",
+          "url": "https://github.com/DaezeI/11785-GS-Fuse-Submission-Public/blob/main/experiments/improvement-v1/matrix.json"
+        },
+        {
+          "label": "Full design and acceptance gates",
+          "url": "https://github.com/DaezeI/11785-GS-Fuse-Submission-Public/blob/main/docs/experiments/IMPROVEMENT_CAMPAIGN_V1.md"
+        }
+      ],
+      "figure": null,
+      "related": [
+        "improvement-v1-ref"
+      ]
+    },
+    {
+      "id": "improvement-v1-multiscale-780",
+      "title": "Improvement v1: multiscale-780",
+      "kind": "Evidence or implementation gated design",
+      "owner": "Adaeze Ilodianya",
+      "status": "planned",
+      "updated_at": "2026-11-19T01:51:04+00:00",
+      "question": "Evaluate the prespecified multiscale-780 hypothesis in the controlled improvement design.",
+      "configuration": "Design only. See named protocol section for comparison, fixed settings, metrics, implementation/evidence gate and acceptance checks. No executable config or submission yet.",
+      "finding": "No execution or measured finding. Intended executor: Nicole Lyu on Nicole’s personal GPU resource.",
+      "limitations": "Intraday publication times remain unverified. CPU code checks do not certify full-backbone GPU execution or performance. No benefit is assumed; new attempts require exact compute/input provenance.",
+      "evidence": [
+        {
+          "label": "Committed configuration matrix",
+          "url": "https://github.com/DaezeI/11785-GS-Fuse-Submission-Public/blob/main/experiments/improvement-v1/matrix.json"
+        },
+        {
+          "label": "Full design and acceptance gates",
+          "url": "https://github.com/DaezeI/11785-GS-Fuse-Submission-Public/blob/main/docs/experiments/IMPROVEMENT_CAMPAIGN_V1.md"
+        }
+      ],
+      "figure": null,
+      "related": [
+        "improvement-v1-ref"
+      ]
+    },
+    {
+      "id": "improvement-v1-moe4",
+      "title": "Improvement v1: moe4",
+      "kind": "Training design",
+      "owner": "Adaeze Ilodianya",
+      "status": "planned",
+      "updated_at": "2026-11-19T03:14:00+00:00",
+      "question": "Four-expert top-2 MoE gate package",
+      "configuration": "Committed variant moe4; reference=ref. All new runs restore validation-best Stage-1/2 weights. Five default configurations are SMOKE ONLY (one-hour caps); full training requires source/snapshot-bound resource, quota, audit and gradient evidence. LoRA/context search is deferred.",
+      "finding": "No new full execution or measured quality finding. Updated audit-first design and testable controls; intended executor Nicole Lyu.",
+      "limitations": "Intraday publication times remain unverified. CPU code checks do not certify full-backbone GPU execution or performance. No benefit is assumed; new attempts require exact compute/input provenance.",
+      "evidence": [
+        {
+          "label": "Committed configuration matrix",
+          "url": "https://github.com/DaezeI/11785-GS-Fuse-Submission-Public/blob/main/experiments/improvement-v1/matrix.json"
+        },
+        {
+          "label": "Full design and acceptance gates",
+          "url": "https://github.com/DaezeI/11785-GS-Fuse-Submission-Public/blob/main/docs/experiments/IMPROVEMENT_CAMPAIGN_V1.md"
+        },
+        {
+          "label": "Audit-first and laptop model revision",
+          "url": "https://github.com/DaezeI/11785-GS-Fuse-Submission-Public/blob/main/docs/experiments/AUDIT_FIRST_AND_COMPACT_V2.md"
+        }
+      ],
+      "figure": null,
+      "related": [
+        "improvement-v1-ref"
+      ]
+    },
+    {
+      "id": "improvement-v1-lora8",
+      "title": "Improvement v1: lora8",
+      "kind": "Training design",
+      "owner": "Adaeze Ilodianya",
+      "status": "planned",
+      "updated_at": "2026-11-19T03:14:00+00:00",
+      "question": "Stage-3 q/v LoRA rank 8, alpha 16",
+      "configuration": "Committed variant lora8; reference=ref. All new runs restore validation-best Stage-1/2 weights. Five default configurations are SMOKE ONLY (one-hour caps); full training requires source/snapshot-bound resource, quota, audit and gradient evidence. LoRA/context search is deferred.",
+      "finding": "No new full execution or measured quality finding. Updated audit-first design and testable controls; intended executor Nicole Lyu.",
+      "limitations": "Intraday publication times remain unverified. CPU code checks do not certify full-backbone GPU execution or performance. No benefit is assumed; new attempts require exact compute/input provenance.",
+      "evidence": [
+        {
+          "label": "Committed configuration matrix",
+          "url": "https://github.com/DaezeI/11785-GS-Fuse-Submission-Public/blob/main/experiments/improvement-v1/matrix.json"
+        },
+        {
+          "label": "Full design and acceptance gates",
+          "url": "https://github.com/DaezeI/11785-GS-Fuse-Submission-Public/blob/main/docs/experiments/IMPROVEMENT_CAMPAIGN_V1.md"
+        },
+        {
+          "label": "Audit-first and laptop model revision",
+          "url": "https://github.com/DaezeI/11785-GS-Fuse-Submission-Public/blob/main/docs/experiments/AUDIT_FIRST_AND_COMPACT_V2.md"
+        }
+      ],
+      "figure": null,
+      "related": [
+        "improvement-v1-ref"
+      ]
+    },
+    {
+      "id": "improvement-v1-lora8-lowlr",
+      "title": "Improvement v1: lora8-lowlr",
+      "kind": "Training design",
+      "owner": "Adaeze Ilodianya",
+      "status": "planned",
+      "updated_at": "2026-11-19T03:14:00+00:00",
+      "question": "Adapter learning rate 1e-5",
+      "configuration": "Committed variant lora8-lowlr; reference=lora8. All new runs restore validation-best Stage-1/2 weights. Five default configurations are SMOKE ONLY (one-hour caps); full training requires source/snapshot-bound resource, quota, audit and gradient evidence. LoRA/context search is deferred.",
+      "finding": "No new full execution or measured quality finding. Updated audit-first design and testable controls; intended executor Nicole Lyu.",
+      "limitations": "Intraday publication times remain unverified. CPU code checks do not certify full-backbone GPU execution or performance. No benefit is assumed; new attempts require exact compute/input provenance.",
+      "evidence": [
+        {
+          "label": "Committed configuration matrix",
+          "url": "https://github.com/DaezeI/11785-GS-Fuse-Submission-Public/blob/main/experiments/improvement-v1/matrix.json"
+        },
+        {
+          "label": "Full design and acceptance gates",
+          "url": "https://github.com/DaezeI/11785-GS-Fuse-Submission-Public/blob/main/docs/experiments/IMPROVEMENT_CAMPAIGN_V1.md"
+        },
+        {
+          "label": "Audit-first and laptop model revision",
+          "url": "https://github.com/DaezeI/11785-GS-Fuse-Submission-Public/blob/main/docs/experiments/AUDIT_FIRST_AND_COMPACT_V2.md"
+        }
+      ],
+      "figure": null,
+      "related": [
+        "improvement-v1-ref"
+      ]
+    },
+    {
+      "id": "improvement-v1-lora8-context140",
+      "title": "Improvement v1: lora8-context140",
+      "kind": "Training design",
+      "owner": "Adaeze Ilodianya",
+      "status": "planned",
+      "updated_at": "2026-11-19T03:14:00+00:00",
+      "question": "Package and factorial interaction: rank-8 LoRA plus 140-bar history",
+      "configuration": "Committed variant lora8-context140; reference=ref. All new runs restore validation-best Stage-1/2 weights. Five default configurations are SMOKE ONLY (one-hour caps); full training requires source/snapshot-bound resource, quota, audit and gradient evidence. LoRA/context search is deferred.",
+      "finding": "No new full execution or measured quality finding. Updated audit-first design and testable controls; intended executor Nicole Lyu.",
+      "limitations": "Intraday publication times remain unverified. CPU code checks do not certify full-backbone GPU execution or performance. No benefit is assumed; new attempts require exact compute/input provenance.",
+      "evidence": [
+        {
+          "label": "Committed configuration matrix",
+          "url": "https://github.com/DaezeI/11785-GS-Fuse-Submission-Public/blob/main/experiments/improvement-v1/matrix.json"
+        },
+        {
+          "label": "Full design and acceptance gates",
+          "url": "https://github.com/DaezeI/11785-GS-Fuse-Submission-Public/blob/main/docs/experiments/IMPROVEMENT_CAMPAIGN_V1.md"
+        },
+        {
+          "label": "Audit-first and laptop model revision",
+          "url": "https://github.com/DaezeI/11785-GS-Fuse-Submission-Public/blob/main/docs/experiments/AUDIT_FIRST_AND_COMPACT_V2.md"
+        }
+      ],
+      "figure": null,
+      "related": [
+        "improvement-v1-ref"
+      ]
+    },
+    {
+      "id": "improvement-v1-lora4",
+      "title": "Improvement v1: lora4",
+      "kind": "Training design",
+      "owner": "Adaeze Ilodianya",
+      "status": "planned",
+      "updated_at": "2026-11-19T03:14:00+00:00",
+      "question": "Stage-3 q/v LoRA rank 4, alpha 8",
+      "configuration": "Committed variant lora4; reference=ref. All new runs restore validation-best Stage-1/2 weights. Five default configurations are SMOKE ONLY (one-hour caps); full training requires source/snapshot-bound resource, quota, audit and gradient evidence. LoRA/context search is deferred.",
+      "finding": "No new full execution or measured quality finding. Updated audit-first design and testable controls; intended executor Nicole Lyu.",
+      "limitations": "Intraday publication times remain unverified. CPU code checks do not certify full-backbone GPU execution or performance. No benefit is assumed; new attempts require exact compute/input provenance.",
+      "evidence": [
+        {
+          "label": "Committed configuration matrix",
+          "url": "https://github.com/DaezeI/11785-GS-Fuse-Submission-Public/blob/main/experiments/improvement-v1/matrix.json"
+        },
+        {
+          "label": "Full design and acceptance gates",
+          "url": "https://github.com/DaezeI/11785-GS-Fuse-Submission-Public/blob/main/docs/experiments/IMPROVEMENT_CAMPAIGN_V1.md"
+        },
+        {
+          "label": "Audit-first and laptop model revision",
+          "url": "https://github.com/DaezeI/11785-GS-Fuse-Submission-Public/blob/main/docs/experiments/AUDIT_FIRST_AND_COMPACT_V2.md"
+        }
+      ],
+      "figure": null,
+      "related": [
+        "improvement-v1-ref"
+      ]
+    },
+    {
+      "id": "improvement-v1-lora16",
+      "title": "Improvement v1: lora16",
+      "kind": "Training design",
+      "owner": "Adaeze Ilodianya",
+      "status": "planned",
+      "updated_at": "2026-11-19T03:14:00+00:00",
+      "question": "LoRA rank 16, alpha 32; keep alpha/r constant",
+      "configuration": "Committed variant lora16; reference=lora8. All new runs restore validation-best Stage-1/2 weights. Five default configurations are SMOKE ONLY (one-hour caps); full training requires source/snapshot-bound resource, quota, audit and gradient evidence. LoRA/context search is deferred.",
+      "finding": "No new full execution or measured quality finding. Updated audit-first design and testable controls; intended executor Nicole Lyu.",
+      "limitations": "Intraday publication times remain unverified. CPU code checks do not certify full-backbone GPU execution or performance. No benefit is assumed; new attempts require exact compute/input provenance.",
+      "evidence": [
+        {
+          "label": "Committed configuration matrix",
+          "url": "https://github.com/DaezeI/11785-GS-Fuse-Submission-Public/blob/main/experiments/improvement-v1/matrix.json"
+        },
+        {
+          "label": "Full design and acceptance gates",
+          "url": "https://github.com/DaezeI/11785-GS-Fuse-Submission-Public/blob/main/docs/experiments/IMPROVEMENT_CAMPAIGN_V1.md"
+        },
+        {
+          "label": "Audit-first and laptop model revision",
+          "url": "https://github.com/DaezeI/11785-GS-Fuse-Submission-Public/blob/main/docs/experiments/AUDIT_FIRST_AND_COMPACT_V2.md"
+        }
+      ],
+      "figure": null,
+      "related": [
+        "improvement-v1-ref"
+      ]
+    },
+    {
+      "id": "improvement-v1-date-upper-bound",
+      "title": "Improvement v1: date-upper-bound",
+      "kind": "Evidence or implementation gated design",
+      "owner": "Adaeze Ilodianya",
+      "status": "planned",
+      "updated_at": "2026-11-19T01:51:03+00:00",
+      "question": "Evaluate the prespecified date-upper-bound hypothesis in the controlled improvement design.",
+      "configuration": "Design only. See named protocol section for comparison, fixed settings, metrics, implementation/evidence gate and acceptance checks. No executable config or submission yet.",
+      "finding": "No execution or measured finding. Intended executor: Nicole Lyu on Nicole’s personal GPU resource.",
+      "limitations": "Intraday publication times remain unverified. CPU code checks do not certify full-backbone GPU execution or performance. No benefit is assumed; new attempts require exact compute/input provenance.",
+      "evidence": [
+        {
+          "label": "Committed configuration matrix",
+          "url": "https://github.com/DaezeI/11785-GS-Fuse-Submission-Public/blob/main/experiments/improvement-v1/matrix.json"
+        },
+        {
+          "label": "Full design and acceptance gates",
+          "url": "https://github.com/DaezeI/11785-GS-Fuse-Submission-Public/blob/main/docs/experiments/IMPROVEMENT_CAMPAIGN_V1.md"
+        }
+      ],
+      "figure": null,
+      "related": [
+        "improvement-v1-ref"
+      ]
+    },
+    {
+      "id": "improvement-v1-dapt-lora",
+      "title": "Improvement v1: dapt-lora",
+      "kind": "Evidence or implementation gated design",
+      "owner": "Adaeze Ilodianya",
+      "status": "planned",
+      "updated_at": "2026-11-19T01:51:05+00:00",
+      "question": "Evaluate the prespecified dapt-lora hypothesis in the controlled improvement design.",
+      "configuration": "Design only. See named protocol section for comparison, fixed settings, metrics, implementation/evidence gate and acceptance checks. No executable config or submission yet.",
+      "finding": "No execution or measured finding. Intended executor: Nicole Lyu on Nicole’s personal GPU resource.",
+      "limitations": "Intraday publication times remain unverified. CPU code checks do not certify full-backbone GPU execution or performance. No benefit is assumed; new attempts require exact compute/input provenance.",
+      "evidence": [
+        {
+          "label": "Committed configuration matrix",
+          "url": "https://github.com/DaezeI/11785-GS-Fuse-Submission-Public/blob/main/experiments/improvement-v1/matrix.json"
+        },
+        {
+          "label": "Full design and acceptance gates",
+          "url": "https://github.com/DaezeI/11785-GS-Fuse-Submission-Public/blob/main/docs/experiments/IMPROVEMENT_CAMPAIGN_V1.md"
+        }
+      ],
+      "figure": null,
+      "related": [
+        "improvement-v1-ref"
+      ]
+    },
+    {
+      "id": "improvement-v1-context70",
+      "title": "Improvement v1: context70",
+      "kind": "Training design",
+      "owner": "Adaeze Ilodianya",
+      "status": "planned",
+      "updated_at": "2026-11-19T03:14:00+00:00",
+      "question": "70 observed five-minute bars",
+      "configuration": "Committed variant context70; reference=ref. All new runs restore validation-best Stage-1/2 weights. Five default configurations are SMOKE ONLY (one-hour caps); full training requires source/snapshot-bound resource, quota, audit and gradient evidence. LoRA/context search is deferred.",
+      "finding": "No new full execution or measured quality finding. Updated audit-first design and testable controls; intended executor Nicole Lyu.",
+      "limitations": "Intraday publication times remain unverified. CPU code checks do not certify full-backbone GPU execution or performance. No benefit is assumed; new attempts require exact compute/input provenance.",
+      "evidence": [
+        {
+          "label": "Committed configuration matrix",
+          "url": "https://github.com/DaezeI/11785-GS-Fuse-Submission-Public/blob/main/experiments/improvement-v1/matrix.json"
+        },
+        {
+          "label": "Full design and acceptance gates",
+          "url": "https://github.com/DaezeI/11785-GS-Fuse-Submission-Public/blob/main/docs/experiments/IMPROVEMENT_CAMPAIGN_V1.md"
+        },
+        {
+          "label": "Audit-first and laptop model revision",
+          "url": "https://github.com/DaezeI/11785-GS-Fuse-Submission-Public/blob/main/docs/experiments/AUDIT_FIRST_AND_COMPACT_V2.md"
+        }
+      ],
+      "figure": null,
+      "related": [
+        "improvement-v1-ref"
+      ]
+    },
+    {
+      "id": "improvement-v1-context280",
+      "title": "Improvement v1: context280",
+      "kind": "Training design",
+      "owner": "Adaeze Ilodianya",
+      "status": "planned",
+      "updated_at": "2026-11-19T03:14:00+00:00",
+      "question": "280 observed five-minute bars",
+      "configuration": "Committed variant context280; reference=ref. All new runs restore validation-best Stage-1/2 weights. Five default configurations are SMOKE ONLY (one-hour caps); full training requires source/snapshot-bound resource, quota, audit and gradient evidence. LoRA/context search is deferred.",
+      "finding": "No new full execution or measured quality finding. Updated audit-first design and testable controls; intended executor Nicole Lyu.",
+      "limitations": "Intraday publication times remain unverified. CPU code checks do not certify full-backbone GPU execution or performance. No benefit is assumed; new attempts require exact compute/input provenance.",
+      "evidence": [
+        {
+          "label": "Committed configuration matrix",
+          "url": "https://github.com/DaezeI/11785-GS-Fuse-Submission-Public/blob/main/experiments/improvement-v1/matrix.json"
+        },
+        {
+          "label": "Full design and acceptance gates",
+          "url": "https://github.com/DaezeI/11785-GS-Fuse-Submission-Public/blob/main/docs/experiments/IMPROVEMENT_CAMPAIGN_V1.md"
+        },
+        {
+          "label": "Audit-first and laptop model revision",
+          "url": "https://github.com/DaezeI/11785-GS-Fuse-Submission-Public/blob/main/docs/experiments/AUDIT_FIRST_AND_COMPACT_V2.md"
+        }
+      ],
+      "figure": null,
+      "related": [
+        "improvement-v1-ref"
+      ]
+    },
+    {
+      "id": "improvement-v1-context140",
+      "title": "Improvement v1: context140",
+      "kind": "Training design",
+      "owner": "Adaeze Ilodianya",
+      "status": "planned",
+      "updated_at": "2026-11-19T03:14:00+00:00",
+      "question": "140 observed five-minute bars",
+      "configuration": "Committed variant context140; reference=ref. All new runs restore validation-best Stage-1/2 weights. Five default configurations are SMOKE ONLY (one-hour caps); full training requires source/snapshot-bound resource, quota, audit and gradient evidence. LoRA/context search is deferred.",
+      "finding": "No new full execution or measured quality finding. Updated audit-first design and testable controls; intended executor Nicole Lyu.",
+      "limitations": "Intraday publication times remain unverified. CPU code checks do not certify full-backbone GPU execution or performance. No benefit is assumed; new attempts require exact compute/input provenance.",
+      "evidence": [
+        {
+          "label": "Committed configuration matrix",
+          "url": "https://github.com/DaezeI/11785-GS-Fuse-Submission-Public/blob/main/experiments/improvement-v1/matrix.json"
+        },
+        {
+          "label": "Full design and acceptance gates",
+          "url": "https://github.com/DaezeI/11785-GS-Fuse-Submission-Public/blob/main/docs/experiments/IMPROVEMENT_CAMPAIGN_V1.md"
+        },
+        {
+          "label": "Audit-first and laptop model revision",
+          "url": "https://github.com/DaezeI/11785-GS-Fuse-Submission-Public/blob/main/docs/experiments/AUDIT_FIRST_AND_COMPACT_V2.md"
+        }
+      ],
+      "figure": null,
+      "related": [
+        "improvement-v1-ref"
+      ]
+    },
+    {
+      "id": "improvement-v1-clock-ledger",
+      "title": "Improvement v1: clock-ledger",
+      "kind": "Evidence or implementation gated design",
+      "owner": "Adaeze Ilodianya",
+      "status": "planned",
+      "updated_at": "2026-11-19T01:51:02+00:00",
+      "question": "Evaluate the prespecified clock-ledger hypothesis in the controlled improvement design.",
+      "configuration": "Design only. See named protocol section for comparison, fixed settings, metrics, implementation/evidence gate and acceptance checks. No executable config or submission yet.",
+      "finding": "No execution or measured finding. Intended executor: Nicole Lyu on Nicole’s personal GPU resource.",
+      "limitations": "Intraday publication times remain unverified. CPU code checks do not certify full-backbone GPU execution or performance. No benefit is assumed; new attempts require exact compute/input provenance.",
+      "evidence": [
+        {
+          "label": "Committed configuration matrix",
+          "url": "https://github.com/DaezeI/11785-GS-Fuse-Submission-Public/blob/main/experiments/improvement-v1/matrix.json"
+        },
+        {
+          "label": "Full design and acceptance gates",
+          "url": "https://github.com/DaezeI/11785-GS-Fuse-Submission-Public/blob/main/docs/experiments/IMPROVEMENT_CAMPAIGN_V1.md"
+        }
+      ],
+      "figure": null,
+      "related": [
+        "improvement-v1-ref"
+      ]
+    },
+    {
+      "id": "improvement-v1-calibrated-ensemble",
+      "title": "Improvement v1: calibrated-ensemble",
+      "kind": "Evidence or implementation gated design",
+      "owner": "Adaeze Ilodianya",
+      "status": "planned",
+      "updated_at": "2026-11-19T01:51:05+00:00",
+      "question": "Evaluate the prespecified calibrated-ensemble hypothesis in the controlled improvement design.",
+      "configuration": "Design only. See named protocol section for comparison, fixed settings, metrics, implementation/evidence gate and acceptance checks. No executable config or submission yet.",
+      "finding": "No execution or measured finding. Intended executor: Nicole Lyu on Nicole’s personal GPU resource.",
+      "limitations": "Intraday publication times remain unverified. CPU code checks do not certify full-backbone GPU execution or performance. No benefit is assumed; new attempts require exact compute/input provenance.",
+      "evidence": [
+        {
+          "label": "Committed configuration matrix",
+          "url": "https://github.com/DaezeI/11785-GS-Fuse-Submission-Public/blob/main/experiments/improvement-v1/matrix.json"
+        },
+        {
+          "label": "Full design and acceptance gates",
+          "url": "https://github.com/DaezeI/11785-GS-Fuse-Submission-Public/blob/main/docs/experiments/IMPROVEMENT_CAMPAIGN_V1.md"
+        }
+      ],
+      "figure": null,
+      "related": [
+        "improvement-v1-ref"
+      ]
+    },
+    {
+      "id": "improvement-v1-ref",
+      "title": "Improvement v1: ref",
+      "kind": "Training design",
+      "owner": "Adaeze Ilodianya",
+      "status": "planned",
+      "updated_at": "2026-11-19T03:14:00+00:00",
+      "question": "Fresh corrected-code R3 reference",
+      "configuration": "Committed variant ref; reference=None. All new runs restore validation-best Stage-1/2 weights. Five default configurations are SMOKE ONLY (one-hour caps); full training requires source/snapshot-bound resource, quota, audit and gradient evidence. LoRA/context search is deferred.",
+      "finding": "No new full execution or measured quality finding. Updated audit-first design and testable controls; intended executor Nicole Lyu.",
+      "limitations": "Intraday publication times remain unverified. CPU code checks do not certify full-backbone GPU execution or performance. No benefit is assumed; new attempts require exact compute/input provenance.",
+      "evidence": [
+        {
+          "label": "Committed configuration matrix",
+          "url": "https://github.com/DaezeI/11785-GS-Fuse-Submission-Public/blob/main/experiments/improvement-v1/matrix.json"
+        },
+        {
+          "label": "Full design and acceptance gates",
+          "url": "https://github.com/DaezeI/11785-GS-Fuse-Submission-Public/blob/main/docs/experiments/IMPROVEMENT_CAMPAIGN_V1.md"
+        },
+        {
+          "label": "Audit-first and laptop model revision",
+          "url": "https://github.com/DaezeI/11785-GS-Fuse-Submission-Public/blob/main/docs/experiments/AUDIT_FIRST_AND_COMPACT_V2.md"
+        }
+      ],
+      "figure": null,
+      "related": []
+    },
     {
       "id": "c1-article-readout-v1",
       "title": "Did a simple model gain from the correct article?",

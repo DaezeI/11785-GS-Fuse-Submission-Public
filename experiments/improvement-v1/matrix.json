@@ -5,33 +5,202 @@
   "status": "planned",
   "snapshot_sha256": "049aa089d2eaa77644be5deba3abad3fa33c0a18b4375553664cafc71370c2bf",
   "manifest_sha256": "1b04373a4361238b09c0b1d952163973403d2d7839dbb9e7215c429af14b23d1",
-  "expected_counts": {"train": 6167, "vali": 2302, "test": 2236},
-  "screen": ["ref", "lora8", "context140", "context280", "tokens2048", "lora8-context140"],
+  "expected_counts": {
+    "train": 6167,
+    "vali": 2302,
+    "test": 2236
+  },
+  "screen": [
+    "ref",
+    "no-contrastive",
+    "no-invariance",
+    "clean-anchor",
+    "text-warmup"
+  ],
   "defaults": {
-    "ts-backbone": "moment", "text-backbone": "llama", "series-id": "SP500",
-    "forecast-task": "return_bp", "c1-timing-policy": "category4_1400_strict_before",
-    "seq-len": 35, "pred-len": 140, "batch-size": 2, "sw-stride": 10,
-    "stage1-epochs": 2, "stage2-epochs": 2, "num-epochs": 2,
-    "window": 500, "stride": 400, "max-token-num": 1024,
-    "direction-weight": 1.0, "direction-deadband-bp": 0.0,
-    "gate-target-objective": "task", "no-raw-ts-residual": true,
-    "learnable-last-value": true, "no-4bit": true, "tf32": true,
-    "fusion-type": "crossattn", "gate-type": "softmax", "interpret-samples": 0
+    "ts-backbone": "moment",
+    "text-backbone": "llama",
+    "series-id": "SP500",
+    "forecast-task": "return_bp",
+    "c1-timing-policy": "category4_1400_strict_before",
+    "seq-len": 35,
+    "pred-len": 140,
+    "batch-size": 2,
+    "sw-stride": 10,
+    "stage1-epochs": 2,
+    "stage2-epochs": 2,
+    "num-epochs": 2,
+    "window": 500,
+    "stride": 400,
+    "max-token-num": 1024,
+    "direction-weight": 1.0,
+    "direction-deadband-bp": 0.0,
+    "gate-target-objective": "task",
+    "no-raw-ts-residual": true,
+    "learnable-last-value": true,
+    "no-4bit": true,
+    "tf32": true,
+    "fusion-type": "crossattn",
+    "gate-type": "softmax",
+    "interpret-samples": 0,
+    "contrastive-lambda": 1.0,
+    "invariance-lambda": 0.1,
+    "contrastive-anchor": "fused",
+    "stage2-price-context": true
   },
   "variants": {
-    "ref": {"reference": null, "change": "Fresh corrected-code R3 reference", "overrides": {}},
-    "lora4": {"reference": "ref", "change": "Stage-3 q/v LoRA rank 4, alpha 8", "overrides": {"use-lora": true, "lora-rank": 4, "lora-alpha": 8.0, "lora-lr": 0.00005}},
-    "lora8": {"reference": "ref", "change": "Stage-3 q/v LoRA rank 8, alpha 16", "overrides": {"use-lora": true, "lora-rank": 8, "lora-alpha": 16.0, "lora-lr": 0.00005}},
-    "lora16": {"reference": "lora8", "change": "LoRA rank 16, alpha 32; keep alpha/r constant", "overrides": {"use-lora": true, "lora-rank": 16, "lora-alpha": 32.0, "lora-lr": 0.00005}},
-    "lora8-lowlr": {"reference": "lora8", "change": "Adapter learning rate 1e-5", "overrides": {"use-lora": true, "lora-rank": 8, "lora-alpha": 16.0, "lora-lr": 0.00001}},
-    "context70": {"reference": "ref", "change": "70 observed five-minute bars", "overrides": {"seq-len": 70}},
-    "context140": {"reference": "ref", "change": "140 observed five-minute bars", "overrides": {"seq-len": 140}},
-    "context280": {"reference": "ref", "change": "280 observed five-minute bars", "overrides": {"seq-len": 280}},
-    "tokens256": {"reference": "ref", "change": "Token fusion budget 256; pooled instance pathway unchanged", "overrides": {"max-token-num": 256}},
-    "tokens2048": {"reference": "ref", "change": "Token fusion budget 2048; pooled instance pathway unchanged", "overrides": {"max-token-num": 2048}},
-    "qformer8": {"reference": "ref", "change": "Q-Former fusion package, 8 queries and 2 layers", "overrides": {"fusion-type": "qformer", "num-queries": 8, "qformer-layers": 2}},
-    "moe4": {"reference": "ref", "change": "Four-expert top-2 MoE gate package", "overrides": {"gate-type": "moe", "num-experts": 4, "moe-top-k": 2}},
-    "lora8-context140": {"reference": "ref", "change": "Package and factorial interaction: rank-8 LoRA plus 140-bar history", "overrides": {"use-lora": true, "lora-rank": 8, "lora-alpha": 16.0, "lora-lr": 0.00005, "seq-len": 140}}
+    "ref": {
+      "reference": null,
+      "change": "Fresh corrected-code R3 reference",
+      "overrides": {}
+    },
+    "lora4": {
+      "reference": "ref",
+      "change": "Stage-3 q/v LoRA rank 4, alpha 8",
+      "overrides": {
+        "use-lora": true,
+        "lora-rank": 4,
+        "lora-alpha": 8.0,
+        "lora-lr": 5e-05
+      }
+    },
+    "lora8": {
+      "reference": "ref",
+      "change": "Stage-3 q/v LoRA rank 8, alpha 16",
+      "overrides": {
+        "use-lora": true,
+        "lora-rank": 8,
+        "lora-alpha": 16.0,
+        "lora-lr": 5e-05
+      }
+    },
+    "lora16": {
+      "reference": "lora8",
+      "change": "LoRA rank 16, alpha 32; keep alpha/r constant",
+      "overrides": {
+        "use-lora": true,
+        "lora-rank": 16,
+        "lora-alpha": 32.0,
+        "lora-lr": 5e-05
+      }
+    },
+    "lora8-lowlr": {
+      "reference": "lora8",
+      "change": "Adapter learning rate 1e-5",
+      "overrides": {
+        "use-lora": true,
+        "lora-rank": 8,
+        "lora-alpha": 16.0,
+        "lora-lr": 1e-05
+      }
+    },
+    "context70": {
+      "reference": "ref",
+      "change": "70 observed five-minute bars",
+      "overrides": {
+        "seq-len": 70
+      }
+    },
+    "context140": {
+      "reference": "ref",
+      "change": "140 observed five-minute bars",
+      "overrides": {
+        "seq-len": 140
+      }
+    },
+    "context280": {
+      "reference": "ref",
+      "change": "280 observed five-minute bars",
+      "overrides": {
+        "seq-len": 280
+      }
+    },
+    "tokens256": {
+      "reference": "ref",
+      "change": "Token fusion budget 256; pooled instance pathway unchanged",
+      "overrides": {
+        "max-token-num": 256
+      }
+    },
+    "tokens2048": {
+      "reference": "ref",
+      "change": "Token fusion budget 2048; pooled instance pathway unchanged",
+      "overrides": {
+        "max-token-num": 2048
+      }
+    },
+    "qformer8": {
+      "reference": "ref",
+      "change": "Q-Former fusion package, 8 queries and 2 layers",
+      "overrides": {
+        "fusion-type": "qformer",
+        "num-queries": 8,
+        "qformer-layers": 2
+      }
+    },
+    "moe4": {
+      "reference": "ref",
+      "change": "Four-expert top-2 MoE gate package",
+      "overrides": {
+        "gate-type": "moe",
+        "num-experts": 4,
+        "moe-top-k": 2
+      }
+    },
+    "lora8-context140": {
+      "reference": "ref",
+      "change": "Package and factorial interaction: rank-8 LoRA plus 140-bar history",
+      "overrides": {
+        "use-lora": true,
+        "lora-rank": 8,
+        "lora-alpha": 16.0,
+        "lora-lr": 5e-05,
+        "seq-len": 140
+      }
+    },
+    "no-contrastive": {
+      "reference": "ref",
+      "change": "Disable instance contrastive loss only",
+      "overrides": {
+        "contrastive-lambda": 0.0
+      }
+    },
+    "no-invariance": {
+      "reference": "ref",
+      "change": "Disable counterfactual invariance loss only",
+      "overrides": {
+        "invariance-lambda": 0.0
+      }
+    },
+    "clean-anchor": {
+      "reference": "ref",
+      "change": "Use pre-attention TS instance as contrastive anchor only",
+      "overrides": {
+        "contrastive-anchor": "pre_attention"
+      }
+    },
+    "text-warmup": {
+      "reference": "ref",
+      "change": "Remove all past-price inputs from Stage-2 warmup only",
+      "overrides": {
+        "stage2-price-context": false,
+        "no-stage2-price-context": true
+      }
+    }
   },
-  "gated_designs": ["clock-ledger", "verified-clock-delay", "date-upper-bound", "past-donors", "ridge-readout", "train-shuffled", "return-only", "multiscale-780", "volatility-gate", "dapt-lora", "calibrated-ensemble"]
+  "gated_designs": [
+    "clock-ledger",
+    "verified-clock-delay",
+    "date-upper-bound",
+    "past-donors",
+    "ridge-readout",
+    "train-shuffled",
+    "return-only",
+    "multiscale-780",
+    "volatility-gate",
+    "dapt-lora",
+    "calibrated-ensemble"
+  ],
+  "default_phase": "smoke",
+  "execution_policy": "CPU provenance/resource audit, then up to five one-hour smokes. Full training requires evidence-backed readiness; LoRA/context search is deferred."
 }

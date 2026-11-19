@@ -3,8 +3,10 @@
 **New planned improvement campaign:** Adaeze prepared a separate
 [controlled campaign](docs/experiments/IMPROVEMENT_CAMPAIGN_V1.md) for Nicole's
 personal GPU resource: corrected-code reference, text LoRA, longer price
-histories, text budgets and optional fusion variants. The six-run default
-screen uses validation; 11 additional designs require evidence or new code.
+histories, text budgets and optional fusion variants. The revised default is five one-hour execution smokes; full training requires
+resource/quota/audit readiness. A compact laptop price-only prototype loads
+no Llama or MOMENT. See [the revised design](docs/experiments/AUDIT_FIRST_AND_COMPACT_V2.md).
+Eleven additional designs require evidence or new code.
 No jobs or new model results are implied. Existing completed results and
 Delta jobs retain their recorded identities and status.
 
