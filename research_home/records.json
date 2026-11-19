@@ -1,8 +1,8 @@
 {
   "title": "GS-Fuse Research Home",
   "stage": "Controlled experiments and final writing",
-  "overview": "The news-trained models beat a separately trained price-only model in both runs. Repeating the last observed prices still beat every trained forecast, and the right article barely changed error compared with a shuffled one.",
-  "updated_at": "2026-11-18T22:57:31+00:00",
+  "overview": "The last-price rule beat our trained price models. In Adaeze’s completed R3 return run, correct and shuffled articles gave nearly identical results, and predicting zero return had slightly lower error.",
+  "updated_at": "2026-11-19T00:25:25+00:00",
   "source_url": "https://github.com/DaezeI/11785-GS-Fuse-Submission-Public/blob/main/research_home/records.json",
   "links": [
     {
@@ -32,8 +32,8 @@
       "reason": "Show what each comparison answers. The training package improved one baseline, while the matched article and simple last-price comparisons set the limits."
     },
     {
-      "title": "Collect Adaeze’s paired article checks",
-      "reason": "R0–R2 changed accuracy very little. R3 and the existing paired runs are still needed to measure the shortcut and article value."
+      "title": "Collect Adaeze’s remaining Delta results",
+      "reason": "R3 finished on Nicole’s personal GPU resource. The Delta R3 run will let us compare the shortcut on the same hardware as R2."
     },
     {
       "title": "Test a simple article readout",
@@ -41,6 +41,41 @@
     }
   ],
   "experiments": [
+    {
+      "id": "adaeze-screened-r3-h200-v2",
+      "title": "R3 got almost the same result with shuffled news",
+      "kind": "Experiment",
+      "status": "completed",
+      "owner": "Adaeze",
+      "question": "Does the R3 return model forecast better with the correctly matched article?",
+      "configuration": "Nicole ran Adaeze’s exact seed-0 R3 setup on one H200. Both article checks used the same model, 2,236 screened events across 845 dates, and three shuffle draws.",
+      "finding": "Average return error was 80.615 basis points with the correct article, 80.618 with shuffled articles, and 80.487 for a simple zero-return forecast.",
+      "limitations": "The paired 95% interval for the small matched-article gain includes zero. This is one seed. The earlier R2 used different hardware, and retained article release times remain unverified.",
+      "figure": {
+        "url": "https://raw.githubusercontent.com/DaezeI/11785-GS-Fuse-Submission-Public/main/results/adaeze-screened-r3-h200-v2/article-comparison.png",
+        "alt": "Correct and shuffled articles gave almost identical R3 return error. The paired 95% interval includes zero."
+      },
+      "evidence": [
+        {
+          "label": "Verified result and interpretation",
+          "url": "https://github.com/DaezeI/11785-GS-Fuse-Submission-Public/blob/main/results/adaeze-screened-r3-h200-v2/summary.md"
+        },
+        {
+          "label": "Metrics and uncertainty",
+          "url": "https://github.com/DaezeI/11785-GS-Fuse-Submission-Public/blob/main/results/adaeze-screened-r3-h200-v2/metrics.json"
+        },
+        {
+          "label": "Configuration and source checksums",
+          "url": "https://github.com/DaezeI/11785-GS-Fuse-Submission-Public/blob/main/results/adaeze-screened-r3-h200-v2/provenance.json"
+        }
+      ],
+      "related": [
+        "return-r0-r3",
+        "screened-price-v1",
+        "screened-price-seed1-v1"
+      ],
+      "updated_at": "2026-11-19T00:25:24+00:00"
+    },
     {
       "id": "news-value-overnight-plan",
       "title": "The last-price rule beat both trained approaches",
@@ -215,7 +250,7 @@
       "status": "submitted",
       "question": "Which of the three return-model changes improves forecasting under the same conditions?",
       "configuration": "Frozen screened C1. R0→R1 adds a direction term, R1→R2 updates gate supervision, and R2→R3 enables a learnable last-value shortcut.",
-      "finding": "R0, R1 and R2 finished with nearly identical error, about 81 basis points. A zero-return forecast scored 80.49 basis points on the same test examples. R3 and all paired article checks remained queued.",
+      "finding": "R0–R2 finished on Delta. At the latest Delta check, its R3 and paired article runs were queued. A separate H200 R3 replay completed and is linked below.",
       "limitations": "These are descriptive differences from one seed. The paired article checks are needed before drawing a conclusion about matched text on the return task.",
       "figure": null,
       "evidence": [
@@ -234,10 +269,16 @@
         {
           "label": "Aligned zero-return benchmark",
           "url": "https://github.com/DaezeI/11785-GS-Fuse-Submission-Public/blob/main/results/screened-return-r0-r2-v1/summary.md"
+        },
+        {
+          "label": "Completed R3 replay on one H200",
+          "url": "https://github.com/DaezeI/11785-GS-Fuse-Submission-Public/blob/main/results/adaeze-screened-r3-h200-v2/summary.md"
         }
       ],
-      "related": [],
-      "updated_at": "2026-11-18T19:13:23+00:00"
+      "related": [
+        "adaeze-screened-r3-h200-v2"
+      ],
+      "updated_at": "2026-11-19T00:25:25+00:00"
     },
     {
       "id": "qformer-padding-original-split",
