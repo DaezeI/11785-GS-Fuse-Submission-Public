@@ -1,5 +1,22 @@
 # Project status
 
+**Latest Adaeze direction:** prioritize a local prices-plus-raw-news model with
+a small trainable text encoder and no Llama feature-export dependency. The
+[continuation handoff](experiments/improvement-v1/CONTINUE_WITHOUT_NICOLE.md)
+records the verified laptop CUDA setup, public data link and remaining work.
+Raw-text encoding is pending; current compact multimodal code uses precomputed
+vectors. No real-data compact accuracy run has completed.
+
+**New planned improvement campaign:** Adaeze prepared a separate
+[controlled campaign](docs/experiments/IMPROVEMENT_CAMPAIGN_V1.md) for Nicole's
+personal GPU resource: corrected-code reference, text LoRA, longer price
+histories, text budgets and optional fusion variants. The revised default is five one-hour execution smokes; full training requires
+resource/quota/audit readiness. A compact laptop price/text prototype loads
+no Llama or MOMENT. See [the revised design](docs/experiments/AUDIT_FIRST_AND_COMPACT_V2.md).
+Eleven additional designs require evidence or new code.
+No jobs or new model results are implied. Existing completed results and
+Delta jobs retain their recorded identities and status.
+
 **Current phase: controlled experiments, result analysis and final writing.**
 Routine data preparation is complete. The [research home](https://gs-fuse-research.twiggydonkey4.chatgpt.site) reads the latest [research records](research_home/records.json) after updates reach GitHub main. Start with the
 [next-phase plan](docs/NEXT_PHASE_PLAN.md); the experiment register and linked

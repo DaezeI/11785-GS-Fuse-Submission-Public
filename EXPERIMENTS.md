@@ -34,6 +34,12 @@ population into another run's row.
 
 ## Current comparison index
 
+**New planned campaign:** [Controlled improvement v1](docs/experiments/IMPROVEMENT_CAMPAIGN_V1.md)
+provides 17 existing-pipeline configurations, a five-arm default smoke screen,
+and 11 evidence/implementation-gated designs. Adaeze owns the experiment
+design; Nicole is the intended executor. All records remain planned; this
+handoff submits no GPU jobs. [Operator prompt](experiments/improvement-v1/NICOLE_PROMPT.md).
+
 The [research decision brief](docs/RESEARCH_DECISION_BRIEF.md) inventories the
 current evidence and ranks the next proposed analyses and experiments.
 

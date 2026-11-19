@@ -1,0 +1,16 @@
+{
+  "kind": "synthetic engineering check; no market-quality result",
+  "device": "cpu",
+  "torch_version": "2.15.0+cpu",
+  "cpu_threads": 2,
+  "seed": 0,
+  "batch_size": 64,
+  "seq_len": 140,
+  "parameters": 16931,
+  "state_bytes": 72761,
+  "model_source_sha256": "7c1bcb87361d9805e074b3da5347b1fd7db228300bf97742e35a091c804cc559",
+  "median_train_step_ms": 16.94050000514835,
+  "median_batch1_inference_ms": 0.7961999799590558,
+  "cuda_peak_allocated_bytes": null,
+  "cuda_peak_reserved_bytes": null
+}

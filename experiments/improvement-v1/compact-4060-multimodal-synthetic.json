@@ -1,0 +1,18 @@
+{
+  "kind": "synthetic engineering check; no market-quality result",
+  "device": "cuda",
+  "torch_version": "2.5.1+cu124",
+  "cpu_threads": 2,
+  "seed": 0,
+  "batch_size": 64,
+  "seq_len": 140,
+  "text_dim": 2048,
+  "gpu_name": "NVIDIA GeForce RTX 4060 Laptop GPU",
+  "parameters": 82598,
+  "state_bytes": 336480,
+  "model_source_sha256": "7c1bcb87361d9805e074b3da5347b1fd7db228300bf97742e35a091c804cc559",
+  "median_train_step_ms": 4.014549980638549,
+  "median_batch1_inference_ms": 1.012450025882572,
+  "cuda_peak_allocated_bytes": 36635136,
+  "cuda_peak_reserved_bytes": 46137344
+}

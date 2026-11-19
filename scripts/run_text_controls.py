@@ -140,8 +140,9 @@ def resolved_return_run(path):
         raise ValueError("Training forecast_task_config is not a return run")
     if (resolved.get("ts_backbone") != "moment" or
             resolved.get("text_backbone") != "llama" or
-            resolved.get("seq_len") != 35 or resolved.get("pred_len") != 140):
-        raise ValueError("This paired return evaluator supports the frozen 35/140 MOMENT/Llama setup")
+            not isinstance(resolved.get("seq_len"), int) or
+            not 1 <= resolved["seq_len"] <= 280 or resolved.get("pred_len") != 140):
+        raise ValueError("This paired return evaluator supports MOMENT/Llama inputs of 1-280 bars and H=140")
     for key in ("use_raw_ts_residual", "use_learnable_last_value"):
         if not isinstance(resolved.get(key), bool):
             raise ValueError(f"Training configuration needs resolved {key}")
@@ -176,6 +177,12 @@ def main():
         raise SystemExit("This full-checkpoint runner needs a CUDA GPU; the aggregate analyzer and split audit use CPU.")
     torch.manual_seed(args.seed); np.random.seed(args.seed)
     module.USE_4BIT = not args.no_4bit; module.TEXT_CACHE_PATH = args.text_cache
+    module.USE_LORA = bool(run_config and run_config.get("use_lora", False))
+    if module.USE_LORA:
+        module.LORA_RANK = run_config["lora_rank"]
+        module.LORA_ALPHA = run_config["lora_alpha"]
+        module.LORA_DROPOUT = run_config["lora_dropout"]
+        module.TEXT_CACHE_PATH = None
     torch.backends.cuda.matmul.allow_tf32 = args.tf32
     torch.backends.cudnn.allow_tf32 = args.tf32
     if args.c1_manifest:

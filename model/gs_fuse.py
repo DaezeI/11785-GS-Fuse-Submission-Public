@@ -7,6 +7,7 @@ import os
 import json
 import sys
 import warnings
+import tempfile
 from pathlib import Path
 import math
 
@@ -868,8 +869,9 @@ class GSFuse(nn.Module):
     def llm(self):
         return self.text_encoder.llm
 
-    @torch.no_grad()
     def text_embedding(self, text: str):
+        if getattr(self.text_encoder, "use_lora", False) or FINETUNE_LLM_LAST_LAYER:
+            return self.text_encoder.encode_instance(text, self.window, self.stride, self.device)
         vec = self.text_inst_cache.get(text)
         if vec is None:
             vec = self.text_encoder.encode_instance(text, self.window, self.stride, self.device)
@@ -877,7 +879,6 @@ class GSFuse(nn.Module):
             return vec
         return vec.to(self.device)
 
-    @torch.no_grad()
     def get_text_tokens_all(self, text: str):
         tok_h, mask = self.text_encoder.encode_tokens(
             text, self.window, self.stride, self.max_text_tokens, self.device
@@ -1333,6 +1334,10 @@ class GSFuse(nn.Module):
             "gate_type": self.gate_type,
             "llm_hidden": llm_hidden,
             "use_4bit": bool(USE_4BIT),
+            "use_lora": bool(getattr(self.text_encoder, "use_lora", False)),
+            "lora_rank": getattr(self.text_encoder, "lora_rank", None),
+            "lora_alpha": getattr(self.text_encoder, "lora_alpha", None),
+            "lora_dropout": getattr(self.text_encoder, "lora_dropout", None),
             "decoder_layers": int(dec_layers) if dec_layers is not None else None,
             "decoder_heads": int(dec_heads) if dec_heads is not None else None,
             "gate_tau": float(getattr(self, "gate_tau", 1.0)),
@@ -1340,6 +1345,8 @@ class GSFuse(nn.Module):
             "device": str(self.device),
             "forecast_task": self.forecast_task_config.to_dict(),
             "gate_target_objective": self.gate_target_objective,
+            "contrastive_anchor": getattr(self, "contrastive_anchor", "fused"),
+            "stage2_price_context": getattr(self, "stage2_price_context", True),
         }
 
     def save_model_combined(self, save_path="model_checkpoint.pth", **kwargs):
@@ -1371,6 +1378,11 @@ class GSFuse(nn.Module):
         # learned state. Save it only when this run can change its parameters.
         if FINETUNE_LLM_LAST_LAYER:
             state_dicts["text_encoder"] = self.text_encoder.state_dict()
+        elif getattr(self.text_encoder, "use_lora", False):
+            state_dicts["text_adapters"] = {
+                name: value for name, value in self.text_encoder.state_dict().items()
+                if name.endswith(("lora_A", "lora_B"))
+            }
 
         if USE_MULTI_SCALE_TS:
             state_dicts["multi_scale_extractor"] = self.multi_scale_extractor.state_dict()
@@ -1383,7 +1395,7 @@ class GSFuse(nn.Module):
             "state_dicts": state_dicts,
             "metadata": {**self._arch_metadata(), "run_provenance": self.run_provenance, **kwargs},
         }
-        torch.save(checkpoint, save_path)
+        atomic_torch_save(checkpoint, save_path)
         print(f"[save] Model weights saved to: {save_path}")
         tok_dir = os.path.join(os.path.dirname(save_path), "tokenizer")
         os.makedirs(tok_dir, exist_ok=True)
@@ -1398,6 +1410,21 @@ class GSFuse(nn.Module):
         ckpt = torch.load(save_path, map_location="cpu")
         sd = ckpt["state_dicts"]
         meta = ckpt.get("metadata", {})
+        adapted = bool(getattr(self.text_encoder, "use_lora", False))
+        if bool(meta.get("use_lora", False)) != adapted:
+            raise ValueError("Checkpoint LoRA architecture differs from the constructed model")
+        if adapted and meta.get("lora_rank") != self.text_encoder.lora_rank:
+            raise ValueError("Checkpoint LoRA rank differs from the constructed model")
+        if adapted and meta.get("lora_alpha") != self.text_encoder.lora_alpha:
+            raise ValueError("Checkpoint LoRA scaling differs from the constructed model")
+        if adapted and "text_adapters" not in sd and "text_encoder" not in sd:
+            raise ValueError("LoRA checkpoint is missing trained adapters")
+        if "text_adapters" in sd:
+            expected = {name for name in self.text_encoder.state_dict()
+                        if name.endswith(("lora_A", "lora_B"))}
+            if set(sd["text_adapters"]) != expected:
+                raise ValueError("Checkpoint adapter keys differ from the constructed model")
+            self.text_encoder.load_state_dict(sd["text_adapters"], strict=False)
         saved_task = meta.get("forecast_task")
         current_task = self.forecast_task_config.task
         saved_task_name = saved_task.get("task") if isinstance(saved_task, dict) else None
@@ -1519,6 +1546,27 @@ def smape(y_hat: torch.Tensor, y_true: torch.Tensor, eps: float = 1e-6) -> torch
     num = (y_hat - y_true).abs()
     den = (y_hat.abs() + y_true.abs()).clamp_min(eps)
     return (2.0 * (num / den)).mean() * 100.0
+
+
+def atomic_torch_save(payload, path):
+    """Keep the prior checkpoint intact if a write fails (including disk quota)."""
+    path = Path(path)
+    descriptor, name = tempfile.mkstemp(prefix="." + path.name + ".", suffix=".partial", dir=path.parent)
+    os.close(descriptor)
+    try:
+        torch.save(payload, name)
+        os.replace(name, path)
+    finally:
+        Path(name).unlink(missing_ok=True)
+
+
+def contrastive_series_anchor(model, analysis, fallback):
+    """Select an explicitly declared anchor without silently substituting fused features."""
+    if getattr(model, "contrastive_anchor", "fused") == "pre_attention":
+        if analysis is None or analysis.get("ts_inst") is None:
+            raise ValueError("pre_attention contrastive anchor requires pre-attention ts_inst")
+        return analysis["ts_inst"]
+    return analysis.get("s_vec_residual", fallback) if analysis is not None else fallback
 
 
 def contrastive_loss_objective(
@@ -1827,7 +1875,8 @@ def train(model, train_loader, test_loader, vali_loader, num_epochs, output_path
         })
 
     # Add LoRA adapter parameters if enabled
-    if USE_LORA:
+    if getattr(model.text_encoder, "use_lora", False):
+        model.text_encoder.enable_lora_training()
         lora_params = model.text_encoder.lora_parameters()
         if lora_params:
             trainable_groups.append({
@@ -2239,8 +2288,7 @@ def train(model, train_loader, test_loader, vali_loader, num_epochs, output_path
             loss_ts_only = 0.0
 
             if contrastive_lambda > 0:
-                ts_anchor = analysis["s_vec_residual"] if (
-                        analysis is not None and "s_vec_residual" in analysis) else batch_series_embeddings
+                ts_anchor = contrastive_series_anchor(model, analysis, batch_series_embeddings)
                 contrastive_loss = contrastive_loss_objective(
                     ts_anchor, batch_sent_report_embeddings, batch_negative_type_report_embeddings,
                     w_ce=0.0, w_triplet=1.0, temperature=0.5, margin=1.0
@@ -2692,8 +2740,7 @@ def test(model, test_loader, return_analysis: bool = False,
             huber = criterion_huber(output, target)
             core_reg = 0.5 * mse_loss + 0.3 * mae_loss + 0.2 * huber
 
-        ts_anchor = analysis["s_vec_residual"] if (
-                analysis is not None and "s_vec_residual" in analysis) else batch_series_embeddings
+        ts_anchor = contrastive_series_anchor(model, analysis, batch_series_embeddings)
         contrastive_loss = contrastive_loss_objective(
             ts_anchor, batch_sent_report_embeddings,
             batch_negative_type_report_embeddings, w_ce=0.0, w_triplet=1.0
@@ -3037,8 +3084,7 @@ def test_save(model, test_loader, output_folder=None,
             huber = nn.SmoothL1Loss(beta=0.5)(output, target)
             core_reg = 0.5 * mse_loss + 0.3 * mae_loss + 0.2 * huber
 
-        ts_anchor = analysis["s_vec_residual"] if (
-                analysis is not None and "s_vec_residual" in analysis) else batch_series_embeddings
+        ts_anchor = contrastive_series_anchor(model, analysis, batch_series_embeddings)
         contrastive_loss = contrastive_loss_objective(
             ts_anchor, batch_sent_report_embeddings,
             batch_negative_type_report_embeddings, w_ce=0.0, w_triplet=1.0
@@ -3320,11 +3366,22 @@ def train_stage1_ts_only(model, sw_train_loader, sw_vali_loader, num_epochs=None
     return log_file
 
 
+def stage2_prediction(model, text_embedding, x_cf):
+    """Optional strict text warmup: remove both decoder and last-value price inputs."""
+    use_prices = getattr(model, "stage2_price_context", True)
+    core = model.decoder(text_embedding, x_cf=x_cf if use_prices else None)
+    if model.use_learnable_last_value:
+        last = x_cf[:, :, -1:].detach() if use_prices else torch.zeros_like(x_cf[:, :, -1:])
+        core, _ = model.last_value_module(core, last, text_embedding)
+    return core
+
+
 def train_stage2_text_only(model, train_loader, vali_loader, num_epochs=None, output_path=None):
     """
     Stage 2: Text Pre-training
 
-    Fine-tune the decoder on the textual modality only, omitting time series features.
+    Warm up the decoder with text. The historical default also supplies past
+    prices through shortcuts; stage2_price_context=False removes those inputs.
     This stage trains the decoder to understand how textual information relates to predictions.
 
     Components trained:
@@ -3430,13 +3487,7 @@ def train_stage2_text_only(model, train_loader, vali_loader, num_epochs=None, ou
             x_cf = model._ensure_cf(batch_seq_scale)
 
             # Decode using text-only pathway
-            core = model.decoder(t_vec_norm, x_cf=x_cf)
-
-            if model.use_learnable_last_value:
-                last_val = x_cf[:, :, -1:].detach()
-                output, _ = model.last_value_module(core, last_val, t_vec_norm)
-            else:
-                output = core
+            output = stage2_prediction(model, t_vec_norm, x_cf)
 
             target = batch_pred_scale.float().to(device)
 
@@ -3483,13 +3534,7 @@ def train_stage2_text_only(model, train_loader, vali_loader, num_epochs=None, ou
 
                 batch_seq_scale = batch_seq_scale.float().to(device)
                 x_cf = model._ensure_cf(batch_seq_scale)
-                core = model.decoder(t_vec_norm, x_cf=x_cf)
-
-                if model.use_learnable_last_value:
-                    last_val = x_cf[:, :, -1:].detach()
-                    output, _ = model.last_value_module(core, last_val, t_vec_norm)
-                else:
-                    output = core
+                output = stage2_prediction(model, t_vec_norm, x_cf)
 
                 target = batch_pred_scale.float().to(device)
                 vali_loss += float(forecast_training_loss(
@@ -3517,6 +3562,15 @@ def train_stage2_text_only(model, train_loader, vali_loader, num_epochs=None, ou
 
     print(f"[Stage 2] Completed. Best Vali {vali_label}: {best_loss:.6f}")
     return log_file
+
+
+def prepare_pretraining_stage(model, checkpoint, stage, **kwargs):
+    """Fresh and resumed runs both hand the validation-selected weights to the next stage."""
+    if not os.path.isfile(checkpoint):
+        stage(model, **kwargs)
+    if not os.path.isfile(checkpoint):
+        raise FileNotFoundError(f"Pretraining did not produce its selected checkpoint: {checkpoint}")
+    model.load_model_combined(save_path=checkpoint, strict=False)
 
 
 def train_three_stage(model, train_loader, test_loader, vali_loader, num_epochs,
@@ -3582,33 +3636,17 @@ def train_three_stage(model, train_loader, test_loader, vali_loader, num_epochs,
 
         # ==================== Stage 1: TS Pre-training (Sliding Window) ====================
         stage1_checkpoint = os.path.join(model_output_path, "stage1_best_model.pth")
-        if os.path.exists(stage1_checkpoint):
-            print(f"[Stage 1] Found existing completed Stage 1 checkpoint: {stage1_checkpoint}")
-            print(f"[Stage 1] Loading pre-trained TS branch and skipping Stage 1 retraining!")
-            model.load_model_combined(save_path=stage1_checkpoint, strict=False)
-            print("\n=== STAGE 1 RESTORED & COMPLETED ===\n")
-        else:
-            train_stage1_ts_only(
-                model, sw_train_loader, sw_vali_loader,
-                num_epochs=stage1_epochs,
-                output_path=output_path
-            )
-            print("\n=== STAGE 1 COMPLETED ===\n")
+        prepare_pretraining_stage(model, stage1_checkpoint, train_stage1_ts_only,
+            sw_train_loader=sw_train_loader, sw_vali_loader=sw_vali_loader,
+            num_epochs=stage1_epochs, output_path=output_path)
+        print("\n=== STAGE 1 SELECTED CHECKPOINT LOADED ===\n")
 
         # ==================== Stage 2: Text Pre-training ====================
         stage2_checkpoint = os.path.join(model_output_path, "stage2_best_model.pth")
-        if os.path.exists(stage2_checkpoint):
-            print(f"[Stage 2] Found existing completed Stage 2 checkpoint: {stage2_checkpoint}")
-            print(f"[Stage 2] Loading pre-trained text branch and skipping Stage 2 retraining!")
-            model.load_model_combined(save_path=stage2_checkpoint, strict=False)
-            print("\n=== STAGE 2 RESTORED & COMPLETED ===\n")
-        else:
-            train_stage2_text_only(
-                model, train_loader, vali_loader,
-                num_epochs=stage2_epochs,
-                output_path=output_path
-            )
-            print("\n=== STAGE 2 COMPLETED ===\n")
+        prepare_pretraining_stage(model, stage2_checkpoint, train_stage2_text_only,
+            train_loader=train_loader, vali_loader=vali_loader,
+            num_epochs=stage2_epochs, output_path=output_path)
+        print("\n=== STAGE 2 SELECTED CHECKPOINT LOADED ===\n")
 
         # ==================== Stage 3: Full Multimodal Training ====================
         print("=" * 80)

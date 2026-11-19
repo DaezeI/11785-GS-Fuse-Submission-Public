@@ -86,6 +86,10 @@ def parse_args():
     p.add_argument("--stage1-epochs", type=int, default=2)
     p.add_argument("--stage2-epochs", type=int, default=2)
     p.add_argument("--contrastive-lambda", type=float, default=1.0)
+    p.add_argument("--invariance-lambda", type=float, default=0.1)
+    p.add_argument("--contrastive-anchor", choices=["fused", "pre_attention"], default="fused")
+    p.add_argument("--stage2-price-context", action=argparse.BooleanOptionalAction, default=True,
+                   help="Allow past price inputs in Stage 2; disable for a strictly text-conditioned warmup")
     p.add_argument("--eval-every-steps", type=int, default=None)
 
     p.add_argument("--decoder-layers", type=int, default=3)
@@ -237,6 +241,8 @@ def main():
         use_learnable_last_value=args.learnable_last_value,
         gate_target_objective=args.gate_target_objective,
     )
+    model.contrastive_anchor = args.contrastive_anchor
+    model.stage2_price_context = args.stage2_price_context
     if args.forecast_task == "return_bp":
         model.run_provenance = {
             "manifest_sha256": events.audit["manifest_sha256"],
@@ -263,6 +269,7 @@ def main():
             num_epochs=args.num_epochs,
             output_path=args.output_path,
             contrastive_lambda=args.contrastive_lambda,
+            inv_lambda=args.invariance_lambda,
             eval_every_steps=args.eval_every_steps,
         )
         if args.interpret_samples > 0:

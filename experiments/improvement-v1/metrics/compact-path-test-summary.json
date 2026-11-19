@@ -1,0 +1,142 @@
+{
+  "schema": "gs-fuse-compact-path-test-summary-v1",
+  "task": "c1-ohlc-return-path-v1",
+  "split": "test",
+  "test_scored": true,
+  "test_events": 2236,
+  "test_dates": 845,
+  "timing_policy": "category4_1400_strict_before",
+  "release_timestamps_verified": false,
+  "snapshot_content_sha256": "049aa089d2eaa77644be5deba3abad3fa33c0a18b4375553664cafc71370c2bf",
+  "manifest_sha256": "1b04373a4361238b09c0b1d952163973403d2d7839dbb9e7215c429af14b23d1",
+  "test_ids_sha256": "0a47dc30790f9271266d54587b7ab0c851dddaa29479f2cda80fb0d6454acb82",
+  "lock_sha256": "3ab5d0a7c07268af23803fd129fe5d0520ce51606af2e68188dc65a4269348ce",
+  "training": false,
+  "aggregation": "mean absolute error over events, 140 bars and OHLC",
+  "reporting_units": "basis-point log return relative to last observed close",
+  "seeds": [
+    0,
+    1,
+    2
+  ],
+  "device": "cuda",
+  "torch_version": "2.5.1+cu124",
+  "per_seed": [
+    {
+      "seed": 0,
+      "price": {
+        "path_mae_bp": 80.10878090647269,
+        "close_endpoint_mae_bp": [
+          63.358092387196855,
+          74.33019077069957,
+          108.3698900072154
+        ],
+        "close_endpoint_direction_hit_rate": [
+          0.5348837209302325,
+          0.524641577060932,
+          0.5259391771019678
+        ]
+      },
+      "price_plus_news": {
+        "path_mae_bp": 80.30942649202896,
+        "close_endpoint_mae_bp": [
+          63.48686953188017,
+          74.7235952500441,
+          108.83714277650836
+        ],
+        "close_endpoint_direction_hit_rate": [
+          0.5420393559928444,
+          0.525089605734767,
+          0.5304114490161002
+        ]
+      },
+      "improvement_bp": -0.20064558555627343
+    },
+    {
+      "seed": 1,
+      "price": {
+        "path_mae_bp": 80.66850337265804,
+        "close_endpoint_mae_bp": [
+          63.659682202396986,
+          74.46137526706661,
+          109.28073052562813
+        ],
+        "close_endpoint_direction_hit_rate": [
+          0.5237030411449016,
+          0.5295698924731183,
+          0.5295169946332737
+        ]
+      },
+      "price_plus_news": {
+        "path_mae_bp": 80.66850337265804,
+        "close_endpoint_mae_bp": [
+          63.659682202396986,
+          74.46137526706661,
+          109.28073052562813
+        ],
+        "close_endpoint_direction_hit_rate": [
+          0.5237030411449016,
+          0.5295698924731183,
+          0.5295169946332737
+        ]
+      },
+      "improvement_bp": 0.0
+    },
+    {
+      "seed": 2,
+      "price": {
+        "path_mae_bp": 80.10732402536301,
+        "close_endpoint_mae_bp": [
+          63.47563837991723,
+          74.37250863369209,
+          108.26078996309
+        ],
+        "close_endpoint_direction_hit_rate": [
+          0.5483005366726297,
+          0.535394265232975,
+          0.5339892665474061
+        ]
+      },
+      "price_plus_news": {
+        "path_mae_bp": 80.04560550779875,
+        "close_endpoint_mae_bp": [
+          63.237648297803396,
+          74.3174573599129,
+          108.32682638905929
+        ],
+        "close_endpoint_direction_hit_rate": [
+          0.5523255813953488,
+          0.5304659498207885,
+          0.5232558139534884
+        ]
+      },
+      "improvement_bp": 0.061718517564258946
+    }
+  ],
+  "means": {
+    "price_path_mae_bp": 80.29486943483124,
+    "price_plus_news_path_mae_bp": 80.34117845749525,
+    "improvement_bp": -0.04630902266400483
+  },
+  "zero": {
+    "path_mae_bp": 80.48726446796474,
+    "close_endpoint_mae_bp": [
+      63.60548186932619,
+      74.512420158625,
+      108.77896835796922
+    ],
+    "close_endpoint_direction_hit_rate": [
+      0.0,
+      0.0,
+      0.0
+    ]
+  },
+  "published_r3": {
+    "path_mae_bp": 80.61504705986441,
+    "zero_path_mae_bp": 80.48726445009157,
+    "source": "https://github.com/DaezeI/11785-GS-Fuse-Submission-Public/blob/main/results/adaeze-screened-r3-h200-v2/metrics.json",
+    "local_minus_r3_zero_mae_bp": 1.7873162505566142e-08,
+    "zero_matches": true,
+    "caveat": "Same published C1 snapshot, manifest, timing and scoring metric; R3 per-event predictions are not available here for an independent ID check."
+  }
+}

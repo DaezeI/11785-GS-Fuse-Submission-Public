@@ -9,11 +9,15 @@ This document provides a mechanical comparison of the original GS-Fuse paper, th
 ### The User's True Goal
 Build a working, deployable deep learning model that accurately forecasts future financial price movements and directional returns on the S&P 500 using multimodal time-series and news text.
 
-### The Original Paper's Illusion
-The original GS-Fuse paper claimed that cross-attention multimodal fusion dynamically balances news and prices to achieve high directional and price forecasting accuracy. However, code and data audits revealed that the paper's reported performance relied on:
-1. **Severe Future-Lookahead Data Leakage:** Over 880 articles in the evaluation sets had publication dates occurring *after* the target forecast windows. The model appeared accurate because it was effectively peeking into future news.
-2. **Unverified Text Utility:** The authors never evaluated paired controls (zero-text or article shuffling) to verify whether the cross-attention module was actually extracting signal or merely acting as random noise.
-3. **Unstable Raw-Price Formulation:** Forecasting un-normalized, non-stationary raw price levels across macroeconomic regimes forces neural networks to fit macro drift rather than tradeable signals.
+### Evidence limits on the released implementation
+The team found suspect article dates and cross-partition price overlap in its
+historical protocol. The screened C1 audit removes known date candidates and
+checks shared price bars, but does not verify intraday publication times.
+These findings do not establish that every published paper score was caused
+by future information. Same-checkpoint text controls measure a different
+question from independently retrained price-only models. Price targets were
+standardized levels, not unnormalized prices. Use the experiment result packs
+and [revised audit](experiments/AUDIT_FIRST_AND_COMPACT_V2.md) for bounded claims.
 
 ### What the Team Planned and Executed
 To build a scientifically valid model, the team had to establish clean foundations first:

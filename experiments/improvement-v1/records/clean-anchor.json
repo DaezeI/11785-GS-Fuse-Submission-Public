@@ -1,0 +1,30 @@
+{
+  "id": "improvement-v1-clean-anchor",
+  "title": "Improvement v1: clean-anchor",
+  "kind": "Training design",
+  "owner": "Adaeze Ilodianya",
+  "status": "planned",
+  "updated_at": "2026-11-19T03:14:00+00:00",
+  "question": "Use pre-attention TS instance as contrastive anchor only",
+  "configuration": "Committed variant clean-anchor; reference=ref. All new runs restore validation-best Stage-1/2 weights. Five default configurations are SMOKE ONLY (one-hour caps); full training requires source/snapshot-bound resource, quota, audit and gradient evidence. LoRA/context search is deferred.",
+  "finding": "No new full execution or measured quality finding. Updated audit-first design and testable controls; intended executor Nicole Lyu.",
+  "limitations": "Intraday publication times remain unverified. CPU code checks do not certify full-backbone GPU execution or performance. No benefit is assumed; new attempts require exact compute/input provenance.",
+  "evidence": [
+    {
+      "label": "Committed configuration matrix",
+      "url": "https://github.com/DaezeI/11785-GS-Fuse-Submission-Public/blob/main/experiments/improvement-v1/matrix.json"
+    },
+    {
+      "label": "Full design and acceptance gates",
+      "url": "https://github.com/DaezeI/11785-GS-Fuse-Submission-Public/blob/main/docs/experiments/IMPROVEMENT_CAMPAIGN_V1.md"
+    },
+    {
+      "label": "Audit-first and laptop model revision",
+      "url": "https://github.com/DaezeI/11785-GS-Fuse-Submission-Public/blob/main/docs/experiments/AUDIT_FIRST_AND_COMPACT_V2.md"
+    }
+  ],
+  "figure": null,
+  "related": [
+    "improvement-v1-ref"
+  ]
+}

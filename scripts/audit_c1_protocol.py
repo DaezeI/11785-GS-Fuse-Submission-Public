@@ -52,6 +52,8 @@ def main():
                    "category4_1400_strict_before"], required=True)
     p.add_argument("--skip-missing", action="store_true")
     p.add_argument("--forecast-task", choices=["price", "return_bp"], default="price")
+    p.add_argument("--seq-len", type=int, default=35)
+    p.add_argument("--pred-len", type=int, default=140)
     p.add_argument("--out", type=Path, required=True)
     p.add_argument("--windows-csv", type=Path,
                    help="Save one row per exact emitted event window")
@@ -65,9 +67,11 @@ def main():
         args.event_dir = args.snapshot_root / "event"
         args.series = args.snapshot_root / "series" / "SP500.csv"
     data = build_c1_dataloaders(args.manifest, args.event_dir, args.series,
+                                seq_len=args.seq_len, pred_len=args.pred_len,
                                 timing_policy=args.timing_policy,
                                 skip_missing=args.skip_missing, task_mode=args.forecast_task)
     report = {**data.audit,
+              "seq_len": args.seq_len, "pred_len": args.pred_len,
               "source_commit": subprocess.check_output(
                   ["git", "rev-parse", "HEAD"], cwd=ROOT, text=True).strip(),
               "snapshot_content_sha256": snapshot["content_sha256"] if snapshot else None,
