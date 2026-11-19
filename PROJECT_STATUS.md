@@ -1,5 +1,13 @@
 # Project status
 
+**New planned improvement campaign:** Adaeze prepared a separate
+[controlled campaign](docs/experiments/IMPROVEMENT_CAMPAIGN_V1.md) for Nicole's
+personal GPU resource: corrected-code reference, text LoRA, longer price
+histories, text budgets and optional fusion variants. The six-run default
+screen uses validation; 11 additional designs require evidence or new code.
+No jobs or new model results are implied. Existing completed results and
+Delta jobs retain their recorded identities and status.
+
 **Current phase: controlled experiments, result analysis and final writing.**
 Routine data preparation is complete. The [research home](https://gs-fuse-research.twiggydonkey4.chatgpt.site) reads the latest [research records](research_home/records.json) after updates reach GitHub main. Start with the
 [next-phase plan](docs/NEXT_PHASE_PLAN.md); the experiment register and linked

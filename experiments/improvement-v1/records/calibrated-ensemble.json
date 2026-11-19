@@ -1,0 +1,26 @@
+{
+  "id": "improvement-v1-calibrated-ensemble",
+  "title": "Improvement v1: calibrated-ensemble",
+  "kind": "Evidence or implementation gated design",
+  "owner": "Adaeze Ilodianya",
+  "status": "planned",
+  "updated_at": "2026-11-19T01:51:05+00:00",
+  "question": "Evaluate the prespecified calibrated-ensemble hypothesis in the controlled improvement design.",
+  "configuration": "Design only. See named protocol section for comparison, fixed settings, metrics, implementation/evidence gate and acceptance checks. No executable config or submission yet.",
+  "finding": "No execution or measured finding. Intended executor: Nicole Lyu on Nicole’s personal GPU resource.",
+  "limitations": "Intraday publication times remain unverified. CPU code checks do not certify full-backbone GPU execution or performance. No benefit is assumed; new attempts require exact compute/input provenance.",
+  "evidence": [
+    {
+      "label": "Committed configuration matrix",
+      "url": "https://github.com/DaezeI/11785-GS-Fuse-Submission-Public/blob/main/experiments/improvement-v1/matrix.json"
+    },
+    {
+      "label": "Full design and acceptance gates",
+      "url": "https://github.com/DaezeI/11785-GS-Fuse-Submission-Public/blob/main/docs/experiments/IMPROVEMENT_CAMPAIGN_V1.md"
+    }
+  ],
+  "figure": null,
+  "related": [
+    "improvement-v1-ref"
+  ]
+}

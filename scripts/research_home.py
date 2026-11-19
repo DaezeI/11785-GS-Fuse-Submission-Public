@@ -116,14 +116,17 @@ def upsert(registry, candidate, path):
         ]
     registry["updated_at"] = datetime.now(timezone.utc).isoformat(timespec="seconds")
     validate(registry)
-    with tempfile.NamedTemporaryFile("w", dir=path.parent, delete=False, encoding="utf-8") as tmp:
-        temporary = Path(tmp.name)
-        try:
+    temporary = None
+    try:
+        with tempfile.NamedTemporaryFile("w", dir=path.parent, delete=False, encoding="utf-8") as tmp:
+            temporary = Path(tmp.name)
             json.dump(registry, tmp, indent=2, ensure_ascii=False, allow_nan=False)
             tmp.write("\n")
             tmp.flush()
-            os.replace(temporary, path)
-        finally:
+        # Windows cannot replace a NamedTemporaryFile while its handle is open.
+        os.replace(temporary, path)
+    finally:
+        if temporary is not None:
             temporary.unlink(missing_ok=True)
 
 
