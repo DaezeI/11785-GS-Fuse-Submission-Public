@@ -113,6 +113,7 @@ when a run fails or finds no improvement; do not turn queued work into a result.
 
 ## Shared workflow
 
+- Before editing, follow the [team branch and PR preflight](TEAM_WORKFLOW.md#team-branch-and-pr-preflight). Check for relevant unmerged work before choosing a base or starting a new task.
 - GitHub: code/lists/instructions/small results. Drive: data/docs/output backups.
   Delta: GPU execution and working files. W&B: experiment records. ACCESS:
   allocation/membership. None automatically synchronizes the others.

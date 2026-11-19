@@ -399,6 +399,13 @@ branch for the next change. If you are continuing an existing branch, incorporat
 current main without overwriting anyone's work. No account or GPU setup is
 needed merely to read these instructions or run the available CPU analysis.
 
+### Team branch and PR preflight
+
+1. Before editing, fetch `origin` and review relevant remote branches and open PRs, including drafts. A fresh `main` does not include unmerged work. If you cannot check GitHub, state that in the handoff.
+2. If a teammate already owns overlapping work, link the branch or PR and record the owner, dependency, and next action. Coordinate before duplicating, building on, or merging their changes.
+3. Share unfinished work on a focused task branch with a draft PR when publication is authorized. State what is verified, pending, or blocked. Do not present plans as results or include restricted material.
+
+
 CPU checks and aggregate reproduction, from the repository root:
 
 ```sh
