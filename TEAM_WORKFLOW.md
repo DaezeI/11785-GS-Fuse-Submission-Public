@@ -406,6 +406,11 @@ needed merely to read these instructions or run the available CPU analysis.
 3. Share unfinished work on a focused task branch with a draft PR when publication is authorized. State what is verified, pending, or blocked. Do not present plans as results or include restricted material.
 
 
+In summaries, handoffs, and status reports, say **article-to-price match**
+when an article is linked to the price bars for a forecast window. State
+separately whether article timing, data permissions, and sample size were
+verified. Use `join` when referring to a technical operation such as a database join.
+
 CPU checks and aggregate reproduction, from the repository root:
 
 ```sh

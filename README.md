@@ -22,6 +22,10 @@ The [next-phase plan](docs/NEXT_PHASE_PLAN.md) explains what is ready and what t
 > for most retained news are unverified, so report this limitation with text
 > results. See the [article-date handoff](analysis/text_value/ARTICLE_DATE_AUDIT.md).
 
+> **Article-to-price match:** an article linked to the S&P 500 price bars before
+> and after the forecast cutoff. A match alone does not prove the text was
+> available at that time or that the sample is ready for training.
+
 > **Team: start with [TEAM_WORKFLOW.md](TEAM_WORKFLOW.md).** It records the
 > November 4 agreement to use **C1 as the main split**, ownership, service setup,
 > dependencies, and next actions. **Agents: read [AGENTS.md](AGENTS.md).**
