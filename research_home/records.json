@@ -2,7 +2,7 @@
   "title": "GS-Fuse Research Home",
   "stage": "Controlled experiments and final writing",
   "overview": "The last-price rule beat our trained price models. In Adaeze’s completed R3 return run, correct and shuffled articles gave nearly identical results, and predicting zero return had slightly lower error.",
-  "updated_at": "2026-11-19T08:35:12+00:00",
+  "updated_at": "2026-11-20T06:14:31+00:00",
   "source_url": "https://github.com/DaezeI/11785-GS-Fuse-Submission-Public/blob/main/research_home/records.json",
   "links": [
     {
@@ -41,6 +41,43 @@
     }
   ],
   "experiments": [
+    {
+      "configuration": "Separate Fed/daily Treasury pilot; 36/12 train/validation statements, 180/60 windows, matched seeds 23–25 and 10 fixed epochs. Four paired cells, shared frozen yield branch, gate fit on chronological train-only OOF predictions.",
+      "evidence": [
+        {
+          "label": "Summary",
+          "url": "https://github.com/DaezeI/11785-GS-Fuse-Submission-Public/blob/main/results/compact-treasury-crossattention-v1/summary.md"
+        },
+        {
+          "label": "Exact sanitized metrics",
+          "url": "https://github.com/DaezeI/11785-GS-Fuse-Submission-Public/blob/main/results/compact-treasury-crossattention-v1/metrics.json"
+        },
+        {
+          "label": "Provenance",
+          "url": "https://github.com/DaezeI/11785-GS-Fuse-Submission-Public/blob/main/results/compact-treasury-crossattention-v1/provenance.json"
+        },
+        {
+          "label": "Protocol and command",
+          "url": "https://github.com/DaezeI/11785-GS-Fuse-Submission-Public/blob/main/experiments/improvement-v1/COMPACT_TREASURY_CROSSATTENTION_PROTOCOL.md"
+        }
+      ],
+      "figure": {
+        "alt": "Validation MAE: no change 9.950 bp, frozen yields 11.830, pooled 11.787 ungated and 11.810 gated, cross-attention 12.200 ungated and 11.976 gated.",
+        "url": "https://raw.githubusercontent.com/DaezeI/11785-GS-Fuse-Submission-Public/main/results/compact-treasury-crossattention-v1/validation-mae.png"
+      },
+      "finding": "No change led at 9.950 bp MAE. Cross-attention was 0.413 bp worse than pooled without a gate, and 0.166 bp worse with one. The gate softened the cross-attention penalty but did not rescue it. Prior-statement text matched or slightly beat the current statement in all four cells.",
+      "id": "compact-treasury-crossattention-v1",
+      "kind": "Controlled experiment",
+      "limitations": "Repeated validation only: 12 statements and overlapping origins; no held-out test, no C1/equity result, no verified historical minute-level availability. Paired bootstrap is descriptive.",
+      "owner": "Adaeze Ilodianya",
+      "question": "Does querying individual statement tokens from frozen yield history improve over pooled text, with and without a learned gate?",
+      "related": [
+        "improvement-v1-compact-raw-path"
+      ],
+      "status": "completed",
+      "title": "Compact Treasury: cross-attention and gate ablation",
+      "updated_at": "2026-11-20T06:12:21+00:00"
+    },
     {
       "id": "compact-direction-v1",
       "title": "Compact price-only: endpoint direction-loss ablation",

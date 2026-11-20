@@ -1,0 +1,57 @@
+{
+  "archive_scope": "only train and validation supplied; prior ridge files bundled in archive are not used by the cross-attention runner",
+  "dataset_archive": "GS-Fuse-Fed-Treasury-Training-v1.zip",
+  "dataset_archive_sha256": "98995e9a6a49790d289936ed6e73f3747a49927051146b0b903fb82e72ce38e2",
+  "direction_endpoints_days": [
+    1,
+    3,
+    5
+  ],
+  "direction_weight": 1.0,
+  "distribution_change_only": "external fixed-name split loader, CLI argument/help and removal of packaged data/decompression imports",
+  "executed_runner_name": "GS-Fuse-Compact-Treasury-CrossAttention.py",
+  "executed_runner_sha256": "86ffa70cbdda87c2a02297cb2637bddf16f32aa67944d0e7127f2e482f25b0dc",
+  "fixed_epochs": 10,
+  "gate_teacher_folds": [
+    "12 to 8",
+    "20 to 8",
+    "28 to 8"
+  ],
+  "gate_weight_mse": 0.1,
+  "optimizer": "AdamW; learning rate 0.001, weight decay 0.001, batch size 32",
+  "outcome_artifact": "metrics.json from original completed run; not included in source-only packet",
+  "primary_arms": [
+    "pooled_matched",
+    "cross_matched",
+    "pooled_gate_matched",
+    "cross_gate_matched"
+  ],
+  "protected_training_evaluation_ast_sha256": "d46056db50d1d2a55947473d8204e613d7cc558c84be0d30fa02f40e79e2fe31",
+  "protocol": "compact-treasury-crossattention-gate-factorial-v1",
+  "scope": "archived Fed statements + daily Treasury 10Y yield-change path; validation only, not C1",
+  "seeds": [
+    23,
+    24,
+    25
+  ],
+  "source_only_runner_sha256_lf": "ec2a3eaaf43542413f8ab5f1a619bb5f91076112d132ccd0b134afb064a66cc2",
+  "split_pin_fields": [
+    "sha256",
+    "rows",
+    "distinct_statements"
+  ],
+  "split_pins": {
+    "train": [
+      "5b958e6c15d5c051f2148ae366bb41fe46f4fbf3e17aa0c2cc7d4b8867d05e3c",
+      180,
+      36
+    ],
+    "validation": [
+      "9474f81626bf4b489fa9ab6f307e0fd2ba84d9c2b6d5522d43d98fdc2264feef",
+      60,
+      12
+    ]
+  },
+  "target_scale_bp": 10.0,
+  "test_accessed": false
+}

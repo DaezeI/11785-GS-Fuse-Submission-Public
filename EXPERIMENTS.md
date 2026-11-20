@@ -88,3 +88,7 @@ owner handoffs and how these feed the paper and presentation.
 ## Compact direction-loss ablation
 
 **Completed, validation only:** [Compact direction-loss ablation](results/compact-direction-v1/summary.md). The penalty did not improve MAE or H140 direction accuracy; Smooth L1 remains the default.
+
+## Separate Fed/Treasury cross-attention and gate pilot
+
+**Completed, validation only:** [Fed/Treasury cross-attention × gate pilot](results/compact-treasury-crossattention-v1/summary.md). No change had the lowest MAE; attention worsened the matched pooling comparison with and without the gate. Not an intraday SPX or screened C1 result.
