@@ -160,3 +160,41 @@ read [docs/NEXT_PHASE_PLAN.md](docs/NEXT_PHASE_PLAN.md). Routine screened-data
 preparation is complete. Refer to additional compute publicly only as
 **Nicole's personal GPU resource**. Keep provider/account/reservation details
 and credentials in her local skill/handoff. Check each owner's current records and scheduler state before submitting a campaign. Nicole authorizes reasonable bounded follow-up experiments within her project scope, using the frozen dataset and the local GPU skill limits.
+
+## Session continuity and documentation
+
+### Continue GS-Fuse
+
+- Inspect Git status and fetch origin without discarding local edits.
+- Read applicable agent instructions, team workflow, project status,
+  Research Home, and relevant recent handoffs.
+- Identify completed, pending, blocked, and unverified work.
+- Resume the next authorized, unblocked task without duplication.
+
+### Record meaningful work continuously
+
+Preserve material research, experiments, implementation, debugging,
+documentation, planning, decisions, failed approaches, and unresolved
+questions. Record what was attempted, why, what was verified, relevant
+technical details, limitations, and implications for future work.
+
+Use existing project records and Git history. Add dated updates when
+existing records do not adequately preserve important context.
+Do not create redundant experiment entries or parallel logs.
+Apply gsfuse-result-report according to the existing reporting rules.
+
+### End GS-Fuse session
+
+- Reconcile completed work with existing project records.
+- Preserve material findings, changes, decisions, failed approaches,
+  outstanding questions, and exact next actions.
+- Apply the existing reporting skill to relevant research work.
+- Review Git status, validation, commits, branches, and pending PRs.
+- Verify evidence delivery and flag unverified backups.
+- Provide a concise continuation summary with state and blockers.
+- Keep detailed durable history separate from the short handoff.
+- Never invent verification, discard local changes, silently publish
+  private materials, or claim unfinished work is complete.
+
+A session may end without a new experiment record. Ending a session
+does not imply an experiment or research question is complete.
