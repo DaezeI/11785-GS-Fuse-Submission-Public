@@ -1,0 +1,46 @@
+{
+  "c1_changed": false,
+  "data_scope": {
+    "gate_oof_training_statements": 24,
+    "source": "official Fed statements plus Treasury daily par yields; no immutable minute archive or market-trade series",
+    "training_rows": 180,
+    "training_statements": 36,
+    "validation_rows": 60,
+    "validation_statements": 12
+  },
+  "distribution_change_only": "external fixed-name split loader, CLI argument/help and removal of packaged data/decompression imports",
+  "executed_runner_name": "GS-Fuse-Compact-Treasury-CrossAttention.py",
+  "executed_runner_sha256": "86ffa70cbdda87c2a02297cb2637bddf16f32aa67944d0e7127f2e482f25b0dc",
+  "figure_sha256": "531eff712822ff310616a780dd7337ddf7283446b0bb894c439d0d15cadea335",
+  "limitations": [
+    "No rerun, independent CUDA reproduction, checkpoint inspection or checkpoint hash verification.",
+    "No held-out predictions/scores, raw yield/text rows, private filesystem path, original full upload, per-statement metrics, or donor mapping in this packet.",
+    "Repeated validation and small effective sample; paired bootstrap only descriptive."
+  ],
+  "metrics_sha256": "38ed9f3e1ba2d4ae48697a7772fb4cc0c402d11dd335098fd0cbd93d8347a680",
+  "original_uploaded_metrics_sha256": "ff63401d6f5ae4f26fa308658d6945fe472ab3cd807643a028d5132ad3eb0b85",
+  "owner": "Adaeze Ilodianya",
+  "owner_console_receipt_utc": "2026-11-20T05:47:03Z",
+  "owner_local_output_identifier_utc": "2026-11-20T05:43:24.372256Z",
+  "protected_training_evaluation_ast_sha256": "d46056db50d1d2a55947473d8204e613d7cc558c84be0d30fa02f40e79e2fe31",
+  "reported_compute": {
+    "device": "cuda",
+    "shell": "Windows PowerShell",
+    "torch_version": "2.5.1+cu124"
+  },
+  "run_id": "compact-treasury-crossattention-v1",
+  "runner_hash_scope": "SHA-256 of retained standalone distribution; local executed bytes were not independently attested.",
+  "source_only_runner_path": "scripts/improvement/run_compact_treasury_crossattention.py",
+  "source_only_runner_sha256_lf": "ec2a3eaaf43542413f8ab5f1a619bb5f91076112d132ccd0b134afb064a66cc2",
+  "split_sha256": {
+    "train": "5b958e6c15d5c051f2148ae366bb41fe46f4fbf3e17aa0c2cc7d4b8867d05e3c",
+    "validation": "9474f81626bf4b489fa9ab6f307e0fd2ba84d9c2b6d5522d43d98fdc2264feef"
+  },
+  "status": "completed",
+  "test_accessed_reported": false,
+  "verification": [
+    "All 14 results match the user-reported console at displayed MAE, MSE and DHR precision.",
+    "Verified seed averages, 10-epoch curves, exact split SHA-256 values and the hard-coded validation-only protocol.",
+    "Source-only distribution passes protected historical training/eval AST parity and reads only external pinned train and validation files."
+  ]
+}
