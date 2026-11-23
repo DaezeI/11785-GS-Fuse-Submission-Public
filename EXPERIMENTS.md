@@ -70,9 +70,9 @@ times for retained articles are still unverified.
 ## Short-horizon Fed/SPX baseline
 
 **Design proposal, Adaeze Ilodianya:** [short-horizon protocol](docs/experiments/FED_SPX_SHORT_HORIZON_PROPOSAL.md).
-Compare the team's compact price-only architecture and a matched text extension
-on a fixed intraday Close return. The proposal specifies a 30-minute candidate
-and eligibility rules. The baseline design and implementation are pending.
+Compare the compact price-only architecture and a matched text extension on
+20- and 30-minute Close returns from a shared forecast origin. The horizons
+are chosen. Exact text-version eligibility and implementation are pending.
 
 ## Entry template for future work
 
