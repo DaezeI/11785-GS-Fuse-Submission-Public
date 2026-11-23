@@ -1,6 +1,23 @@
 {
   "population_sha256": "3e38ea7698a44109d2ff782fb67b2e8485659c2745dc577d0a13915c253aa8fd",
   "population_rows": 216,
+  "by_split": {
+    "train": {
+      "rows": 0,
+      "release_instants": 0,
+      "dates": 0
+    },
+    "val": {
+      "rows": 0,
+      "release_instants": 0,
+      "dates": 0
+    },
+    "test": {
+      "rows": 121,
+      "release_instants": 104,
+      "dates": 98
+    }
+  },
   "by_type_disposition": {
     "fed_board_monetary_release|eligible_archived_copy_before_cutoff": 1,
     "fed_board_monetary_release|eligible_document_release_line_release_day_capture": 38,
