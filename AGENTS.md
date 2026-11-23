@@ -9,6 +9,13 @@ For Nicole's research workflow and fresh-chat continuation, start with
 [RESEARCH_HOME.md](docs/RESEARCH_HOME.md). Use the local
 `nicole-research-companion` skill when available.
 
+## Name models and data by ID
+
+Follow [docs/NAMING.md](docs/NAMING.md) and the local
+[gsfuse-naming](.agents/skills/gsfuse-naming/SKILL.md) skill whenever you refer to a
+forecaster, baseline, control, gate, cohort or comparison. Use the architecture, cohort and
+comparison IDs, never "the model", "the gate" or "the data".
+
 ## Report experiment work by default
 
 When a teammate asks you to prepare a config for execution, submit or resume
