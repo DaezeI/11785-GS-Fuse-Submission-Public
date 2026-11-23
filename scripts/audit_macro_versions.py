@@ -34,7 +34,7 @@ S = requests.Session()
 S.headers["User-Agent"] = AGENT
 RELEASE_LINE = re.compile(
     r"(?:embargoed\s+until|for\s+release(?:\s+at)?|release\s+time|released\s+at|not\s+for\s+release\s+until)"
-    r"[^0-9]{0,40}?(\d{1,2})[:.](\d{2})\s*([ap])\.?\s*m", re.I)
+    r".{0,40}?\b(\d{1,2})[:.](\d{2})\s*([ap])\.?\s*m", re.I)
 
 
 def get(url, delay):
@@ -214,6 +214,28 @@ def decide(rec, release_utc, cutoff):
         "copies, none different")
 
 
+def redecide(args):
+    """Recompute PDF facts and dispositions from saved files; archive lookups are kept as recorded."""
+    lines = [json.loads(x) for x in args.out.read_text(encoding="utf-8").splitlines() if x.strip()]
+    latest = {}
+    for rec in lines:
+        latest[rec["event_id"]] = rec
+    for rec in latest.values():
+        path = args.raw_dir / f"{rec['event_id']}.pdf"
+        if "fingerprint_sha256" in rec and path.exists():
+            data = path.read_bytes()
+            if hashlib.sha256(data).hexdigest() != rec["fingerprint_sha256"]:
+                raise ValueError(f"Saved file changed for {rec['event_id']}")
+            for key in ("release_line", "release_line_utc", "pdf_error"):
+                rec.pop(key, None)
+            rec.update(pdf_facts(data, dt.date.fromisoformat(rec["market_et"][:10])))
+        release_utc = dt.datetime.fromisoformat(rec["market_et"]).replace(tzinfo=ET).astimezone(UTC)
+        rec["disposition"], rec["reason"] = decide(rec, release_utc, dt.datetime.fromisoformat(rec["text_cutoff_utc"]))
+    args.out.write_text("".join(json.dumps(r, default=str) + "\n" for r in latest.values()), encoding="utf-8")
+    from collections import Counter
+    print(len(latest), Counter(r["disposition"] for r in latest.values()).most_common())
+
+
 def main():
     parser = argparse.ArgumentParser(description=__doc__, formatter_class=argparse.RawDescriptionHelpFormatter)
     parser.add_argument("--population", required=True, type=Path)
@@ -222,7 +244,12 @@ def main():
     parser.add_argument("--raw-dir", required=True, type=Path)
     parser.add_argument("--wayback-delay", type=float, default=2.5)
     parser.add_argument("--limit", type=int)
+    parser.add_argument("--redecide", action="store_true",
+                        help="re-read the saved PDFs and recompute every decision in --out without network requests")
     args = parser.parse_args()
+    if args.redecide:
+        redecide(args)
+        return
     args.raw_dir.mkdir(parents=True, exist_ok=True)
     rows = [r for r in csv.DictReader(args.population.open(encoding="utf-8")) if r["source"] == args.source]
     done = set()
