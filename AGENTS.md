@@ -1,5 +1,10 @@
 # Project instructions for coding agents
 
+When starting, resuming, or wrapping up a GS-Fuse session, use the shared
+[gs-fuse-continuity](.agents/skills/gs-fuse-continuity/SKILL.md) skill. It is
+available to contributors working from this repository. If your client does
+not load repository skills, read the linked instructions directly.
+
 For Nicole's research workflow and fresh-chat continuation, start with
 [RESEARCH_HOME.md](docs/RESEARCH_HOME.md). Use the local
 `nicole-research-companion` skill when available.
