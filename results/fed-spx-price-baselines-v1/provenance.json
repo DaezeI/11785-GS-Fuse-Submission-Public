@@ -1,0 +1,15 @@
+{
+  "id": "fed-spx-price-baselines-v1",
+  "owner": "Adaeze Ilodianya",
+  "status": "completed_validation",
+  "run_date_et": "2026-11-22",
+  "code_commit": "d4bf7e17b637b95d364321a679d53c308d048fd4",
+  "alignment_commit": "a4269dce74eb0cc829fa6772b049eed7ed463abd",
+  "command": "python scripts/run_fed_price_baselines.py --price-csv downloads/SP500.csv --out-dir downloads/fed-spx-price-baselines-v1",
+  "compute": "Local Windows CPU. Ridge fit is deterministic. Bootstrap seed 23.",
+  "checkpoint": "Fresh ridge coefficients in downloads/fed-spx-price-baselines-v1/ridge.npz. Persistence has no checkpoint.",
+  "local_evaluation_artifacts": ["val-main-paired.npz", "val-flagged-paired.npz"],
+  "private_artifact_custodian": "Adaeze Ilodianya",
+  "input_and_population_hashes": "See metrics.json for exact input bytes, sorted event ID set hashes and package versions.",
+  "test_status": "Unscored. The validation runner constructs train and validation datasets only."
+}

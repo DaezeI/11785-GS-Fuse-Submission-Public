@@ -1,5 +1,11 @@
 # Project status
 
+**November 22 Fed/SPX handoff:** Adaeze completed the Person 3 price-only
+validation benchmark on Joye's official-Fed alignment v1. On 215 main
+validation rows, last-close persistence had lower OHLC path MAE than ridge
+at all three horizons. Use the [result and matching protocol](results/fed-spx-price-baselines-v1/summary.md)
+for Person 4's comparison. The Fed/SPX held-out scores are pending.
+
 **Latest Adaeze direction:** prioritize a local prices-plus-raw-news model with
 a small trainable text encoder and no Llama feature-export dependency. The
 [continuation handoff](experiments/improvement-v1/CONTINUE_WITHOUT_NICOLE.md)
