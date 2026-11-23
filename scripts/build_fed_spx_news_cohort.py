@@ -190,7 +190,24 @@ def main():
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument("--price-csv", required=True, type=Path)
     parser.add_argument("--out-dir", required=True, type=Path)
+    parser.add_argument("--evidence-version", choices=("v1", "v2"), default="v1",
+                        help="v2 uses the minutes/speech and testimony ledgers re-decided with the corrected "
+                             "release-line parser and wording check (scripts/redecide_fed_document_versions.py)")
     args = parser.parse_args()
+    if args.evidence_version == "v2":
+        global LEDGERS, OVERRIDES
+        swap = {"fed-spx-minutes-speeches-evidence-v1/": "fed-spx-minutes-speeches-evidence-v2/",
+                "fed-spx-testimony-recheck-v1/": "fed-spx-testimony-recheck-v2/"}
+
+        def bump(entries):
+            out = []
+            for label, types, rel in entries:
+                for old, new in swap.items():
+                    rel = rel.replace(old, new)
+                out.append((label, types, rel))
+            return tuple(out)
+
+        LEDGERS, OVERRIDES = bump(LEDGERS), bump(OVERRIDES)
     population = ROOT / "downloads/fed-spx-endpoints-price-v1/population.csv"
     if sha(population) != POPULATION_SHA256:
         raise ValueError("Frozen endpoint population hash mismatch")

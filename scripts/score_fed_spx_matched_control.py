@@ -134,7 +134,10 @@ def main():
     parser.add_argument("--device", choices=("cuda", "cpu"), default="cuda",
                         help="the control was fit on CUDA; exact replay needs the same device")
     parser.add_argument("--forecast-dir", type=Path, required=True, help="ignored location for per-event forecasts")
+    parser.add_argument("--cohort", type=Path, default=COHORT,
+                        help="eligible cohort CSV (v1 default; results/fed-spx-news-cohort-v2/eligible_cohort.csv for v2)")
     args = parser.parse_args()
+    cohort_path = args.cohort if args.cohort.is_absolute() else ROOT / args.cohort
     device = torch.device(args.device)
     torch.use_deterministic_algorithms(True)
     run = json.loads((RUN / "metrics.json").read_text(encoding="utf-8"))
@@ -173,7 +176,7 @@ def main():
         dlinear_states[f"seed{seed}"] = state
     dlinear_val = np.stack(dlinear_val)
 
-    cohort = pd.read_csv(COHORT)
+    cohort = pd.read_csv(cohort_path)
     matched = cohort.loc[cohort.split == "val"]
     keep = val.rows.event_id.isin(matched.event_id).to_numpy()
     if keep.sum() != len(matched):
@@ -232,7 +235,7 @@ def main():
         "dlinear": {"config": dlinear_config, "config_sha256": sha256_file(DLINEAR_CONFIG),
                     "train_rows": len(train.rows), "output": "Close channel, [20 min, 30 min]"},
         "ridge": {"alpha": 10.0, "train_rows": len(train.rows), "features": "35x4 flattened, train-standardized"},
-        "cohort_sha256": sha256_file(COHORT),
+        "cohort_file": cohort_path.relative_to(ROOT).as_posix(), "cohort_sha256": sha256_file(cohort_path),
         "paired_forecasts_sha256": hashlib.sha256(paired_path.read_bytes()).hexdigest(),
         "price_audit": audit, "results": results,
     }
