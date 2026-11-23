@@ -75,7 +75,19 @@ Compare the compact price-only architecture and a matched text extension on
 are chosen. The [compact price-only validation run](results/fed-spx-endpoints-price-v1/summary.md)
 completed with three RTX 4060 seeds. The paired intervals cover zero at both
 horizons. The exact text-version audit and its coverage limits are linked in
-the result pack. Held-out scoring and the matched text comparison are pending.
+the result pack. The [Board and testimony audit](results/fed-spx-board-testimony-evidence-v1/README.md)
+reviewed 603 events and verified eight testimony PDF bodies by their frozen
+cutoffs. The [independent minutes and speech audit](results/fed-spx-minutes-speeches-codex-v1/README.md)
+reviewed all 472 assigned events and found no exact-version proof in the
+publisher records and archive pilot it checked. The
+[combined Fed/SPX news cohort](results/fed-spx-news-cohort-v1/README.md)
+reconciles all 1,185 train and validation event IDs and records the sensitivity
+to the minutes and speech evidence rules. A [Board release re-check](results/fed-spx-board-recheck-v1/README.md)
+adds 10 train and 33 validation rows under the document rule; the cohort file must be rebuilt.
+The [macro coverage count](results/macro-coverage-v1/README.md) finds 2,158 candidate training
+events before text checks. Decisions and limits are in the
+[November 23 update](docs/updates/2026-11-23-fed-spx-text-evidence.md). The matched experiment and held-out
+scoring remain pending.
 
 ## Entry template for future work
 

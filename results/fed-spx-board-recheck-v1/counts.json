@@ -1,0 +1,7 @@
+{
+  "train|eligible_document_release_line_release_day_capture": 10,
+  "train|insufficient_evidence": 305,
+  "val|eligible_document_release_line_release_day_capture": 33,
+  "val|insufficient_evidence": 20,
+  "val|version_conflict_review": 2
+}

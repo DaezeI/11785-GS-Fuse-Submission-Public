@@ -1,0 +1,301 @@
+{
+  "funnel": [
+    {
+      "step": "catalog statements",
+      "remaining": 160,
+      "lost": 0,
+      "remaining_by_split": null,
+      "lost_ids": []
+    },
+    {
+      "step": "1 release time verified",
+      "remaining": 159,
+      "lost": 1,
+      "remaining_by_split": {
+        "train": 94,
+        "val": 23,
+        "test": 21,
+        "NaN": 21
+      },
+      "lost_ids": [
+        "stmt_20080311a"
+      ]
+    },
+    {
+      "step": "2 inside price coverage",
+      "remaining": 138,
+      "lost": 21,
+      "remaining_by_split": {
+        "train": 94,
+        "val": 23,
+        "test": 21
+      },
+      "lost_ids": [
+        "stmt_20240501a",
+        "stmt_20240612a",
+        "stmt_20240731a",
+        "stmt_20240918a",
+        "stmt_20241107a",
+        "stmt_20241218a",
+        "stmt_20250129a",
+        "stmt_20250319a",
+        "stmt_20250507a",
+        "stmt_20250618a",
+        "stmt_20250730a",
+        "stmt_20250917a",
+        "stmt_20251029a",
+        "stmt_20251210a",
+        "stmt_20260128a",
+        "stmt_20260318a",
+        "stmt_20260429a",
+        "stmt_20260617a",
+        "stmt_20260729a",
+        "stmt_20260916a",
+        "stmt_20261028a"
+      ]
+    },
+    {
+      "step": "3a not purged at split boundary",
+      "remaining": 138,
+      "lost": 0,
+      "remaining_by_split": {
+        "train": 94,
+        "val": 23,
+        "test": 21
+      },
+      "lost_ids": []
+    },
+    {
+      "step": "3b test reserved (not evaluated)",
+      "remaining": 117,
+      "lost": 21,
+      "remaining_by_split": {
+        "train": 94,
+        "val": 23
+      },
+      "lost_ids": [
+        "stmt_20210922a",
+        "stmt_20211103a",
+        "stmt_20211215a",
+        "stmt_20220126a",
+        "stmt_20220316a",
+        "stmt_20220504a",
+        "stmt_20220615a",
+        "stmt_20220727a",
+        "stmt_20220921a",
+        "stmt_20221102a",
+        "stmt_20221214a",
+        "stmt_20230201a",
+        "stmt_20230322a",
+        "stmt_20230503a",
+        "stmt_20230614a",
+        "stmt_20230726a",
+        "stmt_20230920a",
+        "stmt_20231101a",
+        "stmt_20231213a",
+        "stmt_20240131a",
+        "stmt_20240320a"
+      ]
+    },
+    {
+      "step": "4 release in regular session",
+      "remaining": 110,
+      "lost": 7,
+      "remaining_by_split": {
+        "train": 91,
+        "val": 19
+      },
+      "lost_ids": [
+        "stmt_20080122b",
+        "stmt_20081008a",
+        "stmt_20100509a",
+        "stmt_20200315a",
+        "stmt_20200319b",
+        "stmt_20200323a",
+        "stmt_20200331a"
+      ]
+    },
+    {
+      "step": "5 35 input bars by release",
+      "remaining": 110,
+      "lost": 0,
+      "remaining_by_split": {
+        "train": 91,
+        "val": 19
+      },
+      "lost_ids": []
+    }
+  ],
+  "per_horizon": {
+    "20m": {
+      "6_target_window_complete": {
+        "remaining": 110,
+        "lost": {},
+        "by_split": {
+          "train": {
+            "rows": 91,
+            "release_instants": 91,
+            "dates": 91
+          },
+          "val": {
+            "rows": 19,
+            "release_instants": 19,
+            "dates": 19
+          }
+        }
+      },
+      "7_cross_split_shared_bars": 0,
+      "8_text_evidence_status": {
+        "eligible_B_official_record_only": 107,
+        "review_minutes_text_differs_from_posted_page": 2,
+        "not_verified_no_official_record_found": 1
+      },
+      "usable_text_and_price": {
+        "total": 107,
+        "by_split": {
+          "train": {
+            "rows": 89,
+            "release_instants": 89,
+            "dates": 89
+          },
+          "val": {
+            "rows": 18,
+            "release_instants": 18,
+            "dates": 18
+          }
+        }
+      },
+      "lacking_text_proof": [
+        "stmt_20120425a",
+        "stmt_20120801a",
+        "stmt_20191011a"
+      ]
+    },
+    "30m": {
+      "6_target_window_complete": {
+        "remaining": 110,
+        "lost": {},
+        "by_split": {
+          "train": {
+            "rows": 91,
+            "release_instants": 91,
+            "dates": 91
+          },
+          "val": {
+            "rows": 19,
+            "release_instants": 19,
+            "dates": 19
+          }
+        }
+      },
+      "7_cross_split_shared_bars": 0,
+      "8_text_evidence_status": {
+        "eligible_B_official_record_only": 107,
+        "review_minutes_text_differs_from_posted_page": 2,
+        "not_verified_no_official_record_found": 1
+      },
+      "usable_text_and_price": {
+        "total": 107,
+        "by_split": {
+          "train": {
+            "rows": 89,
+            "release_instants": 89,
+            "dates": 89
+          },
+          "val": {
+            "rows": 18,
+            "release_instants": 18,
+            "dates": 18
+          }
+        }
+      },
+      "lacking_text_proof": [
+        "stmt_20120425a",
+        "stmt_20120801a",
+        "stmt_20191011a"
+      ]
+    }
+  },
+  "buffer_sensitivity_rows_recovered_by_shorter_buffer": {
+    "0": 0,
+    "1": 0,
+    "2": 0,
+    "3": 0,
+    "4": 0
+  },
+  "input_length_sensitivity_rows_recovered": {
+    "12": 0,
+    "24": 0
+  },
+  "lost_ids_by_step": {
+    "1 release time verified": [
+      "stmt_20080311a"
+    ],
+    "2 inside price coverage": [
+      "stmt_20240501a",
+      "stmt_20240612a",
+      "stmt_20240731a",
+      "stmt_20240918a",
+      "stmt_20241107a",
+      "stmt_20241218a",
+      "stmt_20250129a",
+      "stmt_20250319a",
+      "stmt_20250507a",
+      "stmt_20250618a",
+      "stmt_20250730a",
+      "stmt_20250917a",
+      "stmt_20251029a",
+      "stmt_20251210a",
+      "stmt_20260128a",
+      "stmt_20260318a",
+      "stmt_20260429a",
+      "stmt_20260617a",
+      "stmt_20260729a",
+      "stmt_20260916a",
+      "stmt_20261028a"
+    ],
+    "3b test reserved (not evaluated)": [
+      "stmt_20210922a",
+      "stmt_20211103a",
+      "stmt_20211215a",
+      "stmt_20220126a",
+      "stmt_20220316a",
+      "stmt_20220504a",
+      "stmt_20220615a",
+      "stmt_20220727a",
+      "stmt_20220921a",
+      "stmt_20221102a",
+      "stmt_20221214a",
+      "stmt_20230201a",
+      "stmt_20230322a",
+      "stmt_20230503a",
+      "stmt_20230614a",
+      "stmt_20230726a",
+      "stmt_20230920a",
+      "stmt_20231101a",
+      "stmt_20231213a",
+      "stmt_20240131a",
+      "stmt_20240320a"
+    ],
+    "4 release in regular session": [
+      "stmt_20080122b",
+      "stmt_20081008a",
+      "stmt_20100509a",
+      "stmt_20200315a",
+      "stmt_20200319b",
+      "stmt_20200323a",
+      "stmt_20200331a"
+    ]
+  },
+  "conventions": {
+    "bars": "five-minute cash SPX OHLC, bar-start timestamps, America/New_York, 09:30-16:00",
+    "session": "XNYS calendar incl. early closes",
+    "buffer_min": 5,
+    "text_cutoff": "origin minus buffer; origin = release + buffer rounded up to the bar grid"
+  },
+  "input_sha256": {
+    "prices": "6a873b1d72d27f9188c6bf12acb756775916be8ed9ff42d9e9dd98028f68de2a",
+    "catalog": "56157fe018beeba6f051f765e0f9d6763e839324b9d95ebbf49f15ec47c9d939",
+    "alignment": "0ab047bf9f918d798bd1c4f4eac8c6d59e0317c8d36fcb25c81a6801cfee0270"
+  }
+}

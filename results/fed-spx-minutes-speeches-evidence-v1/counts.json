@@ -1,0 +1,27 @@
+{
+  "assigned": 472,
+  "by_status_class": {
+    "version_conflict": 55,
+    "insufficient_evidence": 294,
+    "eligible": 123
+  },
+  "by_type_split_status": {
+    "fed_speech|train|eligible": 33,
+    "fed_speech|train|insufficient_evidence": 211,
+    "fed_speech|train|version_conflict": 29,
+    "fed_speech|val|eligible": 52,
+    "fed_speech|val|insufficient_evidence": 29,
+    "fed_speech|val|version_conflict": 14,
+    "fomc_minutes|train|eligible": 27,
+    "fomc_minutes|train|insufficient_evidence": 54,
+    "fomc_minutes|train|version_conflict": 6,
+    "fomc_minutes|val|eligible": 11,
+    "fomc_minutes|val|version_conflict": 6
+  },
+  "by_disposition": {
+    "version_conflict_review": 55,
+    "insufficient_evidence": 294,
+    "eligible_official_release_record_unmodified_file": 38,
+    "eligible_document_release_line_unmodified_file": 85
+  }
+}

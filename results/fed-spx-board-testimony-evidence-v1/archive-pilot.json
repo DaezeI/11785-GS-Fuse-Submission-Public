@@ -1,0 +1,19 @@
+{
+  "board_monetary20080115a": [
+    {
+      "url": "https://www.federalreserve.gov/newsevents/pressreleases/monetary20080115a.htm",
+      "status": "no_capture_returned"
+    },
+    {
+      "url": "https://www.federalreserve.gov/newsevents/press/monetary/20080115a.htm",
+      "status": "capture_after_cutoff",
+      "capture_utc": "20080118170510"
+    }
+  ],
+  "testimony_powell20210622a": [
+    {
+      "url": "https://www.federalreserve.gov/newsevents/testimony/powell20210622a.htm",
+      "status": "no_capture_returned"
+    }
+  ]
+}

@@ -6,6 +6,12 @@ with zero return was inconclusive at both horizons. The result pack includes
 the real-input window audit and historical text-version checks. A matched text
 run needs verified versions on a common cohort. [Result pack](results/fed-spx-endpoints-price-v1/summary.md)
 
+**November 23 Fed/SPX text evidence.** Exact-version audits now cover all 1,185
+price-eligible Fed events: about 160 train and 121 validation rows are eligible once the cohort is
+rebuilt with the Board re-check, and evidence classes stay labeled. A broader U.S. macro cohort has
+2,158 candidate training events under a document-based evidence rule. No training ran.
+[Update and next steps](docs/updates/2026-11-23-fed-spx-text-evidence.md)
+
 **November 22 Fed/SPX handoff:** Adaeze completed two price-only validation
 checks on Joye's official-Fed alignment v1. On 215 main
 validation rows, last-close persistence had lower OHLC path MAE than ridge

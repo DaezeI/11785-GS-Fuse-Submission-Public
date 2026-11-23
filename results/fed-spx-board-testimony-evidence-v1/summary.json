@@ -1,0 +1,80 @@
+{
+  "population_sha256": "4061fe505098babf845b2bc0547bdbe11bd732377f6e2a5face383010b024a71",
+  "catalog_sha256": "56157fe018beeba6f051f765e0f9d6763e839324b9d95ebbf49f15ec47c9d939",
+  "prior_archive_ledgers_sha256": {
+    "wayback-text-v1": "04f7068431637704f86be2d278b9dd15f04c6ca70f8bf929107b2a3e70fd45f1",
+    "wayback-availability-v1": "74e2cbea3c06a18d07de5ddcd32779d1e55d17bcc400825a6d84056dbe6b990c"
+  },
+  "groups": {
+    "fed_board_monetary_release/train": {
+      "eligibility": {
+        "not_verified_no_timely_capture_in_checked_index": 104,
+        "not_verified_archive_lookup_incomplete": 315
+      },
+      "official_page_status": {
+        "catalog_match": 419
+      },
+      "prior_archive_statuses": {
+        "nearest_capture_after_cutoff|no_eligible_capture_in_index": 16,
+        "index_unavailable|nearest_capture_after_cutoff": 61,
+        "index_unavailable": 1,
+        "index_unavailable|not_queried_after_rate_limit": 314,
+        "no_eligible_capture_in_index|not_queried_after_rate_limit": 27
+      },
+      "house_status": {
+        "not_applicable": 419
+      }
+    },
+    "fed_board_monetary_release/val": {
+      "eligibility": {
+        "not_verified_archive_lookup_incomplete": 55
+      },
+      "official_page_status": {
+        "catalog_match": 55
+      },
+      "prior_archive_statuses": {
+        "index_unavailable|not_queried_after_rate_limit": 55
+      },
+      "house_status": {
+        "not_applicable": 55
+      }
+    },
+    "fed_testimony/train": {
+      "eligibility": {
+        "not_verified_no_timely_capture_in_checked_index": 11,
+        "not_verified_archive_lookup_incomplete": 96,
+        "eligible_B_official_record_only": 1
+      },
+      "official_page_status": {
+        "catalog_match": 108
+      },
+      "prior_archive_statuses": {
+        "index_unavailable|nearest_capture_after_cutoff": 4,
+        "index_unavailable": 1,
+        "index_unavailable|not_queried_after_rate_limit": 96,
+        "no_eligible_capture_in_index|not_queried_after_rate_limit": 7
+      },
+      "house_status": {
+        "not_applicable": 106,
+        "listed_document_after_cutoff": 1,
+        "verified_timestamped_testimony_pdf": 1
+      }
+    },
+    "fed_testimony/val": {
+      "eligibility": {
+        "not_verified_archive_lookup_incomplete": 14,
+        "eligible_B_official_record_only": 7
+      },
+      "official_page_status": {
+        "catalog_match": 21
+      },
+      "prior_archive_statuses": {
+        "index_unavailable|not_queried_after_rate_limit": 21
+      },
+      "house_status": {
+        "not_applicable": 14,
+        "verified_timestamped_testimony_pdf": 7
+      }
+    }
+  }
+}

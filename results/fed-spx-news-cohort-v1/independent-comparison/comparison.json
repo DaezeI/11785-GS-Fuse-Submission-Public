@@ -1,0 +1,16 @@
+{
+  "population_sha256": "4061fe505098babf845b2bc0547bdbe11bd732377f6e2a5face383010b024a71",
+  "codex_ledger_sha256": "fb3d9d40dd7bd7c4211eee7f9237643ebffde098fffd5c51c2532e1f191208ba",
+  "primary_ledger_sha256": "a33a0c631fa9d9fa1c4ec9639d77fc4d7a52d5f2db1f672532d3f2303f934ad1",
+  "counts": {
+    "fed_speech/train/primary_only_eligible": 33,
+    "fed_speech/train/neither_eligible": 240,
+    "fed_speech/val/primary_only_eligible": 52,
+    "fed_speech/val/neither_eligible": 43,
+    "fomc_minutes/train/primary_only_eligible": 27,
+    "fomc_minutes/train/neither_eligible": 60,
+    "fomc_minutes/val/primary_only_eligible": 11,
+    "fomc_minutes/val/neither_eligible": 6
+  },
+  "fingerprint_note": "Different hashes can reflect extraction or normalization. Review before declaring version conflicts."
+}

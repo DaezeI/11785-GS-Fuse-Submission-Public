@@ -2,7 +2,7 @@
   "title": "GS-Fuse Research Home",
   "stage": "Controlled experiments and final writing",
   "overview": "The last-price rule beat our trained price models. In Adaeze’s completed R3 return run, correct and shuffled articles gave nearly identical results, and predicting zero return had slightly lower error.",
-  "updated_at": "2026-11-23T06:22:59+00:00",
+  "updated_at": "2026-11-23T10:41:19+00:00",
   "source_url": "https://github.com/DaezeI/11785-GS-Fuse-Submission-Public/blob/main/research_home/records.json",
   "links": [
     {
@@ -47,11 +47,11 @@
       "kind": "Price-only benchmark",
       "owner": "Adaeze Ilodianya",
       "status": "completed",
-      "updated_at": "2026-11-23T01:18:00-05:00",
+      "updated_at": "2026-11-23T10:41:18+00:00",
       "question": "Does the compact CNN improve on zero return for 20- and 30-minute SPX Close forecasts given only pre-release prices?",
       "configuration": "Frozen Fed/SPX alignment v1; 35 pre-release OHLC inputs and 20- and 30-minute Close returns from the forecast origin. RTX 4060, seeds 0–2, 30 epochs, 20-minute validation MAE checkpoint selection. 978 train and 207 shared validation events, with unit weight per release instant.",
       "finding": "Mean CNN MAE was 15.318 bp versus 15.343 bp for zero return at 20 minutes and 19.706 versus 19.701 bp at 30 minutes. Both paired block-bootstrap intervals for improvement include zero.",
-      "limitations": "Validation only, checkpoint selection uses 20-minute validation MAE, and the bar clock has empirical support rather than source documentation. Archive access limits left zero historical exact text versions confirmed, so the matched text run remains pending.",
+      "limitations": "Validation only, checkpoint selection uses 20-minute validation MAE, and the bar clock is empirically supported. All 1,185 price-eligible rows have news evidence dispositions. The combined manifest has 150 train and 88 validation rows under all audit rules, or 90 train and 25 validation rows excluding the inferred minutes and speech classes. The matched news model and held-out evaluation remain pending.",
       "figure": {
         "url": "https://raw.githubusercontent.com/DaezeI/11785-GS-Fuse-Submission-Public/main/results/fed-spx-endpoints-price-v1/validation-mae.png",
         "alt": "Zero-return and compact price-only MAE are nearly identical at 20 and 30 minutes, and both paired intervals include zero."
@@ -72,6 +72,22 @@
         {
           "label": "Run config",
           "url": "https://github.com/DaezeI/11785-GS-Fuse-Submission-Public/blob/main/experiments/fed-spx-endpoints-price-v1/config.json"
+        },
+        {
+          "label": "FOMC statement evidence",
+          "url": "https://github.com/DaezeI/11785-GS-Fuse-Submission-Public/blob/main/results/fed-spx-text-evidence-v1/README.md"
+        },
+        {
+          "label": "Board release and testimony evidence",
+          "url": "https://github.com/DaezeI/11785-GS-Fuse-Submission-Public/blob/main/results/fed-spx-board-testimony-evidence-v1/README.md"
+        },
+        {
+          "label": "Independent FOMC minutes and Fed speech audit",
+          "url": "https://github.com/DaezeI/11785-GS-Fuse-Submission-Public/blob/main/results/fed-spx-minutes-speeches-codex-v1/README.md"
+        },
+        {
+          "label": "Combined Fed/SPX news cohort and audit comparison",
+          "url": "https://github.com/DaezeI/11785-GS-Fuse-Submission-Public/blob/main/results/fed-spx-news-cohort-v1/README.md"
         }
       ],
       "related": [

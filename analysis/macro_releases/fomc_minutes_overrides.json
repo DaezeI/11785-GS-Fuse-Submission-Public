@@ -1,0 +1,8 @@
+{
+  "stmt_20080625a": {"url": "https://www.federalreserve.gov/monetarypolicy/files/fomcminutes20080625.pdf", "which": 0,
+                     "reason": "June 2008 minutes are published only as PDF (linked from fomchistorical2008.htm)"},
+  "stmt_20200303a": {"url": "https://www.federalreserve.gov/monetarypolicy/fomcminutes20200315.htm", "which": 1,
+                     "reason": "March 3, 2020 intermeeting action is recorded in the March 15, 2020 minutes"},
+  "stmt_20191011a": {"url": "https://www.federalreserve.gov/monetarypolicy/fomcminutes20191030.htm", "which": 99,
+                     "reason": "October 11, 2019 notation-vote statement appears in the October 30 minutes without a release time"}
+}
