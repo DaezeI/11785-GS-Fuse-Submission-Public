@@ -1,16 +1,22 @@
 # Price-only forecasts around Fed announcements
 
-**Last-close persistence was the stronger price-only reference on main validation.**
-It had lower OHLC path MAE than ridge at every horizon. At 140 bars, persistence
+**Last-close persistence beat ridge on main validation.**
+It had lower OHLC path MAE at every horizon. At 140 bars, persistence
 averaged **75.10 bp** of error and ridge averaged **78.26 bp**. The ridge
 improvement was −4.21% with a 95% paired bootstrap interval of [−8.77%, −0.48%]
 using blocks of ten consecutive announcement dates.
 
-Owner: Adaeze Ilodianya (Person 3). Completed on validation, November 22,
+Owner: Adaeze Ilodianya. Completed on validation, November 22,
 2026. [Protocol and command](../../experiments/fed-spx-price-baselines-v1/README.md) ·
 [Aggregate metrics](metrics.json) · [Provenance](provenance.json)
 
 ![Main validation OHLC path MAE for persistence and ridge, with ridge improvement intervals at 35, 70 and 140 bars. Persistence has lower MAE at each horizon.](baseline-validation.png)
+
+Regenerate the figure from the published metrics with Matplotlib and NumPy:
+
+```text
+python results/fed-spx-price-baselines-v1/plot_validation.py
+```
 
 ## Main validation
 
@@ -44,10 +50,22 @@ press-conference transcripts, and windows with price gaps.
 The flagged intervals span zero. Timing and price gaps vary within this
 smaller group, so its scores are a separate sensitivity check.
 
-## Match Person 4 on the same examples
+## References for the text model
 
-Use persistence as the primary reference and ridge as the learned price-only
-reference. Reproduce the validation arrays and join on `event_id`. Match the
+Persistence is a no-change benchmark. Ridge is a simple learned check of the
+same price history. For the effect of adding text, compare the text model with
+its own price-only counterpart. If the text model reuses Adaeze's
+[compact architecture](../../experiments/improvement-v1/COMPACT_ARCHITECTURE.md),
+fit its CNN on this Fed/SPX split and use that same frozen forecast with and
+without the text residual. The prior compact results used screened C1.
+
+[DLinear](../../README.md#25-standalone-unimodal-baseline-dlinear) is the team's
+historical standalone price-only baseline. Its published scores use continuous
+windows and a different scoring protocol. Refit DLinear on the Fed/SPX event
+windows for a comparable architecture benchmark. This result pack contains
+Fed/SPX scores for persistence and ridge only.
+
+Reproduce the validation arrays and join on `event_id`. Match the
 OHLC channel order, log-return anchor (last input close), horizons and cohort
 weights. If text coverage changes the set of usable IDs, report the excluded
 count and recompute both price baselines' evaluation scores on the same retained
@@ -56,5 +74,5 @@ IDs with weights recomputed within that cohort. Keep the original train fit fixe
 The scores are from a single validation period and a fixed ridge penalty.
 The 140-bar path crosses overnight. Neighboring windows can overlap, the
 pre-2019 training period includes the financial crisis, and bars past April 17,
-2024 are unavailable. Price timing follows Person 2's empirical bar-start
+2024 are unavailable. Price timing follows Joye's empirical bar-start
 audit. The held-out test stays reserved for a frozen matched comparison.

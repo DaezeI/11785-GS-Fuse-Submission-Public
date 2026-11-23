@@ -2,7 +2,7 @@
   "title": "GS-Fuse Research Home",
   "stage": "Controlled experiments and final writing",
   "overview": "The last-price rule beat our trained price models. In Adaeze’s completed R3 return run, correct and shuffled articles gave nearly identical results, and predicting zero return had slightly lower error.",
-  "updated_at": "2026-11-23T04:00:58+00:00",
+  "updated_at": "2026-11-23T05:33:20+00:00",
   "source_url": "https://github.com/DaezeI/11785-GS-Fuse-Submission-Public/blob/main/research_home/records.json",
   "links": [
     {
@@ -49,9 +49,9 @@
       "status": "completed",
       "updated_at": "2026-11-22T22:59:51-05:00",
       "question": "How accurately can pre-announcement SPX price history forecast the OHLC path around official Fed releases, and does ridge improve on last-close persistence?",
-      "configuration": "Person 2 Fed/SPX alignment v1, frozen CAMEF SP500.csv, 35 pre-release bars and 140 target bars. Ridge alpha 10 on 1,013 main train events. Paired validation on 215 main and 85 flagged events with unit weighting per announcement instant within each cohort.",
+      "configuration": "Joye's Fed/SPX alignment v1, frozen CAMEF SP500.csv, 35 pre-release bars and 140 target bars. Ridge alpha 10 on 1,013 main train events. Paired validation on 215 main and 85 flagged events with unit weighting per announcement instant within each cohort.",
       "finding": "Last-close persistence had lower main validation OHLC path MAE at 35, 70 and 140 bars. At 140 bars the MAEs were 75.10 bp for persistence and 78.26 bp for ridge. Ridge improvement was −4.21% with a paired 95% interval of [−8.77%, −0.48%] using ten announcement dates per block.",
-      "limitations": "Validation only, fixed ridge penalty, and one historical validation period. Flagged intervals span zero. Forecast paths overlap and H140 crosses overnight. The held-out test awaits the frozen matched comparison.",
+      "limitations": "Validation only, fixed ridge penalty, and one historical validation period. Flagged intervals span zero. Forecast paths overlap and H140 crosses overnight. DLinear and a price-only counterpart to the text model await evaluation on this split. The held-out test awaits the frozen matched comparison.",
       "figure": {
         "url": "https://raw.githubusercontent.com/DaezeI/11785-GS-Fuse-Submission-Public/main/results/fed-spx-price-baselines-v1/baseline-validation.png",
         "alt": "On 215 main validation rows, last-close persistence has lower OHLC path MAE than ridge at each of 35, 70 and 140 bars. All three paired 95% improvement intervals favor persistence."

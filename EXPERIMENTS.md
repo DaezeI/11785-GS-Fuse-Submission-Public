@@ -34,9 +34,10 @@ population into another run's row.
 
 ## Current comparison index
 
-**Fed/SPX price-only baseline, completed on validation:** [Person 3 result pack](results/fed-spx-price-baselines-v1/summary.md).
-On the fixed Fed/SPX main split, last-close persistence beat train-only ridge
-at 35, 70 and 140 bars. Flagged validation events are reported separately.
+**Fed/SPX price-only checks, completed on validation:** [result pack](results/fed-spx-price-baselines-v1/summary.md).
+Last-close persistence beat ridge at 35, 70 and 140 bars. Flagged validation
+events are reported separately. Matched compact models and DLinear scores on
+this split are pending.
 
 **New planned campaign:** [Controlled improvement v1](docs/experiments/IMPROVEMENT_CAMPAIGN_V1.md)
 provides 17 existing-pipeline configurations, a five-arm default smoke screen,

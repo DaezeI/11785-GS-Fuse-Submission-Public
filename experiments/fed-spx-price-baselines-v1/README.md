@@ -1,14 +1,16 @@
 # Fed/SPX price-only baselines
 
-Owner: Adaeze Ilodianya (Person 3).
+Owner: Adaeze Ilodianya.
 
 How accurately can we forecast the S&P 500 price path around official Fed
 announcements using only the price information available before the release?
-This benchmark provides the matched price-only references for Person 4.
+This run compares last-close persistence with ridge. See the
+[result summary](../../results/fed-spx-price-baselines-v1/summary.md#references-for-the-text-model)
+for the role of each reference in the text experiment.
 
 ## Fixed comparison
 
-- Use [Person 2's alignment v1](../../analysis/macro_releases/price_alignment_v1/README.md)
+- Use [Joye's alignment v1](../../analysis/macro_releases/price_alignment_v1/README.md)
   from `a4269dc` and the frozen `SP500.csv`. Keep the supplied chronological,
   purged split and the 35-input/140-target OHLC windows. The input cutoff is
   the announcement time. The target starts at or after the five-minute lag.
@@ -42,7 +44,7 @@ python scripts/run_fed_price_baselines.py --price-csv downloads/SP500.csv --out-
 ```
 
 Use the original frozen price CSV bytes. The runner checks the SHA-256 from
-Person 2's audit. Keep the output under `downloads/`. It includes
+Joye's audit. Keep the output under `downloads/`. It includes
 `metrics.json`, `ridge.npz` with the fitted coefficients, and separate
 `val-main-paired.npz` and `val-flagged-paired.npz` files. The paired files contain
 `event_ids`, `announcement_dates`, `weights`, `targets`, `last_close` and
