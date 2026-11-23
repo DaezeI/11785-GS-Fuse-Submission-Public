@@ -39,4 +39,7 @@ python scripts/audit_fed_spx_text.py --population downloads/fed-spx-endpoints-pr
 
 Only matching archival extracts with a capture timestamp at or before the
 cutoff enter the verified-text directory. Record coverage and inaccessible
-replays as part of the timing audit.
+replays as part of the timing audit. The optional `--index availability`
+mode checks the nearest timestamp through the separate Availability API. A
+nearest capture after the cutoff leaves earlier captures unresolved if the
+as-of index was inaccessible. Each pass stops sending requests on HTTP 429.

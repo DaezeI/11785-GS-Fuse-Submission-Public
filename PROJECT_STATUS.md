@@ -1,5 +1,11 @@
 # Project status
 
+**November 23 short-horizon Fed/SPX update.** Adaeze completed the compact
+price-only validation run for 20- and 30-minute Close returns. The comparison
+with zero return was inconclusive at both horizons. The result pack includes
+the real-input window audit and historical text-version checks. A matched text
+run needs verified versions on a common cohort. [Result pack](results/fed-spx-endpoints-price-v1/summary.md)
+
 **November 22 Fed/SPX handoff:** Adaeze completed two price-only validation
 checks on Joye's official-Fed alignment v1. On 215 main
 validation rows, last-close persistence had lower OHLC path MAE than ridge

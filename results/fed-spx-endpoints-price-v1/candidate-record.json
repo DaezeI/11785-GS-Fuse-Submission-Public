@@ -1,0 +1,23 @@
+{
+  "id": "fed-spx-endpoints-price-v1",
+  "title": "Compact price-only Fed/SPX endpoint control",
+  "kind": "Price-only benchmark",
+  "owner": "Adaeze Ilodianya",
+  "status": "completed",
+  "updated_at": "2026-11-23T01:18:00-05:00",
+  "question": "Does the compact CNN improve on zero return for 20- and 30-minute SPX Close forecasts given only pre-release prices?",
+  "configuration": "Frozen Fed/SPX alignment v1; 35 pre-release OHLC inputs and 20- and 30-minute Close returns from the forecast origin. RTX 4060, seeds 0–2, 30 epochs, 20-minute validation MAE checkpoint selection. 978 train and 207 shared validation events, with unit weight per release instant.",
+  "finding": "Mean CNN MAE was 15.318 bp versus 15.343 bp for zero return at 20 minutes and 19.706 versus 19.701 bp at 30 minutes. Both paired block-bootstrap intervals for improvement include zero.",
+  "limitations": "Validation only, checkpoint selection uses 20-minute validation MAE, and the bar clock has empirical support rather than source documentation. Archive access limits left zero historical exact text versions confirmed, so the matched text run remains pending.",
+  "figure": {
+    "url": "https://raw.githubusercontent.com/DaezeI/11785-GS-Fuse-Submission-Public/main/results/fed-spx-endpoints-price-v1/validation-mae.png",
+    "alt": "Zero-return and compact price-only MAE are nearly identical at 20 and 30 minutes, and both paired intervals include zero."
+  },
+  "evidence": [
+    {"label": "Validation summary", "url": "https://github.com/DaezeI/11785-GS-Fuse-Submission-Public/blob/main/results/fed-spx-endpoints-price-v1/summary.md"},
+    {"label": "Exact metrics and checkpoint hashes", "url": "https://github.com/DaezeI/11785-GS-Fuse-Submission-Public/blob/main/results/fed-spx-endpoints-price-v1/metrics.json"},
+    {"label": "Text-version audit", "url": "https://github.com/DaezeI/11785-GS-Fuse-Submission-Public/blob/main/results/fed-spx-endpoints-price-v1/text-audit.json"},
+    {"label": "Run config", "url": "https://github.com/DaezeI/11785-GS-Fuse-Submission-Public/blob/main/experiments/fed-spx-endpoints-price-v1/config.json"}
+  ],
+  "related": ["fed-spx-price-baselines-v1"]
+}
