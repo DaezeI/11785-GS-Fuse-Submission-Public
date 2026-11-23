@@ -72,7 +72,8 @@ times for retained articles are still unverified.
 **Design proposal, Adaeze Ilodianya:** [short-horizon protocol](docs/experiments/FED_SPX_SHORT_HORIZON_PROPOSAL.md).
 Compare the compact price-only architecture and a matched text extension on
 20- and 30-minute Close returns from a shared forecast origin. The horizons
-are chosen. Exact text-version eligibility and implementation are pending.
+are chosen. The [compact price-only validation run](experiments/fed-spx-endpoints-price-v1/README.md)
+has a fixed config. Training and exact text-version eligibility are pending.
 
 ## Entry template for future work
 

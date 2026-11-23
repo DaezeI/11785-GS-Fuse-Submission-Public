@@ -19,13 +19,13 @@ class CausalBlock(nn.Module):
 
 
 class CompactReturn(nn.Module):
-    def __init__(self, width=32, text_dim=0):
+    def __init__(self, width=32, text_dim=0, output_dim=3):
         super().__init__()
         self.price_encoder = nn.Sequential(nn.Conv1d(4, width, 1), nn.GELU(),
             *[CausalBlock(width, dilation) for dilation in (1, 2, 4, 8)])
-        self.price_head = nn.Sequential(nn.Linear(2 * width, 64), nn.GELU(), nn.Linear(64, 3))
+        self.price_head = nn.Sequential(nn.Linear(2 * width, 64), nn.GELU(), nn.Linear(64, output_dim))
         self.text_dim = text_dim
-        self.text_head = (nn.Sequential(nn.Linear(text_dim, 32), nn.GELU(), nn.Linear(32, 3))
+        self.text_head = (nn.Sequential(nn.Linear(text_dim, 32), nn.GELU(), nn.Linear(32, output_dim))
                           if text_dim else None)
         # Start from zero-return and zero text correction; both are useful controls.
         nn.init.zeros_(self.price_head[-1].weight)
