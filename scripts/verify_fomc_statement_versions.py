@@ -286,6 +286,8 @@ def main(argv=None):
     ap.add_argument("--wayback", action="store_true")
     ap.add_argument("--minutes-overrides", help="JSON {event_id: {url, which, reason}} for statements "
                     "recorded in another meeting's minutes (e.g. intermeeting actions)")
+    ap.add_argument("--allow-test", action="store_true",
+                    help="version-check held-out test text (reads no prices); use only with the test population")
     a = ap.parse_args(argv)
 
     cat = {r["event_id"]: r for r in csv.DictReader(open(a.catalog, encoding="utf-8"))}
@@ -297,7 +299,7 @@ def main(argv=None):
         c, p = cat[eid], pop.get(eid)
         if p is None:
             sys.exit(f"{eid} is not in the price-eligible population")
-        if p["split"] not in ("train", "val"):
+        if p["split"] not in ("train", "val") + (("test",) if a.allow_test else ()):
             sys.exit(f"{eid}: held-out split must stay reserved")
         day = c["release_date"]
         origin = dt.datetime.fromisoformat(p["origin_et"]).replace(tzinfo=ET)

@@ -261,6 +261,8 @@ def main(argv=None):
     ap.add_argument("--delay", type=float, default=2.5, help="seconds between Wayback requests")
     ap.add_argument("--fed-delay", type=float, default=1.0, help="seconds between federalreserve.gov requests")
     ap.add_argument("--no-wayback", action="store_true")
+    ap.add_argument("--allow-test", action="store_true",
+                    help="version-check held-out test text (reads no prices); use only with the test population")
     a = ap.parse_args(argv)
 
     cat = {r["event_id"]: r for r in csv.DictReader(open(a.catalog, encoding="utf-8"))}
@@ -273,7 +275,7 @@ def main(argv=None):
     raw = Path(a.raw_dir)
     out = []
     for p in pop:
-        if p["split"] not in ("train", "val"):
+        if p["split"] not in ("train", "val") + (("test",) if a.allow_test else ()):
             sys.exit(f"{p['event_id']}: held-out split must stay reserved")
         eid, c = p["event_id"], cat[p["event_id"]]
         cutoff = dt.datetime.fromisoformat(p["text_cutoff_utc"]).astimezone(UTC)

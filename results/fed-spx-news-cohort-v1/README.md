@@ -28,11 +28,22 @@ superset, the cohort without the speech release-line class, and the cohort
 without either inferred class. The manifest carries the audited dispositions
 without treating either inferred class as proof from a timestamped capture.
 
+**November 23 rebuild.** The builder now applies two re-checks on top of the original ledgers:
+the [Board archive re-check](../fed-spx-board-recheck-v1/README.md) (370 rows, 43 eligible) and the
+[testimony re-check](../fed-spx-testimony-recheck-v1/counts.json), which applied the speech document
+rule to the 110 unchecked testimony rows (2 validation rows eligible). Each overridden row keeps
+its earlier disposition in `prior_eligibility`.
+
 | Evidence included | Train rows / instants / dates | Validation rows / instants / dates |
 | --- | ---: | ---: |
-| All audited eligibility classes | 150 / 150 / 150 | 88 / 87 / 84 |
-| Without the speech release-line class | 117 / 117 / 117 | 36 / 36 / 35 |
-| Without either inferred release class | 90 / 90 / 90 | 25 / 25 / 25 |
+| All audited eligibility classes | 160 / 156 / 156 | 123 / 113 / 105 |
+| Without the Board release-day capture class | 150 / 150 / 150 | 90 / 89 / 86 |
+| Without the speech release-line class | 127 / 123 / 123 | 71 / 62 / 60 |
+| Without either inferred minutes/speech class | 100 / 96 / 96 | 60 / 51 / 50 |
+| Without any inferred class (strictest) | 90 / 90 / 90 | 27 / 27 / 27 |
+
+The earlier counts, before both re-checks, were 150 / 88 for all classes and 90 / 25 for the
+strictest rule.
 
 The validation continuation covered all 106 previously unattempted events.
 It added 50 speech and 11 minutes candidates under the inferred release-time

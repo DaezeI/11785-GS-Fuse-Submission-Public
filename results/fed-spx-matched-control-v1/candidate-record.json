@@ -1,0 +1,24 @@
+{
+  "id": "fed-spx-matched-control-v1",
+  "title": "Frozen price-only control on the text-matched Fed/SPX validation set",
+  "kind": "Price-only benchmark",
+  "owner": "Adaeze Ilodianya",
+  "status": "completed",
+  "updated_at": "2026-11-23T23:30:00+00:00",
+  "question": "On the Fed releases whose exact text is verified, how do the frozen price-only CNN control, persistence, DLinear and ridge compare for 20- and 30-minute SPX Close forecasts?",
+  "configuration": "Frozen three-seed compact CNN from fed-spx-endpoints-price-v1 (trained on 978 price-eligible train releases; exact CUDA replay). DLinear and ridge refitted on the same 978 releases and target. Scored on the 123 text-verified validation releases (113 release instants, 105 dates) with unit weight per release instant and paired 10-date block intervals. Test not loaded.",
+  "finding": "Persistence MAE was 17.707 / 22.058 bp at 20 / 30 minutes. The CNN control was 17.615 / 22.042 bp, a gain of +0.082 / -0.002 bp with intervals including zero. DLinear (18.340 / 22.736 bp) and ridge (21.027 / 26.263 bp) were worse than persistence.",
+  "limitations": "Validation only. CNN checkpoint epochs were chosen on the 207 price-eligible validation rows, which contain these 123, so its validation score is optimistic. Intervals of about +/-0.3 bp mean only a text gain of roughly half a basis point or more can register. The cohort includes inferred evidence classes; the strictest-evidence subset has 27 rows. The bar clock is empirically supported.",
+  "figure": {
+    "url": "https://raw.githubusercontent.com/DaezeI/11785-GS-Fuse-Submission-Public/main/results/fed-spx-matched-control-v1/validation-mae.png",
+    "alt": "Grouped bars of validation MAE at 20 and 30 minutes on 123 text-matched releases. Persistence and the price CNN control are nearly equal; DLinear is slightly higher and ridge about 3 to 4 bp higher."
+  },
+  "evidence": [
+    {"label": "Validation summary", "url": "https://github.com/DaezeI/11785-GS-Fuse-Submission-Public/blob/main/results/fed-spx-matched-control-v1/summary.md"},
+    {"label": "Exact metrics and checkpoint hashes", "url": "https://github.com/DaezeI/11785-GS-Fuse-Submission-Public/blob/main/results/fed-spx-matched-control-v1/metrics.json"},
+    {"label": "DLinear config", "url": "https://github.com/DaezeI/11785-GS-Fuse-Submission-Public/blob/main/experiments/fed-spx-matched-control-v1/dlinear.config.json"},
+    {"label": "Text-matched cohort", "url": "https://github.com/DaezeI/11785-GS-Fuse-Submission-Public/blob/main/results/fed-spx-news-cohort-v1/README.md"},
+    {"label": "Held-out test text check", "url": "https://github.com/DaezeI/11785-GS-Fuse-Submission-Public/blob/main/results/fed-spx-test-text-v1/README.md"}
+  ],
+  "related": ["fed-spx-endpoints-price-v1", "fed-spx-price-baselines-v1"]
+}

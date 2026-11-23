@@ -25,6 +25,15 @@ LEDGERS = (
     ("board_testimony", {"fed_board_monetary_release", "fed_testimony"},
      "fed-spx-board-testimony-evidence-v1/fed_board_testimony_evidence_ledger.csv"),
 )
+# Later re-checks replace the earlier disposition for the same event ID. The
+# original ledger row keeps its clocks; the re-check supplies the new evidence.
+OVERRIDES = (
+    ("board_recheck", {"fed_board_monetary_release"},
+     "fed-spx-board-recheck-v1/board_recheck_ledger.csv"),
+    ("testimony_recheck", {"fed_testimony"},
+     "fed-spx-testimony-recheck-v1/testimony_recheck_ledger.csv"),
+)
+BOARD_RECHECK = "eligible_document_release_line_release_day_capture"
 SPEECH_INFERRED = "eligible_document_release_line_unmodified_file"
 MINUTES_INFERRED = "eligible_official_release_record_unmodified_file"
 EVENT_TYPES = sorted(set().union(*(types for _, types, _ in LEDGERS)))
@@ -71,12 +80,47 @@ def disposition(row):
     return "insufficient_evidence"
 
 
-def load_assignments(population):
-    records, hashes = {}, {}
-    for label, types, relpath in LEDGERS:
+def apply_overrides(rows_by_label, hashes):
+    """Replace earlier dispositions with re-check results for the same event IDs."""
+    for label, types, relpath in OVERRIDES:
         path = ROOT / "results" / relpath
         hashes[label] = sha(path)
-        for row in read_csv(path):
+        base = {r["event_id"]: r for rows in rows_by_label.values() for r in rows}
+        for new in read_csv(path):
+            old = base.get(new["event_id"])
+            if old is None or old.get("event_type") not in types:
+                raise ValueError(f"{label} event {new['event_id']} is not an earlier {sorted(types)} row")
+            if new["split"] != old["split"] or datetime.fromisoformat(new["text_cutoff_utc"]) != datetime.fromisoformat(
+                old["text_cutoff_utc"]
+            ):
+                raise ValueError(f"{label} split or cutoff mismatch for {new['event_id']}")
+            old.update({
+                "prior_eligibility": old["eligibility"],
+                "eligibility": new["eligibility"],
+                "note": new.get("reason", ""),
+                "recheck_ledger": label,
+                "evidence_url": new.get("replay_url") or old["evidence_url"],
+                "fingerprint_sha256": new.get("fingerprint_sha256", ""),
+                "fingerprint_source": new.get("fingerprint_source", ""),
+                "wayback_capture_utc": new.get("capture_utc", ""),
+                "wayback_replay_url": new.get("replay_url", ""),
+                "capture_minutes_after_cutoff": new.get("capture_minutes_after_cutoff", ""),
+                "current_release_line": new.get("release_line") or old.get("current_release_line", ""),
+                "added_since_release": new.get("added_since_release", ""),
+                "house_document_url": old.get("house_document_url") or "",
+                "source_url": new.get("source_url", ""),
+            })
+
+
+def load_assignments(population):
+    records, hashes, rows_by_label = {}, {}, {}
+    for label, _, relpath in LEDGERS:
+        path = ROOT / "results" / relpath
+        hashes[label] = sha(path)
+        rows_by_label[label] = read_csv(path)
+    apply_overrides(rows_by_label, hashes)
+    for label, types, _ in LEDGERS:
+        for row in rows_by_label[label]:
             event = row["event_id"]
             frozen = population.get(event)
             if event in records or frozen is None or frozen["event_type"] not in types:
@@ -162,9 +206,13 @@ def main():
     merged, manifest = build_manifest(by_id, evidence)
     scenarios = {
         "all_audit_eligible": manifest,
+        "without_board_release_day_capture": [r for r in manifest if r["evidence_class"] != BOARD_RECHECK],
         "without_speech_release_line": [r for r in manifest if r["evidence_class"] != SPEECH_INFERRED],
         "without_both_inferred_release_classes": [
             r for r in manifest if r["evidence_class"] not in {SPEECH_INFERRED, MINUTES_INFERRED}
+        ],
+        "without_any_inferred_release_class": [
+            r for r in manifest if r["evidence_class"] not in {SPEECH_INFERRED, MINUTES_INFERRED, BOARD_RECHECK}
         ],
     }
     out = args.out_dir
