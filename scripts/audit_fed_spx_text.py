@@ -27,22 +27,33 @@ ARCHIVE = "https://web.archive.org"
 TIMEOUT = (5, 12)
 
 
-def audit_event(row, text_dir, rate_limited):
+def audit_event(row, text_dir, rate_limited, index):
     cutoff = pd.Timestamp(row.text_cutoff_utc).tz_convert("UTC").strftime("%Y%m%d%H%M%S")
     result = {"event_id": row.event_id, "split": row.split, "event_type": row.event_type,
               "source_url": row.source_url, "cutoff_utc": cutoff}
     if rate_limited.is_set():
         return {**result, "status": "not_queried_after_rate_limit"}
     try:
-        response = requests.get(ARCHIVE + "/cdx/search/cdx", timeout=TIMEOUT, params={
-            "url": row.source_url, "output": "json", "fl": "timestamp,original",
-            "filter": "statuscode:200", "to": cutoff, "limit": "-1",
-        })
-        response.raise_for_status()
-        captures = response.json() if response.content.strip() else []
-        if len(captures) < 2:
-            return {**result, "status": "no_eligible_capture_in_index"}
-        stamp, original = captures[-1]
+        if index == "cdx":
+            response = requests.get(ARCHIVE + "/cdx/search/cdx", timeout=TIMEOUT, params={
+                "url": row.source_url, "output": "json", "fl": "timestamp,original",
+                "filter": "statuscode:200", "to": cutoff, "limit": "-1",
+            })
+            response.raise_for_status()
+            captures = response.json() if response.content.strip() else []
+            if len(captures) < 2:
+                return {**result, "status": "no_eligible_capture_in_index"}
+            stamp, original = captures[-1]
+        else:
+            response = requests.get("https://archive.org/wayback/available", timeout=TIMEOUT,
+                                    params={"url": row.source_url, "timestamp": cutoff})
+            response.raise_for_status()
+            closest = response.json().get("archived_snapshots", {}).get("closest", {})
+            if not closest.get("available") or closest.get("status") != "200":
+                return {**result, "status": "no_nearest_capture_returned"}
+            stamp, original = closest.get("timestamp", ""), row.source_url
+            if stamp > cutoff:
+                return {**result, "status": "nearest_capture_after_cutoff", "capture_utc": stamp}
         if not re.fullmatch(r"\d{14}", stamp) or stamp > cutoff:
             return {**result, "status": "capture_timestamp_invalid", "capture_utc": stamp}
         replay = f"{ARCHIVE}/web/{stamp}id_/{original}"
@@ -78,6 +89,7 @@ def main():
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument("--population", type=Path, required=True)
     parser.add_argument("--out-dir", type=Path, required=True)
+    parser.add_argument("--index", choices=("cdx", "availability"), default="cdx")
     parser.add_argument("--workers", type=int, choices=range(1, 7), default=4)
     args = parser.parse_args()
     if sha256_file(CATALOG) != INPUT_SHA256["catalog"]:
@@ -98,13 +110,14 @@ def main():
         "w", encoding="utf-8", buffering=1,
     ) as ledger:
         results = []
-        for row in pool.map(lambda row: audit_event(row, text_dir, rate_limited), rows.itertuples(index=False)):
+        for row in pool.map(lambda row: audit_event(row, text_dir, rate_limited, args.index), rows.itertuples(index=False)):
             results.append(row)
             ledger.write(json.dumps(row) + "\n")
             if len(results) % 100 == 0:
                 print(f"Archived text rows checked: {len(results)}/{len(rows)}", flush=True)
     summary = {"population_sha256": sha256_file(args.population), "catalog_sha256": INPUT_SHA256["catalog"],
-               "method": "Latest successful CDX capture at or before T0 minus five minutes; exact replay hash",
+               "index": args.index,
+               "method": "CDX as-of capture or nearest Availability capture; cutoff and exact replay hash required",
                "splits": {split: dict(Counter(r["status"] for r in results if r["split"] == split))
                           for split in ("train", "val")}}
     (args.out_dir / "summary.json").write_text(json.dumps(summary, indent=2) + "\n", encoding="utf-8")
