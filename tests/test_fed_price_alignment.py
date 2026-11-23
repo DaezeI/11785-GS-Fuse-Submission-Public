@@ -234,19 +234,25 @@ def test_leakage_invariant_holds_for_many_random_times(tmp_path):
 
 # ---------------------------------------------------------------- CLI
 def test_cli_writes_outputs_and_audit(tmp_path):
-    prices = write_prices(tmp_path, make_prices())
-    events = events_csv(tmp_path, [("a", "2008-03-13 14:00:00", True), ("b", "2008-03-15 12:00:00", True),
-                                   ("x", "2008-03-13 10:00:00", False)])
+    prices = write_prices(tmp_path, make_prices(start="2008-02-25", end="2008-09-30"))
+    days = pd.bdate_range("2008-03-10", "2008-08-01")[::3]
+    items = [(f"e{i}", f"{d:%Y-%m-%d} 14:00:00", True) for i, d in enumerate(days)]
+    items += [("weekend", "2008-03-15 12:00:00", True), ("x", "2008-03-13 10:00:00", False)]
+    events = events_csv(tmp_path, items)
     out_dir = tmp_path / "out"
     args = ["--events", str(events), "--prices", str(prices), "--out-dir", str(out_dir),
             "--expect-price-sha256", ""]
     fpa.main(args)
     audit = json.loads((out_dir / "price_alignment_audit_v1.json").read_text())
-    assert audit["events_total"] == 3 and audit["aligned"] == 2 and audit["main_candidates"] == 1
+    n_main = len(days)
+    assert audit["events_total"] == n_main + 2 and audit["aligned"] == n_main + 1
+    assert audit["main_candidates"] == n_main
     assert audit["leakage_check"]["violations"] == 0
     assert audit["rows_by_outcome"]["not_usable_intraday_in_events_file"] == 1
     assert audit["meta"]["prices_sha256"] == fpa.sha256_file(prices)
     assert audit["params"]["input_cutoff"] == "market" and audit["market_time_text_mismatches"] == 0
+    assert audit["splits"]["windows_disjoint"] and sum(audit["splits"]["rows_main"].values()) == n_main
+    assert (out_dir / "fed_price_alignment_v1.csv").exists()
     with pytest.raises(SystemExit, match="exist"):
         fpa.main(args)
     fpa.main(args + ["--force"])

@@ -251,7 +251,76 @@ def align(events: pd.DataFrame, bars: pd.DataFrame, seq_len=35, pred_len=140,
     return pd.DataFrame(rows)
 
 
+# ---------------------------------------------------------------- splits
+SPLITS = ("train", "val", "test")
+
+
+def assign_splits(out: pd.DataFrame, fractions=(0.70, 0.15, 0.15)) -> pd.DataFrame:
+    """Chronological train/val/test split with purging; adds a ``split`` column.
+
+    Cut dates are the announcement-time quantiles of the MAIN rows, applied to every aligned row.
+    Rows with the same available time stay together. Then rows of a later split whose input
+    window starts at or before the last target bar of any retained row of an earlier split are
+    marked ``purged``, so no price bar belongs to windows of two splits.
+    """
+    if abs(sum(fractions) - 1) > 1e-9 or len(fractions) != 3:
+        raise ValueError("fractions must be three numbers summing to 1")
+    out = out.copy()
+    out["split"] = ""
+    ok = out.exclude_reason == ""
+    main = out[ok & out.main_candidate.astype(bool)].sort_values("available_et")
+    n = len(main)
+    if n < 10:
+        raise ValueError("too few main rows to split")
+    cut1 = main.available_et.iloc[int(n * fractions[0])]
+    cut2 = main.available_et.iloc[int(n * (fractions[0] + fractions[1]))]
+    tent = np.where(out.available_et < cut1, "train", np.where(out.available_et < cut2, "val", "test"))
+    out.loc[ok, "split"] = tent[ok.values]
+    max_end = pd.Timestamp.min
+    for name in SPLITS:
+        rows = out.split == name
+        if name != "train":
+            bad = rows & (out.input_first_bar <= max_end)
+            out.loc[bad, "split"] = "purged"
+            rows = out.split == name
+        if rows.any():
+            max_end = max(max_end, out.loc[rows, "target_last_bar"].max())
+    out.attrs["split_cuts"] = {"train_before": str(cut1), "val_before": str(cut2)}
+    return out
+
+
+def verify_splits(out: pd.DataFrame) -> dict:
+    """Raise if any retained windows of different splits share a price bar or an announcement instant."""
+    kept = out[out.split.isin(SPLITS)]
+    spans = {n: (kept.loc[kept.split == n, "input_first_bar"].min(),
+                 kept.loc[kept.split == n, "target_last_bar"].max()) for n in SPLITS}
+    for i, a in enumerate(SPLITS):
+        for b in SPLITS[i + 1:]:
+            if spans[a][1] >= spans[b][0]:
+                raise AssertionError(f"windows of {a} and {b} share price bars")
+    inst = kept.groupby("available_utc").split.nunique()
+    if (inst > 1).any():
+        raise AssertionError("an announcement instant is spread over several splits")
+    return {"split_windows": {n: [str(spans[n][0]), str(spans[n][1])] for n in SPLITS},
+            "windows_disjoint": True, "instants_not_split": True}
+
+
 # ---------------------------------------------------------------- audit
+def split_audit(out: pd.DataFrame) -> dict:
+    if "split" not in out:
+        return {}
+    ok = out[out.exclude_reason == ""]
+    main = ok[ok.main_candidate.astype(bool)]
+    res = {"rows_all": {k: int(v) for k, v in ok.split.value_counts().items()},
+           "rows_main": {k: int(v) for k, v in main.split.value_counts().items()},
+           "cuts": out.attrs.get("split_cuts", {}),
+           "date_range_main": {n: [str(main[main.split == n].available_et.min()),
+                                   str(main[main.split == n].available_et.max())]
+                               for n in SPLITS if (main.split == n).any()}}
+    res.update(verify_splits(out))
+    return res
+
+
 def audit_summary(out: pd.DataFrame, price_report: dict, meta: dict, params: dict) -> dict:
     ok = out[out.exclude_reason == ""].copy()
     for c in ("input_crosses_day", "input_has_gap", "target_crosses_day", "target_has_gap",
@@ -284,6 +353,7 @@ def audit_summary(out: pd.DataFrame, price_report: dict, meta: dict, params: dic
                                    else "input_last_bar_end <= available_et <= target_first_bar_start"),
                           "violations": 0, "checked_rows": int(len(ok))},
         "market_time_text_mismatches": meta["market_time_text_mismatches"],
+        "splits": split_audit(out),
     }
 
 
@@ -299,6 +369,8 @@ def main(argv=None):
                     help="end the input at the announcement (market) time or at the available time")
     ap.add_argument("--expect-price-sha256", default=FROZEN_PRICE_SHA256,
                     help="empty string disables the frozen-price check")
+    ap.add_argument("--split-fractions", default="0.70,0.15,0.15",
+                    help="train,val,test fractions of the main rows (chronological, purged)")
     ap.add_argument("--force", action="store_true", help="overwrite existing outputs")
     a = ap.parse_args(argv)
 
@@ -314,18 +386,19 @@ def main(argv=None):
     bars, price_report = load_prices(a.prices)
     events = load_events(a.events)
     out = align(events, bars, a.seq_len, a.pred_len, a.main_max_lag_min, a.input_cutoff)
+    out = assign_splits(out, tuple(float(x) for x in a.split_fractions.split(",")))
     meta = {"events_sha256": sha256_file(a.events), "prices_sha256": price_sha,
             "events_rows": int(len(events)),
             "market_time_text_mismatches": int(events.market_time_mismatch.sum())}
     params = {"seq_len": a.seq_len, "pred_len": a.pred_len, "main_max_lag_min": a.main_max_lag_min,
-              "input_cutoff": a.input_cutoff,
+              "input_cutoff": a.input_cutoff, "split_fractions": a.split_fractions,
               "session": [SESSION_START, SESSION_END], "bar_timestamp": "bar start, New York time"}
     summary = audit_summary(out, price_report, meta, params)
     out.to_csv(targets[0], index=False)
     targets[1].write_text(json.dumps(summary, indent=2, default=str) + "\n")
     print(json.dumps({k: summary[k] for k in ("events_total", "rows_by_outcome", "aligned", "main_candidates",
                                               "aligned_by_session_at_market_time", "reaction_lag_buckets",
-                                              "market_time_text_mismatches")}, indent=2))
+                                              "market_time_text_mismatches", "splits")}, indent=2))
     print("wrote", *targets)
 
 

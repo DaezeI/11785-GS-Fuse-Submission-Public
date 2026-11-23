@@ -1,7 +1,11 @@
 # Fed announcements to S&P 500 price windows (Person 2) - November 22, 2026
 
-**Status: code and offline tests ready; time rules agreed with Person 1 (Jessica) on November 22.
-No model was trained. Splits are not assigned here.**
+**Status: dataset ready to use; time rules agreed with Person 1 (Jessica) on November 22.
+No model was trained. The aligned table, chronological purged splits, a numpy loader
+(`data/fed_price_dataset.py`) and a usage guide
+([`analysis/macro_releases/price_alignment_v1/README.md`](../../analysis/macro_releases/price_alignment_v1/README.md))
+are included. The 35 / 140-bar windows follow the existing GS-Fuse setup; changing them means
+rebuilding with `--seq-len` / `--pred-len`.**
 
 Owner: Person 2. Input from Person 1: `analysis/macro_releases/fed_announcements_v2.csv`
 (PR #41, merged; commit `12e3e51`, file sha256 `56157fe0…c9d939`). Price file: the team's frozen
@@ -75,14 +79,22 @@ with another event (`concurrent_group_id`); 116 are short cover notes (`short_te
 
 These are data-preparation counts, not model results.
 
-## Still open (Persons 3 and 4)
+## Splits
 
-- Keep 35 input / 140 target bars although 140 bars is almost two sessions? Allow windows across
-  the overnight break? The audit file reports how many do.
-- The price file ends 2024-04-17; extend it to 2024-06 to recover part of the 383?
-- Splits are not assigned here. Concurrent events share a price window and are not independent;
-  a chronological split must purge windows that overlap across splits (the C1 audit already does).
+Chronological and purged, assigned in the same script: cut dates are the 70% / 85% announcement-time
+quantiles of the main rows (train before 2019-05-22 14:05, val before 2021-08-24 14:05, test after).
+Main rows: train 1,013, val 215, test 218; all aligned rows 1,409 / 300 / 334; 2 purged (their windows
+would have shared a price bar with an earlier split). The audit verifies that no price bar is shared
+across splits and that events at the same instant stay together. Train includes 2008-09, test is the
+2022 rate-hike period, so val/test are calmer in scaled units (std about 0.77 and 0.63) and a regime
+shift is expected.
+
+## Still open
+
+- Window length (35 input / 140 target bars; 140 is almost two sessions) and extending prices past
+  2024-04-17 to recover part of the 383 events are left as they are. Both are one-flag rebuilds.
 - Press conferences are all in the flagged subset; the FOMC statement row stands in for them.
+- Exchange holidays are reported, not classified.
 
 ## Reproduce
 
@@ -90,9 +102,10 @@ These are data-preparation counts, not model results.
 python scripts/build_fed_price_alignment.py \
     --events analysis/macro_releases/fed_announcements_v2.csv \
     --prices /path/to/SP500.csv --out-dir downloads/fed_price_alignment_v1
-python -m pytest tests/test_fed_price_alignment.py -q
+python -m pytest tests/test_fed_price_alignment.py tests/test_fed_price_dataset.py -q
 ```
 
 Outputs (`fed_price_alignment_v1.csv`, `price_alignment_audit_v1.json`) hold timestamps and flags
-only: no prices and no article text. They are not committed in this change. The official-close
-check used FRED series `SP500`, downloaded for the comparison and not stored in the repository.
+only (no prices, no article text) and are committed in `analysis/macro_releases/price_alignment_v1/`
+so every teammate uses the same splits. The official-close check used FRED series `SP500`,
+downloaded for the comparison and not stored in the repository.
