@@ -9,17 +9,20 @@ Time contract (see docs/updates/2026-11-22-fed-price-alignment.md):
   * The ``date`` column of the price file is the START of each 5-minute bar, in New York time.
     This is inferred from the data (a 09:30 bar has its own range and closes next to the 09:35
     open); it is not stated by the data source, so Person 1 is asked to confirm it.
-  * ``available_utc`` (market time + 5 minutes, from Person 1) is the earliest moment the
-    announcement may influence a forecast. It is converted to New York time.
-  * TARGET window starts at the first bar whose start is >= available time.
-  * INPUT window ends at the last bar that had ENDED by the available time, that is
-    start <= available time - 5 minutes. A bar that straddles the available time is an
-    "embargo" bar: it is used neither as input nor as target.
+  * ``market_time_et`` is when the market first learned the content (Person 1). ``available_utc``
+    is that time + 5 minutes of processing lag; it is converted to New York time.
+  * TARGET window starts at the first bar whose start is >= available time (no extra buffer).
+  * INPUT window (default ``--input-cutoff market``, agreed with Person 1) ends at the last bar that
+    had ENDED by the market time, that is start <= market time - 5 minutes. For a 14:00 statement
+    the last input bar is 13:55-14:00; the 14:00-14:05 bar (the first reaction) is an "embargo" bar
+    used neither as input nor as target. The 5-minute lag only decides where the target starts.
+    ``--input-cutoff available`` keeps the older rule (cut at the available time).
   * Only regular-session bars (start 09:30 to 16:00 inclusive) are real prices. Bars after 16:00
     are mostly flat filler (about 61% at 16:05, 97% at 16:10, 100% at 16:15) and are dropped.
 
 The script never reads text. Every output row is asserted to satisfy
-``input_last_bar_end <= available_et <= target_first_bar_start``.
+``input_last_bar_end <= market_et <= available_et <= target_first_bar_start``
+(or only ``<= available_et`` for the older rule).
 
 Usage:
   python scripts/build_fed_price_alignment.py \
@@ -142,12 +145,20 @@ def _to_bool(s: pd.Series) -> pd.Series:
 
 def load_events(path) -> pd.DataFrame:
     ev = pd.read_csv(path, dtype={"release_date": str})
-    need = {"event_id", "event_type", "available_utc", "usable_intraday", "text_chars"}
+    need = {"event_id", "event_type", "available_utc", "usable_intraday", "text_chars",
+            "processing_lag_min", "market_time_et"}
     if need - set(ev.columns):
         raise ValueError(f"events file lacks columns: {sorted(need - set(ev.columns))}")
     ev["usable"] = _to_bool(ev.usable_intraday)
     utc = pd.to_datetime(ev.available_utc, utc=True, errors="coerce")
     ev["available_et_naive"] = utc.dt.tz_convert(ET).dt.tz_localize(None)
+    lag = pd.to_numeric(ev.processing_lag_min, errors="coerce")
+    ev["market_et_naive"] = ev.available_et_naive - pd.to_timedelta(lag, unit="m")
+    # cross-check against the human-readable market time ("2008-01-30 2:15 p.m.")
+    txt = (ev.market_time_et.astype(str).str.replace("a.m.", "AM", regex=False)
+           .str.replace("p.m.", "PM", regex=False))
+    parsed = pd.to_datetime(txt, format="%Y-%m-%d %I:%M %p", errors="coerce")
+    ev["market_time_mismatch"] = ev.usable & (parsed != ev.market_et_naive)
     return ev
 
 
@@ -168,7 +179,9 @@ def classify_session(avail: pd.Timestamp, trading_days: set) -> str:
 
 
 def align(events: pd.DataFrame, bars: pd.DataFrame, seq_len=35, pred_len=140,
-          main_max_lag_min=5) -> pd.DataFrame:
+          main_max_lag_min=5, input_cutoff="market") -> pd.DataFrame:
+    if input_cutoff not in ("market", "available"):
+        raise ValueError("input_cutoff must be 'market' or 'available'")
     idx = BarIndex(bars)
     trading_days = set(pd.to_datetime(bars.date.dt.normalize().unique()))
     rows = []
@@ -184,21 +197,24 @@ def align(events: pd.DataFrame, bars: pd.DataFrame, seq_len=35, pred_len=140,
         if not e.usable:
             rows.append({**base, "exclude_reason": "not_usable_intraday_in_events_file"})
             continue
-        av = e.available_et_naive
-        if pd.isna(av):
+        av, mk = e.available_et_naive, e.market_et_naive
+        if pd.isna(av) or pd.isna(mk):
             rows.append({**base, "exclude_reason": "unparseable_available_time"})
             continue
+        base["market_et"] = mk
         base["available_et"] = av
-        base["session_at_available"] = classify_session(av, trading_days)
+        base["session_at_market"] = classify_session(mk, trading_days)
+        cut = mk if input_cutoff == "market" else av
         av64 = np.datetime64(av.to_datetime64(), "ns")
-        if av64 < idx.start[0] + np.timedelta64(5, "m"):
+        cut64 = np.datetime64(cut.to_datetime64(), "ns")
+        if cut64 < idx.start[0] + np.timedelta64(5, "m"):
             rows.append({**base, "exclude_reason": "before_price_coverage"})
             continue
         t = int(np.searchsorted(idx.start, av64, side="left"))      # first bar start >= available
         if t >= idx.n:
             rows.append({**base, "exclude_reason": "after_price_coverage"})
             continue
-        last_in = int(np.searchsorted(idx.start, av64 - np.timedelta64(5, "m"), side="right")) - 1
+        last_in = int(np.searchsorted(idx.start, cut64 - np.timedelta64(5, "m"), side="right")) - 1
         first_in = last_in - seq_len + 1
         if first_in < 0:
             rows.append({**base, "exclude_reason": "insufficient_input_bars"})
@@ -209,14 +225,14 @@ def align(events: pd.DataFrame, bars: pd.DataFrame, seq_len=35, pred_len=140,
             continue
 
         in_end = pd.Timestamp(idx.start[last_in]) + BAR
-        assert in_end <= av, f"LEAK: input ends {in_end} after available {av} ({e.event_id})"
+        assert in_end <= cut and in_end <= av, f"LEAK: input ends {in_end} after cutoff {cut} ({e.event_id})"
         assert pd.Timestamp(idx.start[t]) >= av, f"LEAK: target starts before available ({e.event_id})"
         assert last_in < t, f"window order ({e.event_id})"
 
         iflag, tflag = idx.window_flags(first_in, last_in), idx.window_flags(t, last_t)
         lag = (pd.Timestamp(idx.start[t]) - av).total_seconds() / 60
-        stale = (av - in_end).total_seconds() / 60
-        main = (base["session_at_available"] == "regular" and lag <= main_max_lag_min
+        stale = (cut - in_end).total_seconds() / 60
+        main = (base["session_at_market"] == "regular" and lag <= main_max_lag_min
                 and not iflag["has_gap"] and not tflag["has_gap"])
         rows.append({**base, "exclude_reason": "",
                      "input_first_bar": pd.Timestamp(idx.start[first_in]),
@@ -250,7 +266,7 @@ def audit_summary(out: pd.DataFrame, price_report: dict, meta: dict, params: dic
         "rows_by_outcome": {k: int(v) for k, v in reasons.items()},
         "aligned": int(len(ok)),
         "main_candidates": int(ok.main_candidate.sum()),
-        "aligned_by_session": {k: int(v) for k, v in ok.session_at_available.value_counts().items()},
+        "aligned_by_session_at_market_time": {k: int(v) for k, v in ok.session_at_market.value_counts().items()},
         "aligned_by_event_type": {k: int(v) for k, v in ok.event_type.value_counts().items()},
         "aligned_by_year": {str(k): int(v) for k, v in ok.available_et.dt.year.value_counts().sort_index().items()},
         "reaction_lag_buckets": {str(k): int(v) for k, v in lag_bins.value_counts().sort_index().items()},
@@ -263,8 +279,11 @@ def audit_summary(out: pd.DataFrame, price_report: dict, meta: dict, params: dic
         "independence": {"distinct_available_instants": int(ok.available_utc.nunique()),
                          "rows_sharing_an_instant": int((ok.n_concurrent_usable > 1).sum()),
                          "short_text_rows": int(ok.short_text.sum())},
-        "leakage_check": {"rule": "input_last_bar_end <= available_et <= target_first_bar_start",
+        "leakage_check": {"rule": ("input_last_bar_end <= market_et <= available_et <= target_first_bar_start"
+                                   if params["input_cutoff"] == "market"
+                                   else "input_last_bar_end <= available_et <= target_first_bar_start"),
                           "violations": 0, "checked_rows": int(len(ok))},
+        "market_time_text_mismatches": meta["market_time_text_mismatches"],
     }
 
 
@@ -276,6 +295,8 @@ def main(argv=None):
     ap.add_argument("--seq-len", type=int, default=35)
     ap.add_argument("--pred-len", type=int, default=140)
     ap.add_argument("--main-max-lag-min", type=float, default=5)
+    ap.add_argument("--input-cutoff", choices=["market", "available"], default="market",
+                    help="end the input at the announcement (market) time or at the available time")
     ap.add_argument("--expect-price-sha256", default=FROZEN_PRICE_SHA256,
                     help="empty string disables the frozen-price check")
     ap.add_argument("--force", action="store_true", help="overwrite existing outputs")
@@ -292,16 +313,19 @@ def main(argv=None):
 
     bars, price_report = load_prices(a.prices)
     events = load_events(a.events)
-    out = align(events, bars, a.seq_len, a.pred_len, a.main_max_lag_min)
+    out = align(events, bars, a.seq_len, a.pred_len, a.main_max_lag_min, a.input_cutoff)
     meta = {"events_sha256": sha256_file(a.events), "prices_sha256": price_sha,
-            "events_rows": int(len(events))}
+            "events_rows": int(len(events)),
+            "market_time_text_mismatches": int(events.market_time_mismatch.sum())}
     params = {"seq_len": a.seq_len, "pred_len": a.pred_len, "main_max_lag_min": a.main_max_lag_min,
+              "input_cutoff": a.input_cutoff,
               "session": [SESSION_START, SESSION_END], "bar_timestamp": "bar start, New York time"}
     summary = audit_summary(out, price_report, meta, params)
     out.to_csv(targets[0], index=False)
     targets[1].write_text(json.dumps(summary, indent=2, default=str) + "\n")
     print(json.dumps({k: summary[k] for k in ("events_total", "rows_by_outcome", "aligned", "main_candidates",
-                                              "aligned_by_session", "reaction_lag_buckets")}, indent=2))
+                                              "aligned_by_session_at_market_time", "reaction_lag_buckets",
+                                              "market_time_text_mismatches")}, indent=2))
     print("wrote", *targets)
 
 
