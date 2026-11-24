@@ -2,12 +2,12 @@
   "id": "fed-spx-text-llama31-8b-v1",
   "title": "Nicole\u2019s 8B Fed text arm awaits frozen inputs",
   "kind": "Experiment",
-  "status": "awaiting_evidence",
+  "status": "submitted",
   "owner": "Nicole",
   "question": "Does Llama-3.1-8B(frozen)+CNN(frozen)~Pool~Add improve 20/30-minute forecasts over the frozen price baseline on FED-PXTX-ALL-REL5-v2 validation?",
   "configuration": "Frozen full-float32 Llama-3.1-8B; masked mean, first 2048 tokens; frozen CNN seeds 0/1/2 trained on FED-PX-REL5-v1; text head trains on 171 FED-PXTX-ALL-REL5-v2 rows after 2 exclusions; scores 149 validation rows. Fixed 30-epoch pilot, train-only text scaling, real/zero/past-only shuffled text.",
-  "finding": "Runner and private one-GPU launcher prepared. Verified text files are staged. Training has not been submitted: the exact frozen CNN files and 8B weights are not available in Nicole\u2019s inspected workspace.",
-  "limitations": "No end-to-end 8B smoke or accuracy result. Validation is exploratory; ALL contains inferred evidence classes. Delta access requires a fresh login. Final test remains reserved and final evidence level remains undecided.",
+  "finding": "Exact one-H200 training job submitted on explicit user hold, pinned to merged main 013ca5c. Training has not started and no GPU time is consumed. Release awaits the frozen CNN checkpoint bundle and exact Llama-3.1-8B weights; Delta login works but shared project searches found neither artifact.",
+  "limitations": "No end-to-end 8B smoke or accuracy result. Validation is exploratory; ALL contains inferred evidence classes. The exact required artifacts remain missing after shared Delta searches. Final test remains reserved and final evidence level remains undecided.",
   "figure": null,
   "evidence": [
     {
@@ -20,5 +20,5 @@
     }
   ],
   "related": [],
-  "updated_at": "2026-11-24T18:40:01.691766+00:00"
+  "updated_at": "2026-11-24T18:43:54.813235+00:00"
 }
