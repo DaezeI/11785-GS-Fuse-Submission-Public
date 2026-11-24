@@ -32,6 +32,10 @@ Use `PENDING` for unknown fields. A queued job has no result. A smoke run checks
 execution, not model quality. Do not copy a result from one checkpoint or data
 population into another run's row.
 
+## Nicole's Fed text pilot (November 24)
+
+[Exact 8B pilot](experiments/fed-spx-text-llama31-8b-v1/README.md), owner Nicole, #55: prepared and awaiting exact frozen CNN checkpoints and Llama-3.1-8B weights. No submitted job or finding. Train 171 / validation 149 on FED-PXTX-ALL-REL5-v2 after two documented train exclusions; test reserved.
+
 ## Current comparison index
 
 **Fed/SPX price-only checks, completed on validation:** [result pack](results/fed-spx-price-baselines-v1/summary.md).

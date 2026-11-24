@@ -1,3 +1,7 @@
+# Person 4 restart — November 24, 2026
+
+Fed/SPX dependencies merged in PR #62. Nicole owns #55: `Llama-3.1-8B(frozen)+CNN(frozen)~Pool~Add` on `FED-PXTX-ALL-REL5-v2` (171 train after exclusions / 149 val). The [exact 8B pilot](experiments/fed-spx-text-llama31-8b-v1/README.md) is prepared; the frozen CNN checkpoint files and exact 8B weights are missing from her inspected workspace. No training job or test scoring is claimed. Adaeze owns the paired scorer package (#54). Older campaign prose below is historical context.
+
 # Project status
 
 **November 23 short-horizon Fed/SPX update.** Adaeze completed the compact

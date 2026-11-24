@@ -75,3 +75,9 @@ are not model names.
 
 `fed-spx-matched-control-v1` predates this rule. Its CNN is the baseline `none+CNN~none~none`;
 the text arm will reuse it as its frozen price encoder.
+
+## November 24 Person 4 exact IDs
+
+`FED-PXTX-ALL-REL5-v2`: 173 / 149 / 172 releases, defined by the merged v2 ledgers and verified-text manifest. The #55 training configuration drops the two documented truncated train texts (171 used); validation is unchanged. Preserve that exclusion in every comparison label/provenance record.
+
+`Llama-3.1-8B(frozen)+CNN(frozen)~Pool~Add`: Nicole's exact #55 architecture, implemented in `scripts/run_fed_spx_text.py`, using the frozen `none+CNN~none~none` checkpoints. Prepared, not trained. See the registered pilot for token budget, preprocessing and evaluation controls.
