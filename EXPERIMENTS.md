@@ -34,6 +34,11 @@ population into another run's row.
 
 ## Current comparison index
 
+**Fed/SPX price-only checks, completed on validation:** [result pack](results/fed-spx-price-baselines-v1/summary.md).
+Last-close persistence beat ridge at 35, 70 and 140 bars. Flagged validation
+events are reported separately. Matched compact models and DLinear scores on
+this split are pending.
+
 **New planned campaign:** [Controlled improvement v1](docs/experiments/IMPROVEMENT_CAMPAIGN_V1.md)
 provides 17 existing-pipeline configurations, a five-arm default smoke screen,
 and 11 evidence/implementation-gated designs. Adaeze owns the experiment
@@ -61,6 +66,28 @@ current evidence and ranks the next proposed analyses and experiments.
 The original unscreened C1 manifest and historical outputs remain preserved for
 audit context. The screened subset excludes 883 suspect articles; publication
 times for retained articles are still unverified.
+
+## Short-horizon Fed/SPX baseline
+
+**Design proposal, Adaeze Ilodianya:** [short-horizon protocol](docs/experiments/FED_SPX_SHORT_HORIZON_PROPOSAL.md).
+Compare the compact price-only architecture and a matched text extension on
+20- and 30-minute Close returns from a shared forecast origin. The horizons
+are chosen. The [compact price-only validation run](results/fed-spx-endpoints-price-v1/summary.md)
+completed with three RTX 4060 seeds. The paired intervals cover zero at both
+horizons. The exact text-version audit and its coverage limits are linked in
+the result pack. The [Board and testimony audit](results/fed-spx-board-testimony-evidence-v1/README.md)
+reviewed 603 events and verified eight testimony PDF bodies by their frozen
+cutoffs. The [independent minutes and speech audit](results/fed-spx-minutes-speeches-codex-v1/README.md)
+reviewed all 472 assigned events and found no exact-version proof in the
+publisher records and archive pilot it checked. The
+[combined Fed/SPX news cohort](results/fed-spx-news-cohort-v1/README.md)
+reconciles all 1,185 train and validation event IDs and records the sensitivity
+to the minutes and speech evidence rules. A [Board release re-check](results/fed-spx-board-recheck-v1/README.md)
+adds 10 train and 33 validation rows under the document rule; the cohort file must be rebuilt.
+The [macro coverage count](results/macro-coverage-v1/README.md) finds 2,158 candidate training
+events before text checks. Decisions and limits are in the
+[November 23 update](docs/updates/2026-11-23-fed-spx-text-evidence.md). The matched experiment and held-out
+scoring remain pending.
 
 ## Entry template for future work
 

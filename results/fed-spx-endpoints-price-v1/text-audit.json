@@ -1,0 +1,127 @@
+{
+  "scope": "978 price-eligible train and 207 validation rows; held-out test reserved",
+  "population_sha256": "4061fe505098babf845b2bc0547bdbe11bd732377f6e2a5face383010b024a71",
+  "evidence_rule": "Historical capture no later than forecast origin minus five minutes; replayed HTML extraction or PDF hash must match the frozen Fed catalog.",
+  "archive_interfaces": [
+    "https://github.com/internetarchive/wayback/blob/master/wayback-cdx-server/README.md",
+    "https://archive.org/wayback/available"
+  ],
+  "passes": {
+    "cdx": {
+      "status_counts_by_split": {
+        "train": {
+          "no_eligible_capture_in_index": 80,
+          "index_unavailable": 898
+        },
+        "val": {
+          "index_unavailable": 207
+        }
+      },
+      "ledger_sha256": "04f7068431637704f86be2d278b9dd15f04c6ca70f8bf929107b2a3e70fd45f1",
+      "http_status_counts": {}
+    },
+    "availability": {
+      "status_counts_by_split": {
+        "train": {
+          "nearest_capture_after_cutoff": 101,
+          "index_unavailable": 2,
+          "not_queried_after_rate_limit": 875
+        },
+        "val": {
+          "not_queried_after_rate_limit": 207
+        }
+      },
+      "ledger_sha256": "74e2cbea3c06a18d07de5ddcd32779d1e55d17bcc400825a6d84056dbe6b990c",
+      "http_status_counts": {
+        "429": 2
+      }
+    }
+  },
+  "five_validation_url_pilot": [
+    {
+      "event_id": "speech_powell20210817a",
+      "service": "cdx",
+      "cutoff_utc": "20210817173000",
+      "capture_utc": null,
+      "status": "no_capture_returned"
+    },
+    {
+      "event_id": "speech_powell20210817a",
+      "service": "availability",
+      "cutoff_utc": "20210817173000",
+      "capture_utc": null,
+      "status": "no_capture_returned"
+    },
+    {
+      "event_id": "testimony_powell20210622a",
+      "service": "cdx",
+      "cutoff_utc": "20210622180000",
+      "capture_utc": "20210622155409",
+      "status": "candidate_replay_required"
+    },
+    {
+      "event_id": "testimony_powell20210622a",
+      "service": "availability",
+      "cutoff_utc": "20210622180000",
+      "capture_utc": "20210622180734",
+      "status": "after_cutoff"
+    },
+    {
+      "event_id": "stmt_20210728a",
+      "service": "cdx",
+      "cutoff_utc": "20210728180000",
+      "capture_utc": null,
+      "status": "no_capture_returned"
+    },
+    {
+      "event_id": "stmt_20210728a",
+      "service": "availability",
+      "cutoff_utc": "20210728180000",
+      "capture_utc": "20210728180107",
+      "status": "after_cutoff"
+    },
+    {
+      "event_id": "min_20210728",
+      "service": "cdx",
+      "cutoff_utc": "20210818180000",
+      "capture_utc": null,
+      "status": "no_capture_returned"
+    },
+    {
+      "event_id": "min_20210728",
+      "service": "availability",
+      "cutoff_utc": "20210818180000",
+      "capture_utc": "20210818183709",
+      "status": "after_cutoff"
+    },
+    {
+      "event_id": "board_monetary20210728b",
+      "service": "cdx",
+      "cutoff_utc": "20210728180000",
+      "capture_utc": null,
+      "status": "no_capture_returned"
+    },
+    {
+      "event_id": "board_monetary20210728b",
+      "service": "availability",
+      "cutoff_utc": "20210728180000",
+      "capture_utc": "20210728180235",
+      "status": "after_cutoff"
+    }
+  ],
+  "direct_pre_cutoff_replay_check": {
+    "event_id": "testimony_powell20210622a",
+    "split": "val",
+    "capture_utc": "20210622155409",
+    "text_cutoff_utc": "2021-06-22T18:00:00+00:00",
+    "replay_url": "https://web.archive.org/web/20210622155409id_/https://www.federalreserve.gov/newsevents/testimony/powell20210622a.htm",
+    "status": "replay_unavailable",
+    "error_type": "ConnectionError",
+    "http_status": null
+  },
+  "verified_exact_version_rows_by_split": {
+    "train": 0,
+    "val": 0
+  },
+  "interpretation": "Zero exact versions were confirmed from the available historical evidence. Network refusal, rate limiting, and captures after the cutoff leave unresolved versions. No matched text model was trained."
+}

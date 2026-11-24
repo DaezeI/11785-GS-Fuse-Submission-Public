@@ -1,0 +1,153 @@
+{
+  "splits_from_alignment_v1": {
+    "test": [
+      "2021-08-24 14:00:00",
+      "2024-04-10 14:00:00"
+    ],
+    "train": [
+      "2008-01-11 12:00:00",
+      "2019-05-20 13:05:00"
+    ],
+    "val": [
+      "2019-05-28 14:00:00",
+      "2021-08-18 14:00:00"
+    ]
+  },
+  "price_coverage": [
+    "2008-01-02",
+    "2024-04-17"
+  ],
+  "releases_by_source_kind_split": {
+    "BEA: GDP": {
+      "premarket|test": 32,
+      "premarket|train": 134,
+      "premarket|val": 27
+    },
+    "BEA: Personal Income": {
+      "intraday|test": 1,
+      "intraday|train": 5,
+      "intraday|val": 3,
+      "premarket|test": 30,
+      "premarket|train": 127,
+      "premarket|val": 24
+    },
+    "BLS: CPI": {
+      "premarket|test": 32,
+      "premarket|train": 135,
+      "premarket|val": 26
+    },
+    "BLS: EMPSIT": {
+      "premarket|test": 31,
+      "premarket|train": 133,
+      "premarket|val": 26
+    },
+    "BLS: JOLTS": {
+      "intraday|test": 32,
+      "intraday|train": 135,
+      "intraday|val": 27
+    },
+    "BLS: PPI": {
+      "premarket|between_or_outside_splits": 1,
+      "premarket|test": 31,
+      "premarket|train": 136,
+      "premarket|val": 27
+    },
+    "DOL: Initial claims (approx. schedule)": {
+      "premarket|between_or_outside_splits": 5,
+      "premarket|test": 137,
+      "premarket|train": 591,
+      "premarket|val": 116
+    },
+    "Fed: fed_board_monetary_release": {
+      "intraday|test": 43,
+      "intraday|train": 419,
+      "intraday|val": 55
+    },
+    "Fed: fed_speech": {
+      "intraday|test": 118,
+      "intraday|train": 273,
+      "intraday|val": 95
+    },
+    "Fed: fed_testimony": {
+      "intraday|test": 15,
+      "intraday|train": 108,
+      "intraday|val": 21
+    },
+    "Fed: fomc_minutes": {
+      "intraday|test": 19,
+      "intraday|train": 87,
+      "intraday|val": 17
+    },
+    "Fed: fomc_other_policy_release": {
+      "intraday|val": 1
+    },
+    "Fed: fomc_statement": {
+      "intraday|test": 21,
+      "intraday|train": 91,
+      "intraday|val": 18
+    }
+  },
+  "lost_releases": {
+    "no_price_bars_that_day|BEA: Personal Income": 1,
+    "no_price_bars_that_day|DOL: Initial claims (approx. schedule)": 1,
+    "outside_price_coverage|BEA: GDP": 9,
+    "outside_price_coverage|BEA: Personal Income": 9,
+    "outside_price_coverage|BLS: CPI": 9,
+    "outside_price_coverage|BLS: EMPSIT": 9,
+    "outside_price_coverage|BLS: JOLTS": 10,
+    "outside_price_coverage|BLS: PPI": 8,
+    "outside_price_coverage|DOL: Initial claims (approx. schedule)": 37,
+    "release_on_non_session_day|BEA: GDP": 1,
+    "release_on_non_session_day|BEA: Personal Income": 3,
+    "release_on_non_session_day|BLS: CPI": 2,
+    "release_on_non_session_day|BLS: EMPSIT": 5,
+    "too_late_for_30m_target|Fed: fed_board_monetary_release": 27,
+    "too_late_for_30m_target|Fed: fed_speech": 17,
+    "too_late_for_30m_target|Fed: fed_testimony": 1
+  },
+  "distinct_forecast_events_by_kind_split": {
+    "intraday|test": 229,
+    "intraday|train": 1053,
+    "intraday|val": 222,
+    "premarket|between_or_outside_splits": 5,
+    "premarket|test": 242,
+    "premarket|train": 1105,
+    "premarket|val": 206
+  },
+  "events_with_any_macro_release": {
+    "intraday|test": 33,
+    "intraday|train": 140,
+    "intraday|val": 30,
+    "premarket|between_or_outside_splits": 5,
+    "premarket|test": 242,
+    "premarket|train": 1105,
+    "premarket|val": 206
+  },
+  "events_fed_only": {
+    "intraday|test": 196,
+    "intraday|train": 913,
+    "intraday|val": 192
+  },
+  "releases_per_event": {
+    "1": 2740,
+    "2": 322
+  },
+  "events_excluding_claims_only": {
+    "intraday|test": 229,
+    "intraday|train": 1053,
+    "intraday|val": 222,
+    "premarket|between_or_outside_splits": 1,
+    "premarket|test": 156,
+    "premarket|train": 660,
+    "premarket|val": 130
+  },
+  "train_events_total": 2158,
+  "target_train_rows": 2000,
+  "notes": [
+    "Counts are candidate events before any exact-version text check.",
+    "BLS archive index lists start in February 2008; January 2008 BLS releases are missing.",
+    "BLS times are the standard release times, not checked per release; DOL claims dates are an approximate Thursday schedule.",
+    "Intraday events within 30 minutes of each other are counted separately but their target windows overlap.",
+    "Test period counted from the exchange calendar only."
+  ]
+}

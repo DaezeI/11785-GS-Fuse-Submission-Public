@@ -1,0 +1,22 @@
+{
+  "id": "fed-spx-matched-control-v2",
+  "title": "Price-only baselines on FED-PXTX-ALL-REL5-v2 validation",
+  "kind": "Price-only benchmark",
+  "owner": "Adaeze Ilodianya",
+  "status": "completed",
+  "updated_at": "2026-11-24T02:00:00+00:00",
+  "question": "After correcting the release-text checks (v2), how do Persistence, the frozen none+CNN~none~none, none+DLinear~none~none and none+Ridge~none~none compare on the text-verified validation releases?",
+  "configuration": "Same frozen forecasters as fed-spx-matched-control-v1, all trained on FED-PX-REL5-v1 train (978 releases). Scored on FED-PXTX-ALL-REL5-v2 validation: 149 releases, 139 release instants, 125 dates, unit weight per instant, paired 10-date block intervals. Test not loaded.",
+  "finding": "Persistence MAE 16.155 / 20.484 bp at 20 / 30 minutes. none+CNN~none~none 16.057 / 20.392 bp (gain +0.088 / +0.054 bp, intervals include zero). none+DLinear~none~none 16.751 / 20.892 bp and none+Ridge~none~none 19.295 / 23.928 bp are worse than Persistence.",
+  "limitations": "Validation only; CNN epochs were selected on the 207 FED-PX-REL5-v1 validation rows, which contain these 149. Inferred evidence classes are included. Intervals of about +/-0.3 bp mean only a text gain of roughly half a basis point or more can register.",
+  "figure": {
+    "url": "https://raw.githubusercontent.com/DaezeI/11785-GS-Fuse-Submission-Public/main/results/fed-spx-matched-control-v2/validation-mae.png",
+    "alt": "Grouped bars of validation MAE at 20 and 30 minutes on 149 releases. Persistence and the frozen CNN are nearly equal; DLinear is about 0.6 bp higher and ridge about 3 bp higher."
+  },
+  "evidence": [
+    {"label": "Validation summary", "url": "https://github.com/DaezeI/11785-GS-Fuse-Submission-Public/blob/main/results/fed-spx-matched-control-v2/summary.md"},
+    {"label": "Exact metrics", "url": "https://github.com/DaezeI/11785-GS-Fuse-Submission-Public/blob/main/results/fed-spx-matched-control-v2/metrics.json"},
+    {"label": "Evidence v2 corrections", "url": "https://github.com/DaezeI/11785-GS-Fuse-Submission-Public/blob/main/results/fed-spx-evidence-v2/README.md"}
+  ],
+  "related": ["fed-spx-matched-control-v1", "fed-spx-endpoints-price-v1"]
+}

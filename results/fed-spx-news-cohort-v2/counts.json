@@ -1,0 +1,463 @@
+{
+  "population_sha256": "4061fe505098babf845b2bc0547bdbe11bd732377f6e2a5face383010b024a71",
+  "input_ledger_sha256": {
+    "statements": "6a246ca6e89533f5b51b1bfb535462f782dc8780106847fbd5d4faf6d6de0668",
+    "minutes_speeches": "b1be2ca94ed45278e0a5cc24e97fe2a61553d8fd6f76c0850800586d5c894579",
+    "board_testimony": "ebdf39c692205facc02196d56a75d3f4836148b8cfd3e1632e7769136b6d811f",
+    "board_recheck": "90a36b6777812b889860226acd2689f8b8c33cd0ef5bfc31af90ba432b719bc1",
+    "testimony_recheck": "46eb538febd2fb27c63604e580aaca19a122f78a784f83f1081bbd6517f49084"
+  },
+  "total_events": 1185,
+  "price_audit": {
+    "calendar": "XNYS",
+    "exchange_calendars_version": "4.13.3",
+    "input_sha256": {
+      "prices": "6a873b1d72d27f9188c6bf12acb756775916be8ed9ff42d9e9dd98028f68de2a",
+      "catalog": "56157fe018beeba6f051f765e0f9d6763e839324b9d95ebbf49f15ec47c9d939",
+      "alignment": "0ab047bf9f918d798bd1c4f4eac8c6d59e0317c8d36fcb25c81a6801cfee0270"
+    },
+    "cross_split_shared_bars": 0,
+    "splits": {
+      "train": {
+        "main_input_rows": 1013,
+        "eligible_rows": 978,
+        "distinct_instants": 929,
+        "dates": 787,
+        "excluded": {
+          "outside_xnys_session": 35
+        }
+      },
+      "val": {
+        "main_input_rows": 215,
+        "eligible_rows": 207,
+        "distinct_instants": 192,
+        "dates": 165,
+        "excluded": {
+          "outside_xnys_session": 8
+        }
+      }
+    }
+  },
+  "by_type_split_disposition": {
+    "fed_board_monetary_release/train/eligible": 10,
+    "fed_board_monetary_release/train/insufficient_evidence": 409,
+    "fed_board_monetary_release/val/eligible": 33,
+    "fed_board_monetary_release/val/insufficient_evidence": 20,
+    "fed_board_monetary_release/val/version_conflict": 2,
+    "fed_speech/train/eligible": 46,
+    "fed_speech/train/insufficient_evidence": 185,
+    "fed_speech/train/version_conflict": 42,
+    "fed_speech/val/eligible": 76,
+    "fed_speech/val/insufficient_evidence": 2,
+    "fed_speech/val/version_conflict": 17,
+    "fed_testimony/train/eligible": 1,
+    "fed_testimony/train/insufficient_evidence": 102,
+    "fed_testimony/train/version_conflict": 5,
+    "fed_testimony/val/eligible": 11,
+    "fed_testimony/val/insufficient_evidence": 10,
+    "fomc_minutes/train/eligible": 27,
+    "fomc_minutes/train/insufficient_evidence": 54,
+    "fomc_minutes/train/version_conflict": 6,
+    "fomc_minutes/val/eligible": 11,
+    "fomc_minutes/val/version_conflict": 6,
+    "fomc_other_policy_release/val/insufficient_evidence": 1,
+    "fomc_statement/train/eligible": 89,
+    "fomc_statement/train/version_conflict": 2,
+    "fomc_statement/val/eligible": 18
+  },
+  "by_type_split_evidence_class": {
+    "fed_board_monetary_release/train/eligible_document_release_line_release_day_capture": 10,
+    "fed_board_monetary_release/train/insufficient_evidence": 305,
+    "fed_board_monetary_release/train/not_verified_no_timely_capture_in_checked_index": 104,
+    "fed_board_monetary_release/val/eligible_document_release_line_release_day_capture": 33,
+    "fed_board_monetary_release/val/insufficient_evidence": 20,
+    "fed_board_monetary_release/val/version_conflict_review": 2,
+    "fed_speech/train/eligible_document_release_line_unmodified_file": 46,
+    "fed_speech/train/insufficient_evidence": 185,
+    "fed_speech/train/version_conflict_review": 42,
+    "fed_speech/val/eligible_document_release_line_unmodified_file": 76,
+    "fed_speech/val/insufficient_evidence": 2,
+    "fed_speech/val/version_conflict_review": 17,
+    "fed_testimony/train/eligible_B_official_record_only": 1,
+    "fed_testimony/train/insufficient_evidence": 91,
+    "fed_testimony/train/not_verified_no_timely_capture_in_checked_index": 11,
+    "fed_testimony/train/version_conflict_review": 5,
+    "fed_testimony/val/eligible_B_official_record_only": 7,
+    "fed_testimony/val/eligible_archived_copy_before_cutoff": 2,
+    "fed_testimony/val/eligible_document_release_line_unmodified_file": 2,
+    "fed_testimony/val/insufficient_evidence": 10,
+    "fomc_minutes/train/eligible_official_release_record_unmodified_file": 27,
+    "fomc_minutes/train/insufficient_evidence": 54,
+    "fomc_minutes/train/version_conflict_review": 6,
+    "fomc_minutes/val/eligible_official_release_record_unmodified_file": 11,
+    "fomc_minutes/val/version_conflict_review": 6,
+    "fomc_other_policy_release/val/not_verified_no_official_record_found": 1,
+    "fomc_statement/train/eligible_A_official_record_plus_near_time_capture": 3,
+    "fomc_statement/train/eligible_B_official_record_only": 86,
+    "fomc_statement/train/review_minutes_text_differs_from_posted_page": 2,
+    "fomc_statement/val/eligible_A_official_record_plus_near_time_capture": 3,
+    "fomc_statement/val/eligible_B_official_record_only": 15
+  },
+  "scenarios": {
+    "all_audit_eligible": {
+      "all/train": {
+        "rows": 173,
+        "release_instants": 169,
+        "dates": 167
+      },
+      "fed_board_monetary_release/train": {
+        "rows": 10,
+        "release_instants": 10,
+        "dates": 10
+      },
+      "fed_speech/train": {
+        "rows": 46,
+        "release_instants": 46,
+        "dates": 45
+      },
+      "fed_testimony/train": {
+        "rows": 1,
+        "release_instants": 1,
+        "dates": 1
+      },
+      "fomc_minutes/train": {
+        "rows": 27,
+        "release_instants": 27,
+        "dates": 27
+      },
+      "fomc_other_policy_release/train": {
+        "rows": 0,
+        "release_instants": 0,
+        "dates": 0
+      },
+      "fomc_statement/train": {
+        "rows": 89,
+        "release_instants": 89,
+        "dates": 89
+      },
+      "all/val": {
+        "rows": 149,
+        "release_instants": 139,
+        "dates": 125
+      },
+      "fed_board_monetary_release/val": {
+        "rows": 33,
+        "release_instants": 31,
+        "dates": 31
+      },
+      "fed_speech/val": {
+        "rows": 76,
+        "release_instants": 75,
+        "dates": 71
+      },
+      "fed_testimony/val": {
+        "rows": 11,
+        "release_instants": 11,
+        "dates": 11
+      },
+      "fomc_minutes/val": {
+        "rows": 11,
+        "release_instants": 11,
+        "dates": 11
+      },
+      "fomc_other_policy_release/val": {
+        "rows": 0,
+        "release_instants": 0,
+        "dates": 0
+      },
+      "fomc_statement/val": {
+        "rows": 18,
+        "release_instants": 18,
+        "dates": 18
+      }
+    },
+    "without_board_release_day_capture": {
+      "all/train": {
+        "rows": 163,
+        "release_instants": 163,
+        "dates": 161
+      },
+      "fed_board_monetary_release/train": {
+        "rows": 0,
+        "release_instants": 0,
+        "dates": 0
+      },
+      "fed_speech/train": {
+        "rows": 46,
+        "release_instants": 46,
+        "dates": 45
+      },
+      "fed_testimony/train": {
+        "rows": 1,
+        "release_instants": 1,
+        "dates": 1
+      },
+      "fomc_minutes/train": {
+        "rows": 27,
+        "release_instants": 27,
+        "dates": 27
+      },
+      "fomc_other_policy_release/train": {
+        "rows": 0,
+        "release_instants": 0,
+        "dates": 0
+      },
+      "fomc_statement/train": {
+        "rows": 89,
+        "release_instants": 89,
+        "dates": 89
+      },
+      "all/val": {
+        "rows": 116,
+        "release_instants": 115,
+        "dates": 108
+      },
+      "fed_board_monetary_release/val": {
+        "rows": 0,
+        "release_instants": 0,
+        "dates": 0
+      },
+      "fed_speech/val": {
+        "rows": 76,
+        "release_instants": 75,
+        "dates": 71
+      },
+      "fed_testimony/val": {
+        "rows": 11,
+        "release_instants": 11,
+        "dates": 11
+      },
+      "fomc_minutes/val": {
+        "rows": 11,
+        "release_instants": 11,
+        "dates": 11
+      },
+      "fomc_other_policy_release/val": {
+        "rows": 0,
+        "release_instants": 0,
+        "dates": 0
+      },
+      "fomc_statement/val": {
+        "rows": 18,
+        "release_instants": 18,
+        "dates": 18
+      }
+    },
+    "without_speech_release_line": {
+      "all/train": {
+        "rows": 127,
+        "release_instants": 123,
+        "dates": 123
+      },
+      "fed_board_monetary_release/train": {
+        "rows": 10,
+        "release_instants": 10,
+        "dates": 10
+      },
+      "fed_speech/train": {
+        "rows": 0,
+        "release_instants": 0,
+        "dates": 0
+      },
+      "fed_testimony/train": {
+        "rows": 1,
+        "release_instants": 1,
+        "dates": 1
+      },
+      "fomc_minutes/train": {
+        "rows": 27,
+        "release_instants": 27,
+        "dates": 27
+      },
+      "fomc_other_policy_release/train": {
+        "rows": 0,
+        "release_instants": 0,
+        "dates": 0
+      },
+      "fomc_statement/train": {
+        "rows": 89,
+        "release_instants": 89,
+        "dates": 89
+      },
+      "all/val": {
+        "rows": 71,
+        "release_instants": 62,
+        "dates": 60
+      },
+      "fed_board_monetary_release/val": {
+        "rows": 33,
+        "release_instants": 31,
+        "dates": 31
+      },
+      "fed_speech/val": {
+        "rows": 0,
+        "release_instants": 0,
+        "dates": 0
+      },
+      "fed_testimony/val": {
+        "rows": 9,
+        "release_instants": 9,
+        "dates": 9
+      },
+      "fomc_minutes/val": {
+        "rows": 11,
+        "release_instants": 11,
+        "dates": 11
+      },
+      "fomc_other_policy_release/val": {
+        "rows": 0,
+        "release_instants": 0,
+        "dates": 0
+      },
+      "fomc_statement/val": {
+        "rows": 18,
+        "release_instants": 18,
+        "dates": 18
+      }
+    },
+    "without_both_inferred_release_classes": {
+      "all/train": {
+        "rows": 100,
+        "release_instants": 96,
+        "dates": 96
+      },
+      "fed_board_monetary_release/train": {
+        "rows": 10,
+        "release_instants": 10,
+        "dates": 10
+      },
+      "fed_speech/train": {
+        "rows": 0,
+        "release_instants": 0,
+        "dates": 0
+      },
+      "fed_testimony/train": {
+        "rows": 1,
+        "release_instants": 1,
+        "dates": 1
+      },
+      "fomc_minutes/train": {
+        "rows": 0,
+        "release_instants": 0,
+        "dates": 0
+      },
+      "fomc_other_policy_release/train": {
+        "rows": 0,
+        "release_instants": 0,
+        "dates": 0
+      },
+      "fomc_statement/train": {
+        "rows": 89,
+        "release_instants": 89,
+        "dates": 89
+      },
+      "all/val": {
+        "rows": 60,
+        "release_instants": 51,
+        "dates": 50
+      },
+      "fed_board_monetary_release/val": {
+        "rows": 33,
+        "release_instants": 31,
+        "dates": 31
+      },
+      "fed_speech/val": {
+        "rows": 0,
+        "release_instants": 0,
+        "dates": 0
+      },
+      "fed_testimony/val": {
+        "rows": 9,
+        "release_instants": 9,
+        "dates": 9
+      },
+      "fomc_minutes/val": {
+        "rows": 0,
+        "release_instants": 0,
+        "dates": 0
+      },
+      "fomc_other_policy_release/val": {
+        "rows": 0,
+        "release_instants": 0,
+        "dates": 0
+      },
+      "fomc_statement/val": {
+        "rows": 18,
+        "release_instants": 18,
+        "dates": 18
+      }
+    },
+    "without_any_inferred_release_class": {
+      "all/train": {
+        "rows": 90,
+        "release_instants": 90,
+        "dates": 90
+      },
+      "fed_board_monetary_release/train": {
+        "rows": 0,
+        "release_instants": 0,
+        "dates": 0
+      },
+      "fed_speech/train": {
+        "rows": 0,
+        "release_instants": 0,
+        "dates": 0
+      },
+      "fed_testimony/train": {
+        "rows": 1,
+        "release_instants": 1,
+        "dates": 1
+      },
+      "fomc_minutes/train": {
+        "rows": 0,
+        "release_instants": 0,
+        "dates": 0
+      },
+      "fomc_other_policy_release/train": {
+        "rows": 0,
+        "release_instants": 0,
+        "dates": 0
+      },
+      "fomc_statement/train": {
+        "rows": 89,
+        "release_instants": 89,
+        "dates": 89
+      },
+      "all/val": {
+        "rows": 27,
+        "release_instants": 27,
+        "dates": 27
+      },
+      "fed_board_monetary_release/val": {
+        "rows": 0,
+        "release_instants": 0,
+        "dates": 0
+      },
+      "fed_speech/val": {
+        "rows": 0,
+        "release_instants": 0,
+        "dates": 0
+      },
+      "fed_testimony/val": {
+        "rows": 9,
+        "release_instants": 9,
+        "dates": 9
+      },
+      "fomc_minutes/val": {
+        "rows": 0,
+        "release_instants": 0,
+        "dates": 0
+      },
+      "fomc_other_policy_release/val": {
+        "rows": 0,
+        "release_instants": 0,
+        "dates": 0
+      },
+      "fomc_statement/val": {
+        "rows": 18,
+        "release_instants": 18,
+        "dates": 18
+      }
+    }
+  }
+}

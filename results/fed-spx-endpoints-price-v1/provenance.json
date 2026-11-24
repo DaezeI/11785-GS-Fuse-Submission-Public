@@ -1,0 +1,18 @@
+{
+  "id": "fed-spx-endpoints-price-v1",
+  "owner": "Adaeze Ilodianya",
+  "status": "completed_validation",
+  "run_date_et": "2026-11-23",
+  "training_commit": "45b4c9a4dd7b2b36ee6059ea45fb0e9c2f13a5e3",
+  "alignment_commit": "a4269dce74eb0cc829fa6772b049eed7ed463abd",
+  "cdx_audit_code_commit": "45b4c9a4dd7b2b36ee6059ea45fb0e9c2f13a5e3",
+  "availability_audit_code_commit": "fe86d6cfd1aa34f9ae29ea1a99971d85716bc147",
+  "command": "python scripts/run_fed_spx_endpoints_price.py --price-csv ../fed-person3/downloads/SP500.csv --out-dir downloads/fed-spx-endpoints-price-v1 --device cuda",
+  "figure_command": "python results/fed-spx-endpoints-price-v1/plot_validation.py",
+  "figure_matplotlib_version": "3.11.2",
+  "checkpoint_hashes_and_versions": "Per-seed checkpoint SHA-256, input and config hashes, population identity, and package versions are in metrics.json.",
+  "private_artifact_custodian": "Adaeze Ilodianya",
+  "private_artifacts": "Local downloads/fed-spx-endpoints-price-v1 contains three fitted checkpoints, population.csv and paired predictions. Archive response ledgers are in downloads/wayback-text-v1 and downloads/wayback-availability-v1.",
+  "verification": "47 focused tests passed. The saved checkpoint hashes and deterministic replayed forecasts matched. The text audit and model run used byte-identical population manifests.",
+  "test_status": "Held out. The real-price builder returns train and validation cohorts only."
+}

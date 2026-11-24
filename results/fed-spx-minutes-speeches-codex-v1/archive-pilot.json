@@ -1,0 +1,30 @@
+{
+  "min_20080130": [
+    {
+      "url": "https://www.federalreserve.gov/monetarypolicy/fomcminutes20080130.htm",
+      "status": "capture_after_cutoff",
+      "capture_utc": "20080223212425"
+    }
+  ],
+  "min_20160615": [
+    {
+      "url": "https://www.federalreserve.gov/monetarypolicy/fomcminutes20160615.htm",
+      "status": "capture_after_cutoff",
+      "capture_utc": "20160708093532"
+    }
+  ],
+  "min_20210728": [
+    {
+      "url": "https://www.federalreserve.gov/monetarypolicy/fomcminutes20210728.htm",
+      "status": "capture_after_cutoff",
+      "capture_utc": "20210818183709"
+    }
+  ],
+  "speech_powell20210817a": [
+    {
+      "url": "https://www.federalreserve.gov/newsevents/speech/powell20210817a.htm",
+      "status": "capture_after_cutoff",
+      "capture_utc": "20210817173304"
+    }
+  ]
+}

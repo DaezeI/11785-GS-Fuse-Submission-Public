@@ -2,7 +2,7 @@
   "title": "GS-Fuse Research Home",
   "stage": "Controlled experiments and final writing",
   "overview": "The last-price rule beat our trained price models. In Adaeze’s completed R3 return run, correct and shuffled articles gave nearly identical results, and predicting zero return had slightly lower error.",
-  "updated_at": "2026-11-20T06:14:31+00:00",
+  "updated_at": "2026-11-23T23:22:11+00:00",
   "source_url": "https://github.com/DaezeI/11785-GS-Fuse-Submission-Public/blob/main/research_home/records.json",
   "links": [
     {
@@ -41,6 +41,170 @@
     }
   ],
   "experiments": [
+    {
+      "id": "fed-spx-matched-control-v2",
+      "title": "Price-only baselines on FED-PXTX-ALL-REL5-v2 validation",
+      "kind": "Price-only benchmark",
+      "owner": "Adaeze Ilodianya",
+      "status": "completed",
+      "updated_at": "2026-11-24T02:00:00+00:00",
+      "question": "After correcting the release-text checks (v2), how do Persistence, the frozen none+CNN~none~none, none+DLinear~none~none and none+Ridge~none~none compare on the text-verified validation releases?",
+      "configuration": "Same frozen forecasters as fed-spx-matched-control-v1, all trained on FED-PX-REL5-v1 train (978 releases). Scored on FED-PXTX-ALL-REL5-v2 validation: 149 releases, 139 release instants, 125 dates, unit weight per instant, paired 10-date block intervals. Test not loaded.",
+      "finding": "Persistence MAE 16.155 / 20.484 bp at 20 / 30 minutes. none+CNN~none~none 16.057 / 20.392 bp (gain +0.088 / +0.054 bp, intervals include zero). none+DLinear~none~none 16.751 / 20.892 bp and none+Ridge~none~none 19.295 / 23.928 bp are worse than Persistence.",
+      "limitations": "Validation only; CNN epochs were selected on the 207 FED-PX-REL5-v1 validation rows, which contain these 149. Inferred evidence classes are included. Intervals of about +/-0.3 bp mean only a text gain of roughly half a basis point or more can register.",
+      "figure": {
+        "url": "https://raw.githubusercontent.com/DaezeI/11785-GS-Fuse-Submission-Public/main/results/fed-spx-matched-control-v2/validation-mae.png",
+        "alt": "Grouped bars of validation MAE at 20 and 30 minutes on 149 releases. Persistence and the frozen CNN are nearly equal; DLinear is about 0.6 bp higher and ridge about 3 bp higher."
+      },
+      "evidence": [
+        {
+          "label": "Validation summary",
+          "url": "https://github.com/DaezeI/11785-GS-Fuse-Submission-Public/blob/main/results/fed-spx-matched-control-v2/summary.md"
+        },
+        {
+          "label": "Exact metrics",
+          "url": "https://github.com/DaezeI/11785-GS-Fuse-Submission-Public/blob/main/results/fed-spx-matched-control-v2/metrics.json"
+        },
+        {
+          "label": "Evidence v2 corrections",
+          "url": "https://github.com/DaezeI/11785-GS-Fuse-Submission-Public/blob/main/results/fed-spx-evidence-v2/README.md"
+        }
+      ],
+      "related": [
+        "fed-spx-matched-control-v1",
+        "fed-spx-endpoints-price-v1"
+      ]
+    },
+    {
+      "id": "fed-spx-matched-control-v1",
+      "title": "Frozen price-only control on the text-matched Fed/SPX validation set",
+      "kind": "Price-only benchmark",
+      "owner": "Adaeze Ilodianya",
+      "status": "completed",
+      "updated_at": "2026-11-23T23:30:00+00:00",
+      "question": "On the Fed releases whose exact text is verified, how do the frozen price-only CNN control, persistence, DLinear and ridge compare for 20- and 30-minute SPX Close forecasts?",
+      "configuration": "Frozen three-seed compact CNN from fed-spx-endpoints-price-v1 (trained on 978 price-eligible train releases; exact CUDA replay). DLinear and ridge refitted on the same 978 releases and target. Scored on the 123 text-verified validation releases (113 release instants, 105 dates) with unit weight per release instant and paired 10-date block intervals. Test not loaded.",
+      "finding": "Persistence MAE was 17.707 / 22.058 bp at 20 / 30 minutes. The CNN control was 17.615 / 22.042 bp, a gain of +0.082 / -0.002 bp with intervals including zero. DLinear (18.340 / 22.736 bp) and ridge (21.027 / 26.263 bp) were worse than persistence.",
+      "limitations": "Validation only. CNN checkpoint epochs were chosen on the 207 price-eligible validation rows, which contain these 123, so its validation score is optimistic. Intervals of about +/-0.3 bp mean only a text gain of roughly half a basis point or more can register. The cohort includes inferred evidence classes; the strictest-evidence subset has 27 rows. The bar clock is empirically supported.",
+      "figure": {
+        "url": "https://raw.githubusercontent.com/DaezeI/11785-GS-Fuse-Submission-Public/main/results/fed-spx-matched-control-v1/validation-mae.png",
+        "alt": "Grouped bars of validation MAE at 20 and 30 minutes on 123 text-matched releases. Persistence and the price CNN control are nearly equal; DLinear is slightly higher and ridge about 3 to 4 bp higher."
+      },
+      "evidence": [
+        {
+          "label": "Validation summary",
+          "url": "https://github.com/DaezeI/11785-GS-Fuse-Submission-Public/blob/main/results/fed-spx-matched-control-v1/summary.md"
+        },
+        {
+          "label": "Exact metrics and checkpoint hashes",
+          "url": "https://github.com/DaezeI/11785-GS-Fuse-Submission-Public/blob/main/results/fed-spx-matched-control-v1/metrics.json"
+        },
+        {
+          "label": "DLinear config",
+          "url": "https://github.com/DaezeI/11785-GS-Fuse-Submission-Public/blob/main/experiments/fed-spx-matched-control-v1/dlinear.config.json"
+        },
+        {
+          "label": "Text-matched cohort",
+          "url": "https://github.com/DaezeI/11785-GS-Fuse-Submission-Public/blob/main/results/fed-spx-news-cohort-v1/README.md"
+        },
+        {
+          "label": "Held-out test text check",
+          "url": "https://github.com/DaezeI/11785-GS-Fuse-Submission-Public/blob/main/results/fed-spx-test-text-v1/README.md"
+        }
+      ],
+      "related": [
+        "fed-spx-endpoints-price-v1",
+        "fed-spx-price-baselines-v1"
+      ]
+    },
+    {
+      "id": "fed-spx-endpoints-price-v1",
+      "title": "Compact price-only Fed/SPX endpoint control",
+      "kind": "Price-only benchmark",
+      "owner": "Adaeze Ilodianya",
+      "status": "completed",
+      "updated_at": "2026-11-23T10:41:18+00:00",
+      "question": "Does the compact CNN improve on zero return for 20- and 30-minute SPX Close forecasts given only pre-release prices?",
+      "configuration": "Frozen Fed/SPX alignment v1; 35 pre-release OHLC inputs and 20- and 30-minute Close returns from the forecast origin. RTX 4060, seeds 0–2, 30 epochs, 20-minute validation MAE checkpoint selection. 978 train and 207 shared validation events, with unit weight per release instant.",
+      "finding": "Mean CNN MAE was 15.318 bp versus 15.343 bp for zero return at 20 minutes and 19.706 versus 19.701 bp at 30 minutes. Both paired block-bootstrap intervals for improvement include zero.",
+      "limitations": "Validation only, checkpoint selection uses 20-minute validation MAE, and the bar clock is empirically supported. All 1,185 price-eligible rows have news evidence dispositions. The combined manifest has 150 train and 88 validation rows under all audit rules, or 90 train and 25 validation rows excluding the inferred minutes and speech classes. The matched news model and held-out evaluation remain pending.",
+      "figure": {
+        "url": "https://raw.githubusercontent.com/DaezeI/11785-GS-Fuse-Submission-Public/main/results/fed-spx-endpoints-price-v1/validation-mae.png",
+        "alt": "Zero-return and compact price-only MAE are nearly identical at 20 and 30 minutes, and both paired intervals include zero."
+      },
+      "evidence": [
+        {
+          "label": "Validation summary",
+          "url": "https://github.com/DaezeI/11785-GS-Fuse-Submission-Public/blob/main/results/fed-spx-endpoints-price-v1/summary.md"
+        },
+        {
+          "label": "Exact metrics and checkpoint hashes",
+          "url": "https://github.com/DaezeI/11785-GS-Fuse-Submission-Public/blob/main/results/fed-spx-endpoints-price-v1/metrics.json"
+        },
+        {
+          "label": "Text-version audit",
+          "url": "https://github.com/DaezeI/11785-GS-Fuse-Submission-Public/blob/main/results/fed-spx-endpoints-price-v1/text-audit.json"
+        },
+        {
+          "label": "Run config",
+          "url": "https://github.com/DaezeI/11785-GS-Fuse-Submission-Public/blob/main/experiments/fed-spx-endpoints-price-v1/config.json"
+        },
+        {
+          "label": "FOMC statement evidence",
+          "url": "https://github.com/DaezeI/11785-GS-Fuse-Submission-Public/blob/main/results/fed-spx-text-evidence-v1/README.md"
+        },
+        {
+          "label": "Board release and testimony evidence",
+          "url": "https://github.com/DaezeI/11785-GS-Fuse-Submission-Public/blob/main/results/fed-spx-board-testimony-evidence-v1/README.md"
+        },
+        {
+          "label": "Independent FOMC minutes and Fed speech audit",
+          "url": "https://github.com/DaezeI/11785-GS-Fuse-Submission-Public/blob/main/results/fed-spx-minutes-speeches-codex-v1/README.md"
+        },
+        {
+          "label": "Combined Fed/SPX news cohort and audit comparison",
+          "url": "https://github.com/DaezeI/11785-GS-Fuse-Submission-Public/blob/main/results/fed-spx-news-cohort-v1/README.md"
+        }
+      ],
+      "related": [
+        "fed-spx-price-baselines-v1"
+      ]
+    },
+    {
+      "id": "fed-spx-price-baselines-v1",
+      "title": "Fed/SPX price-only validation baselines",
+      "kind": "Price-only benchmark",
+      "owner": "Adaeze Ilodianya",
+      "status": "completed",
+      "updated_at": "2026-11-22T22:59:51-05:00",
+      "question": "How accurately can pre-announcement SPX price history forecast the OHLC path around official Fed releases, and does ridge improve on last-close persistence?",
+      "configuration": "Joye's Fed/SPX alignment v1, frozen CAMEF SP500.csv, 35 pre-release bars and 140 target bars. Ridge alpha 10 on 1,013 main train events. Paired validation on 215 main and 85 flagged events with unit weighting per announcement instant within each cohort.",
+      "finding": "Last-close persistence had lower main validation OHLC path MAE at 35, 70 and 140 bars. At 140 bars the MAEs were 75.10 bp for persistence and 78.26 bp for ridge. Ridge improvement was −4.21% with a paired 95% interval of [−8.77%, −0.48%] using ten announcement dates per block.",
+      "limitations": "Validation only, fixed ridge penalty, and one historical validation period. Flagged intervals span zero. Forecast paths overlap and H140 crosses overnight. DLinear and a price-only counterpart to the text model await evaluation on this split. The held-out test awaits the frozen matched comparison.",
+      "figure": {
+        "url": "https://raw.githubusercontent.com/DaezeI/11785-GS-Fuse-Submission-Public/main/results/fed-spx-price-baselines-v1/baseline-validation.png",
+        "alt": "On 215 main validation rows, last-close persistence has lower OHLC path MAE than ridge at each of 35, 70 and 140 bars. All three paired 95% improvement intervals favor persistence."
+      },
+      "evidence": [
+        {
+          "label": "Summary and handoff",
+          "url": "https://github.com/DaezeI/11785-GS-Fuse-Submission-Public/blob/main/results/fed-spx-price-baselines-v1/summary.md"
+        },
+        {
+          "label": "Exact metrics",
+          "url": "https://github.com/DaezeI/11785-GS-Fuse-Submission-Public/blob/main/results/fed-spx-price-baselines-v1/metrics.json"
+        },
+        {
+          "label": "Provenance",
+          "url": "https://github.com/DaezeI/11785-GS-Fuse-Submission-Public/blob/main/results/fed-spx-price-baselines-v1/provenance.json"
+        },
+        {
+          "label": "Runbook",
+          "url": "https://github.com/DaezeI/11785-GS-Fuse-Submission-Public/blob/main/experiments/fed-spx-price-baselines-v1/README.md"
+        }
+      ],
+      "related": []
+    },
     {
       "configuration": "Separate Fed/daily Treasury pilot; 36/12 train/validation statements, 180/60 windows, matched seeds 23–25 and 10 fixed epochs. Four paired cells, shared frozen yield branch, gate fit on chronological train-only OOF predictions.",
       "evidence": [

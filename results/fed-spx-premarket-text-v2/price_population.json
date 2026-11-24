@@ -1,0 +1,38 @@
+{
+  "pre_market_rows_in_alignment_v1": 309,
+  "eligible_rows": 233,
+  "by_split": {
+    "train": {
+      "rows": 153,
+      "release_instants": 151
+    },
+    "val": {
+      "rows": 37,
+      "release_instants": 35
+    },
+    "test": {
+      "rows": 43,
+      "release_instants": 42
+    }
+  },
+  "by_type_split": {
+    "fomc_statement|train": 2,
+    "fed_board_monetary_release|train": 24,
+    "fed_speech|train": 99,
+    "fed_testimony|train": 27,
+    "fomc_minutes|train": 1,
+    "fed_speech|val": 24,
+    "fed_testimony|val": 3,
+    "fed_board_monetary_release|val": 7,
+    "fomc_other_policy_release|val": 2,
+    "fomc_statement|val": 1,
+    "fed_speech|test": 40,
+    "fed_testimony|test": 3
+  },
+  "excluded": {
+    "date_only_midnight_time": 1,
+    "press_conference_transcript": 75
+  },
+  "population_sha256": "210c858f440c75f679640c009103a4ba28cbf1efae137924c908a41bb8d86572",
+  "prices_read": "date column only"
+}

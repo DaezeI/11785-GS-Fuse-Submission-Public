@@ -1,0 +1,18 @@
+{
+  "id": "fed-spx-endpoints-price-v1",
+  "title": "Compact price-only Fed/SPX endpoint control",
+  "kind": "Price-only benchmark",
+  "owner": "Adaeze Ilodianya",
+  "status": "planned",
+  "updated_at": "2026-11-23T01:00:00-05:00",
+  "question": "Does the compact CNN improve on zero return for 20- and 30-minute SPX Close forecasts given only pre-release prices?",
+  "configuration": "Fed/SPX alignment v1; 35 pre-release OHLC inputs, 20- and 30-minute Close returns from the forecast origin. RTX 4060, seeds 0–2, 30 epochs, 20-minute validation MAE checkpoint selection.",
+  "finding": "Training and scoring are pending.",
+  "limitations": "Validation only; price-eligible cohort. The text comparison uses a future common, timing-verified cohort.",
+  "figure": null,
+  "evidence": [
+    {"label": "Run protocol", "url": "https://github.com/DaezeI/11785-GS-Fuse-Submission-Public/blob/main/experiments/fed-spx-endpoints-price-v1/README.md"},
+    {"label": "Frozen config", "url": "https://github.com/DaezeI/11785-GS-Fuse-Submission-Public/blob/main/experiments/fed-spx-endpoints-price-v1/config.json"}
+  ],
+  "related": ["fed-spx-price-baselines-v1"]
+}

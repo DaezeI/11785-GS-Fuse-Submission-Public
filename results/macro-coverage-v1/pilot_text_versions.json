@@ -1,0 +1,324 @@
+[
+ {
+  "id": "bls_empsit_20080606",
+  "source": "BLS",
+  "release_et": "2008-06-06 08:30",
+  "today_file": "www.bls.gov/news.release/archives/empsit_06062008.pdf",
+  "today_basis": "Wayback copies of archive URL (48 captures, 1 distinct digests)",
+  "archive_first_capture": "20080923184037",
+  "archive_last_capture": "20260819193714",
+  "embargo_line": "embargoed until 8:30 A",
+  "pdf_created": "D:20080602113729-04'00'",
+  "pdf_modified": "D:20080605181325-04'00'",
+  "release_day_lookups": [
+   [
+    "www.bls.gov/news.release/pdf/empsit.pdf",
+    0
+   ]
+  ],
+  "release_day_captures": 0,
+  "release_day_match": null,
+  "disposition": "insufficient_no_release_day_copy"
+ },
+ {
+  "id": "bls_cpi_20110317",
+  "source": "BLS",
+  "release_et": "2011-03-17 08:30",
+  "today_file": "www.bls.gov/news.release/archives/cpi_03172011.pdf",
+  "today_basis": "Wayback copies of archive URL (46 captures, 1 distinct digests)",
+  "archive_first_capture": "20110506074553",
+  "archive_last_capture": "20260819193525",
+  "embargo_line": "embargoed until USDL-11-0350 8:30 a",
+  "pdf_created": "D:20110411141416-04'00'",
+  "pdf_modified": "D:20110414153559-04'00'",
+  "release_day_lookups": [
+   [
+    "www.bls.gov/news.release/pdf/cpi.pdf",
+    0
+   ]
+  ],
+  "release_day_captures": 0,
+  "release_day_match": null,
+  "disposition": "insufficient_no_release_day_copy"
+ },
+ {
+  "id": "bls_jolts_20130709",
+  "source": "BLS",
+  "release_et": "2013-07-09 10:00",
+  "today_file": "www.bls.gov/news.release/archives/jolts_07092013.pdf",
+  "today_basis": "Wayback copies of archive URL (29 captures, 1 distinct digests)",
+  "archive_first_capture": "20130811134320",
+  "archive_last_capture": "20260819195132",
+  "embargo_line": null,
+  "pdf_created": "D:20130708094102-04'00'",
+  "pdf_modified": "D:20130708134743-04'00'",
+  "release_day_lookups": [
+   [
+    "www.bls.gov/news.release/pdf/jolts.pdf",
+    0
+   ]
+  ],
+  "release_day_captures": 0,
+  "release_day_match": null,
+  "disposition": "insufficient_no_release_day_copy"
+ },
+ {
+  "id": "bls_ppi_20160513",
+  "source": "BLS",
+  "release_et": "2016-05-13 08:30",
+  "today_file": "www.bls.gov/news.release/archives/ppi_05132016.pdf",
+  "today_basis": "Wayback copies of archive URL (29 captures, 1 distinct digests)",
+  "archive_first_capture": "20170228030148",
+  "archive_last_capture": "20260819201436",
+  "embargo_line": "embargoed until USDL 16-0946 8:30 a",
+  "pdf_created": "D:20160512095300-04'00'",
+  "pdf_modified": "D:20160512095521-04'00'",
+  "release_day_lookups": [
+   [
+    "www.bls.gov/news.release/pdf/ppi.pdf",
+    0
+   ]
+  ],
+  "release_day_captures": 0,
+  "release_day_match": null,
+  "disposition": "insufficient_no_release_day_copy"
+ },
+ {
+  "id": "bls_empsit_20190405",
+  "source": "BLS",
+  "release_et": "2019-04-05 08:30",
+  "today_file": "www.bls.gov/news.release/archives/empsit_04052019.pdf",
+  "today_basis": "Wayback copies of archive URL (30 captures, 1 distinct digests)",
+  "archive_first_capture": "20201018112540",
+  "archive_last_capture": "20260819193816",
+  "embargo_line": "embargoed until USDL-19-0565 8:30 a",
+  "pdf_created": "D:20190402144814-04'00'",
+  "pdf_modified": "D:20190404152049-04'00'",
+  "release_day_lookups": [
+   [
+    "www.bls.gov/news.release/pdf/empsit.pdf",
+    2
+   ]
+  ],
+  "release_day_captures": 2,
+  "release_day_match": [
+   "20190406005412",
+   "https://www.bls.gov/news.release/pdf/empsit.pdf"
+  ],
+  "disposition": "eligible_same_bytes_on_release_day"
+ },
+ {
+  "id": "bea_gdp_20080731",
+  "source": "BEA",
+  "release_et": "2008-07-31 08:30",
+  "page_embargo_line": "EMBARGOED UNTIL RELEASE AT 8:30 A.M. EDT, THURSDAY, JULY 31, 2008",
+  "page_pdf_links": [
+   "/sites/default/files/2019-11/gdp208a.pdf"
+  ],
+  "today_file": "https://www.bea.gov/sites/default/files/2019-11/gdp208a.pdf",
+  "today_basis": "direct download",
+  "today_server_written": "Sun, 08 Mar 2020 17:46:13 GMT",
+  "embargo_line": "EMBARGOED UNTIL RELEASE AT 8:30 A",
+  "pdf_created": "D:20080730200159-04'00'",
+  "pdf_modified": "D:20080730200352-04'00'",
+  "release_day_lookups": [
+   [
+    "www.bea.gov/sites/default/files/2019-11/gdp208a.pdf",
+    0
+   ],
+   [
+    "www.bea.gov/newsreleases/national/gdp/2008/pdf/gdp208a.pdf",
+    0
+   ],
+   [
+    "www.bea.gov/national/gdp/2008/pdf/gdp208a.pdf",
+    0
+   ]
+  ],
+  "release_day_captures": 0,
+  "release_day_match": null,
+  "disposition": "insufficient_no_release_day_copy"
+ },
+ {
+  "id": "bea_pi_20100628",
+  "source": "BEA",
+  "release_et": "2010-06-28 08:30",
+  "page_embargo_line": "EMBARGOED UNTIL RELEASE AT 8:30 A.M. EDT, MONDAY, JUNE 28, 2010",
+  "page_pdf_links": [
+   "/sites/default/files/2020-03/pi0510.pdf"
+  ],
+  "today_file": "https://www.bea.gov/sites/default/files/2020-03/pi0510.pdf",
+  "today_basis": "direct download",
+  "today_server_written": "Sun, 08 Mar 2020 17:48:46 GMT",
+  "embargo_line": "EMBARGOED UNTIL RELEASE AT 8:30 A",
+  "pdf_created": "D:20100625125111-04'00'",
+  "pdf_modified": "D:20100625125249-04'00'",
+  "release_day_lookups": [
+   [
+    "www.bea.gov/sites/default/files/2020-03/pi0510.pdf",
+    0
+   ],
+   [
+    "www.bea.gov/newsreleases/national/pi/2010/pdf/pi0510.pdf",
+    0
+   ],
+   [
+    "www.bea.gov/national/pi/2010/pdf/pi0510.pdf",
+    0
+   ]
+  ],
+  "release_day_captures": 0,
+  "release_day_match": null,
+  "disposition": "insufficient_no_release_day_copy"
+ },
+ {
+  "id": "bea_gdp_20140730",
+  "source": "BEA",
+  "release_et": "2014-07-30 08:30",
+  "page_embargo_line": "EMBARGOED UNTIL RELEASE AT 8:30 A.M. EDT, WEDNESDAY, JULY 30, 2014",
+  "page_pdf_links": [
+   "/sites/default/files/2019-02/gdp2q14_adv.pdf"
+  ],
+  "today_file": "https://www.bea.gov/sites/default/files/2019-02/gdp2q14_adv.pdf",
+  "today_basis": "direct download",
+  "today_server_written": "Sun, 08 Mar 2020 17:45:00 GMT",
+  "embargo_line": "EMBARGOED UNTIL RELEASE AT 8:30 A",
+  "pdf_created": "D:20140729171324-04'00'",
+  "pdf_modified": "D:20140729171718-04'00'",
+  "release_day_lookups": [
+   [
+    "www.bea.gov/sites/default/files/2019-02/gdp2q14_adv.pdf",
+    0
+   ],
+   [
+    "www.bea.gov/newsreleases/national/gdp/2014/pdf/gdp2q14_adv.pdf",
+    1
+   ],
+   [
+    "www.bea.gov/national/gdp/2014/pdf/gdp2q14_adv.pdf",
+    0
+   ]
+  ],
+  "release_day_captures": 1,
+  "release_day_match": [
+   "20140730203616",
+   "http://www.bea.gov/newsreleases/national/gdp/2014/pdf/gdp2q14_adv.pdf"
+  ],
+  "disposition": "eligible_same_bytes_on_release_day"
+ },
+ {
+  "id": "bea_pi_20170331",
+  "source": "BEA",
+  "release_et": "2017-03-31 08:30",
+  "page_embargo_line": "EMBARGOED UNTIL RELEASE AT 8:30 A.M. EDT, Friday, March 31, 2017",
+  "page_pdf_links": [
+   "/sites/default/files/2017-04/pi0217.pdf",
+   "/sites/default/files/2017-04/pi0217_hist.pdf"
+  ],
+  "today_file": "https://www.bea.gov/sites/default/files/2017-04/pi0217.pdf",
+  "today_basis": "direct download",
+  "today_server_written": "Wed, 12 Apr 2017 16:01:29 GMT",
+  "embargo_line": "EMBARGOED UNTIL RELEASE AT 8:30 A",
+  "pdf_created": "D:20170330114520-04'00'",
+  "pdf_modified": "D:20170330114632-04'00'",
+  "release_day_lookups": [
+   [
+    "www.bea.gov/sites/default/files/2017-04/pi0217.pdf",
+    0
+   ],
+   [
+    "www.bea.gov/newsreleases/national/pi/2017/pdf/pi0217.pdf",
+    1
+   ],
+   [
+    "www.bea.gov/national/pi/2017/pdf/pi0217.pdf",
+    0
+   ]
+  ],
+  "release_day_captures": 1,
+  "release_day_match": [
+   "20170331132138",
+   "https://www.bea.gov/newsreleases/national/pi/2017/pdf/pi0217.pdf"
+  ],
+  "disposition": "eligible_same_bytes_on_release_day"
+ },
+ {
+  "id": "bea_gdp_20210429",
+  "source": "BEA",
+  "release_et": "2021-04-29 08:30",
+  "page_embargo_line": "EMBARGOED UNTIL RELEASE AT 8:30 A.M. EDT, Thursday, April 29, 2021",
+  "page_pdf_links": [
+   "/sites/default/files/2021-04/gdp1q21_adv.pdf"
+  ],
+  "today_file": "https://www.bea.gov/sites/default/files/2021-04/gdp1q21_adv.pdf",
+  "today_basis": "direct download",
+  "today_server_written": "Thu, 29 Apr 2021 11:27:24 GMT",
+  "embargo_line": "EMBARGOED UNTIL RELEASE AT 8:30 A",
+  "pdf_created": "D:20210428155853-04'00'",
+  "pdf_modified": "D:20210428162723-04'00'",
+  "release_day_lookups": [
+   [
+    "www.bea.gov/sites/default/files/2021-04/gdp1q21_adv.pdf",
+    0
+   ],
+   [
+    "www.bea.gov/newsreleases/national/gdp/2021/pdf/gdp1q21_adv.pdf",
+    0
+   ],
+   [
+    "www.bea.gov/national/gdp/2021/pdf/gdp1q21_adv.pdf",
+    0
+   ]
+  ],
+  "release_day_captures": 0,
+  "release_day_match": null,
+  "disposition": "insufficient_no_release_day_copy"
+ },
+ {
+  "id": "dol_claims_20090611",
+  "source": "DOL",
+  "release_et": "2009-06-11 08:30",
+  "today_file": "https://oui.doleta.gov/press/2009/061109.pdf",
+  "today_basis": "download failed 404",
+  "release_day_lookups": [
+   [
+    "www.dol.gov/opa/media/press/eta/ui/current.htm",
+    0
+   ],
+   [
+    "www.dol.gov/ui/data.pdf",
+    0
+   ]
+  ],
+  "release_day_captures": 0,
+  "release_day_match": null,
+  "disposition": "blocked_or_missing_today_file"
+ },
+ {
+  "id": "dol_claims_20200409",
+  "source": "DOL",
+  "release_et": "2020-04-09 08:30",
+  "today_file": "https://oui.doleta.gov/press/2020/040920.pdf",
+  "today_basis": "direct download",
+  "today_server_written": "Thu, 21 Oct 2021 00:58:17 GMT",
+  "embargo_line": "EMBARGOED UNTIL 8:30 A",
+  "pdf_created": "D:20200407185057-04'00'",
+  "pdf_modified": "D:20200407185247-04'00'",
+  "release_day_lookups": [
+   [
+    "www.dol.gov/ui/data.pdf",
+    8
+   ],
+   [
+    "www.dol.gov/opa/media/press/eta/ui/current.htm",
+    0
+   ]
+  ],
+  "release_day_captures": 8,
+  "release_day_match": [
+   "20200409145856",
+   "https://www.dol.gov/ui/data.pdf"
+  ],
+  "disposition": "eligible_same_bytes_on_release_day"
+ }
+]

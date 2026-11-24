@@ -1,0 +1,10 @@
+{
+  "seeds": [0, 1, 2],
+  "epochs": 50,
+  "batch_size": 128,
+  "kernel_size": 25,
+  "learning_rate": 0.001,
+  "min_learning_rate": 0.00001,
+  "mae_weight": 0.1,
+  "note": "Settings from experiments/fed-spx-dlinear-v1/config.json (branch adaeze/fed-spx-dlinear). Last epoch is kept; validation is not used for selection."
+}

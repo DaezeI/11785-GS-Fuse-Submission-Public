@@ -1,0 +1,68 @@
+{
+  "population_sha256": "210c858f440c75f679640c009103a4ba28cbf1efae137924c908a41bb8d86572",
+  "population_rows": 233,
+  "by_split": {
+    "train": {
+      "rows": 19,
+      "release_instants": 19,
+      "dates": 19
+    },
+    "val": {
+      "rows": 12,
+      "release_instants": 12,
+      "dates": 12
+    },
+    "test": {
+      "rows": 22,
+      "release_instants": 22,
+      "dates": 21
+    }
+  },
+  "by_type_disposition": {
+    "fed_board_monetary_release|eligible_document_release_line_release_day_capture": 6,
+    "fed_board_monetary_release|insufficient_evidence": 19,
+    "fed_board_monetary_release|version_conflict_review": 6,
+    "fed_speech|eligible_archived_copy_before_cutoff": 7,
+    "fed_speech|eligible_document_release_line_unmodified_file": 39,
+    "fed_speech|insufficient_evidence": 100,
+    "fed_speech|version_conflict_review": 17,
+    "fed_testimony|eligible_document_release_line_unmodified_file": 1,
+    "fed_testimony|insufficient_evidence": 29,
+    "fed_testimony|version_conflict_review": 3,
+    "fomc_minutes|insufficient_evidence": 1,
+    "fomc_other_policy_release|not_verified_no_official_record_found": 2,
+    "fomc_statement|not_verified_no_official_record_found": 3
+  },
+  "eligible_by_type": {
+    "fed_board_monetary_release": 6,
+    "fed_speech": 46,
+    "fed_testimony": 1
+  },
+  "eligible_missing_fingerprint": [],
+  "scenarios": {
+    "all_audit_eligible": {
+      "rows": 53,
+      "release_instants": 53,
+      "dates": 52
+    },
+    "without_board_release_day_capture": {
+      "rows": 47,
+      "release_instants": 47,
+      "dates": 46
+    },
+    "without_speech_release_line": {
+      "rows": 13,
+      "release_instants": 13,
+      "dates": 13
+    },
+    "without_any_inferred_release_class": {
+      "rows": 7,
+      "release_instants": 7,
+      "dates": 7
+    }
+  },
+  "strict_classes": [
+    "eligible_B_official_record_only",
+    "eligible_archived_copy_before_cutoff"
+  ]
+}

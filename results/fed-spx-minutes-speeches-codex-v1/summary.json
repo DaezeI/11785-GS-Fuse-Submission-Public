@@ -1,0 +1,75 @@
+{
+  "population_sha256": "4061fe505098babf845b2bc0547bdbe11bd732377f6e2a5face383010b024a71",
+  "catalog_sha256": "56157fe018beeba6f051f765e0f9d6763e839324b9d95ebbf49f15ec47c9d939",
+  "groups": {
+    "fomc_minutes/train": {
+      "eligibility": {
+        "not_verified_no_version_specific_publication_proof": 86,
+        "review_official_early_release_incident": 1
+      },
+      "current_matches_catalog": {
+        "True": 86,
+        "False": 1
+      },
+      "publisher_pdf_status": {
+        "retrieved": 86,
+        "no_unique_pdf_in_fed_meeting_index": 1
+      },
+      "publisher_pdf_modified_vs_cutoff": {
+        "after_cutoff": 3,
+        "by_cutoff": 83,
+        "no_offset_aware_metadata": 1
+      }
+    },
+    "fomc_minutes/val": {
+      "eligibility": {
+        "not_verified_no_version_specific_publication_proof": 17
+      },
+      "current_matches_catalog": {
+        "True": 17
+      },
+      "publisher_pdf_status": {
+        "retrieved": 17
+      },
+      "publisher_pdf_modified_vs_cutoff": {
+        "by_cutoff": 15,
+        "after_cutoff": 2
+      }
+    },
+    "fed_speech/train": {
+      "eligibility": {
+        "not_verified_no_version_specific_publication_proof": 273
+      },
+      "current_matches_catalog": {
+        "True": 272,
+        "False": 1
+      },
+      "publisher_pdf_status": {
+        "not_checked": 50,
+        "retrieved": 223
+      },
+      "publisher_pdf_modified_vs_cutoff": {
+        "no_offset_aware_metadata": 50,
+        "by_cutoff": 185,
+        "after_cutoff": 38
+      }
+    },
+    "fed_speech/val": {
+      "eligibility": {
+        "not_verified_no_version_specific_publication_proof": 95
+      },
+      "current_matches_catalog": {
+        "True": 95
+      },
+      "publisher_pdf_status": {
+        "retrieved": 94,
+        "not_checked": 1
+      },
+      "publisher_pdf_modified_vs_cutoff": {
+        "by_cutoff": 82,
+        "no_offset_aware_metadata": 1,
+        "after_cutoff": 12
+      }
+    }
+  }
+}

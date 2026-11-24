@@ -1,0 +1,7 @@
+{
+  "train|insufficient_evidence": 91,
+  "train|version_conflict_review": 5,
+  "val|eligible_archived_copy_before_cutoff": 2,
+  "val|eligible_document_release_line_unmodified_file": 2,
+  "val|insufficient_evidence": 10
+}
