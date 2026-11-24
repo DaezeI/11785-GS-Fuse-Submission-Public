@@ -1,0 +1,40 @@
+{
+  "cohort": "FED-PXTX-ALL-REL5-v2",
+  "rows": 494,
+  "status": {
+    "test|verified": 172,
+    "train|verified": 173,
+    "val|verified": 149
+  },
+  "by_type_split": {
+    "fed_board_monetary_release|test": 39,
+    "fed_board_monetary_release|train": 10,
+    "fed_board_monetary_release|val": 33,
+    "fed_speech|test": 87,
+    "fed_speech|train": 46,
+    "fed_speech|val": 76,
+    "fed_testimony|test": 9,
+    "fed_testimony|train": 1,
+    "fed_testimony|val": 11,
+    "fomc_minutes|test": 16,
+    "fomc_minutes|train": 27,
+    "fomc_minutes|val": 11,
+    "fomc_statement|test": 21,
+    "fomc_statement|train": 89,
+    "fomc_statement|val": 18
+  },
+  "model_text_source": {
+    "fed_board_monetary_release|same as text": 82,
+    "fed_speech|web page; every paragraph found in the released PDF": 209,
+    "fed_testimony|released PDF, headers removed and hyphenation joined": 8,
+    "fed_testimony|same as text": 2,
+    "fed_testimony|web page; every paragraph found in the released PDF": 11,
+    "fomc_minutes|web page; every paragraph found in the released PDF": 54,
+    "fomc_statement|same as text": 128
+  },
+  "jsonl_sha256": {
+    "test.jsonl": "c7c4eff283d8c3f2d2021f4efd6f425df35d7170d16c682e268d5a8901e8e97f",
+    "train.jsonl": "7d34c2a1f5a34ded2bc459cf1894f390048b2cb760479cd5475dc70aa7fc5760",
+    "val.jsonl": "b2e52208741d3b1a4f32d55e5cd06292b275eaa92028b81b1d4aff8abd0495be"
+  }
+}
