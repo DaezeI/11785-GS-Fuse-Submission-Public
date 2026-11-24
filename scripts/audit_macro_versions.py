@@ -32,8 +32,11 @@ ET, UTC = ZoneInfo("America/New_York"), dt.timezone.utc
 AGENT = "CMU-11785-GS-Fuse-research (macro release version audit)"
 S = requests.Session()
 S.headers["User-Agent"] = AGENT
+# "embargoed ... until": 2008-09 BLS releases print the line in two columns, so text extraction puts the
+# media-contact phone number between "EMBARGOED" and "UNTIL 8:30 A.M." (up to 80 characters allowed).
 RELEASE_LINE = re.compile(
-    r"(?:embargoed\s+until|for\s+release(?:\s+at)?|release\s+time|released\s+at|not\s+for\s+release\s+until)"
+    r"(?:embargoed(?:\s+until|.{0,80}?\buntil\b)|for\s+release(?:\s+at)?|release\s+time|released\s+at|"
+    r"not\s+for\s+release\s+until)"
     r".{0,40}?\b(\d{1,2})[:.](\d{2})\s*([ap])\.?\s*m", re.I)
 
 
