@@ -2,7 +2,7 @@
   "title": "GS-Fuse Research Home",
   "stage": "Controlled experiments and final writing",
   "overview": "The last-price rule beat our trained price models. In Adaeze’s completed R3 return run, correct and shuffled articles gave nearly identical results, and predicting zero return had slightly lower error.",
-  "updated_at": "2026-11-26T21:41:32+00:00",
+  "updated_at": "2026-11-26T21:53:26+00:00",
   "source_url": "https://github.com/DaezeI/11785-GS-Fuse-Submission-Public/blob/main/research_home/records.json",
   "links": [
     {
@@ -43,14 +43,14 @@
   "experiments": [
     {
       "id": "fed-spx-text-llama31-8b-v1",
-      "title": "Meta access approved; exact 8B staging awaits personal CLI sign-in",
+      "title": "Exact frozen 8B Fed text arm is running",
       "kind": "Experiment",
-      "status": "submitted",
+      "status": "running",
       "owner": "Nicole",
       "question": "Does Llama-3.1-8B(frozen)+CNN(frozen)~Pool~Add improve 20/30-minute forecasts over the frozen price baseline on FED-PXTX-ALL-REL5-v2 validation?",
       "configuration": "Frozen full-float32 Llama-3.1-8B; masked mean, first 2048 tokens; frozen CNN seeds 0/1/2 trained on FED-PX-REL5-v1; text head trains on 171 FED-PXTX-ALL-REL5-v2 rows after 2 exclusions; scores 149 validation rows. Fixed 30-epoch pilot, train-only text scaling, real/zero/past-only shuffled text.",
-      "finding": "Meta model access was verified as granted on November 26. Frozen CNN checkpoints and the 171/149 train/validation input audit are ready. The existing one-H200 job remains user-held while personal download authentication and pinned model staging are completed. No GPU training or test scoring has started.",
-      "limitations": "Exact Llama-3.1-8B weights/tokenizer still need authenticated staging and size/hash verification at pinned revision d04e592bb4f6aa9cfee91e2e20afa771667e1d4b. No end-to-end 8B smoke or accuracy finding. Validation is exploratory; ALL includes inferred evidence classes. Test remains reserved.",
+      "finding": "Approved personal access staged all 12 pinned model/tokenizer files (16,069,729,886 bytes) with size and SHA256 checks. The 171/149 real train/validation preflight and tokenizer load passed. The existing one-H200 job was released and is running with the fixed three-hour cap. No accuracy result or test score is claimed.",
+      "limitations": "Training and validation outputs remain pending. Validation is exploratory and ALL includes inferred evidence classes. Test remains reserved. The exact source revision is d04e592bb4f6aa9cfee91e2e20afa771667e1d4b; the inference encoder is full float32 without quantization.",
       "figure": null,
       "evidence": [
         {
@@ -68,10 +68,14 @@
         {
           "label": "Real-input preflight",
           "url": "https://github.com/DaezeI/11785-GS-Fuse-Submission-Public/blob/main/experiments/fed-spx-text-llama31-8b-v1/input-preflight.json"
+        },
+        {
+          "label": "Verified exact 8B file identities",
+          "url": "https://github.com/DaezeI/11785-GS-Fuse-Submission-Public/blob/main/experiments/fed-spx-text-llama31-8b-v1/llama31-download-verification.json"
         }
       ],
       "related": [],
-      "updated_at": "2026-11-26T21:41:32.513337+00:00"
+      "updated_at": "2026-11-26T21:53:26.549621+00:00"
     },
     {
       "id": "fed-spx-matched-control-v2",

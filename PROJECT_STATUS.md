@@ -1,3 +1,7 @@
+# Exact frozen 8B run started — November 26
+
+Nicole’s exact `Llama-3.1-8B(frozen)+CNN(frozen)~Pool~Add` is running on one H200 after all 12 pinned files and train/validation inputs passed verification. The existing held job was released with its fixed three-hour cap. No accuracy result or test score is claimed. [Protocol and verified model files](experiments/fed-spx-text-llama31-8b-v1/README.md).
+
 # Meta access approved — November 26
 
 Meta approval for Nicole’s exact `Llama-3.1-8B(frozen)+CNN(frozen)~Pool~Add` was verified on the refreshed model page. The existing job stays on user hold pending personal download authentication and pinned-weight staging/verification. No GPU training or test scoring has run. Frozen CNN files, train/validation inputs and the shared scorer are ready. Earlier pending-review notes below are historical. [Exact protocol](experiments/fed-spx-text-llama31-8b-v1/README.md).

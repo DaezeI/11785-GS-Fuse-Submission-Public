@@ -1,6 +1,6 @@
 # Nicole's exact 8B text arm (#55)
 
-Status: prepared; execution awaits the exact Llama-3.1-8B weights. The frozen price checkpoints were staged on Drive on November 25. No GPU training or held-out scoring has run.
+Status: running November 26 after pinned model/tokenizer verification and full real-input preflight. The existing one-H200 job has started with the fixed three-hour cap. Accuracy results are pending; test remains reserved. Earlier dated preparation notes below are historical.
 
 Architecture: `Llama-3.1-8B(frozen)+CNN(frozen)~Pool~Add`.
 The frozen `none+CNN~none~none` was trained on `FED-PX-REL5-v1` (978 training releases).
@@ -47,3 +47,7 @@ The exact job remains on user hold with zero GPU usage. Meta's model page confir
 ## November 26 Meta approval
 
 The refreshed authenticated model page confirms access has been granted. The existing job remains held until personal download authentication, pinned full model/tokenizer staging and size/hash checks pass. No GPU training or test scoring has started. The source revision and fixed pilot are unchanged.
+
+## November 26 exact model staged and run started
+
+All 12 pinned files passed size and SHA256 verification (16,069,729,886 bytes), and the tokenizer loaded successfully. See [file identities](llama31-download-verification.json). The full real-input preflight passed 171 training and 149 validation releases. The existing one-H200 job was released and is running; no duplicate was submitted. Results are pending and test remains reserved.
