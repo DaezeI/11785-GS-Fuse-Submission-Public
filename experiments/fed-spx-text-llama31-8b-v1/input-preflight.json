@@ -1,0 +1,46 @@
+{
+  "code_commit": "013ca5c4e8bf595f7716aa2bf34cbddf555f4780",
+  "price_rows": {
+    "train": 978,
+    "val": 207
+  },
+  "text_rows": {
+    "train": 171,
+    "val": 149
+  },
+  "validation_event_ids_exact": true,
+  "saved_target_max_abs_diff_bp": 2.842170943040401e-14,
+  "saved_target_tolerance_bp": 1e-09,
+  "alignment_frozen_bytes_restored": true,
+  "price_audit": {
+    "calendar": "XNYS",
+    "exchange_calendars_version": "4.13.3",
+    "input_sha256": {
+      "prices": "6a873b1d72d27f9188c6bf12acb756775916be8ed9ff42d9e9dd98028f68de2a",
+      "catalog": "56157fe018beeba6f051f765e0f9d6763e839324b9d95ebbf49f15ec47c9d939",
+      "alignment": "0ab047bf9f918d798bd1c4f4eac8c6d59e0317c8d36fcb25c81a6801cfee0270"
+    },
+    "cross_split_shared_bars": 0,
+    "splits": {
+      "train": {
+        "main_input_rows": 1013,
+        "eligible_rows": 978,
+        "distinct_instants": 929,
+        "dates": 787,
+        "excluded": {
+          "outside_xnys_session": 35
+        }
+      },
+      "val": {
+        "main_input_rows": 215,
+        "eligible_rows": 207,
+        "distinct_instants": 192,
+        "dates": 165,
+        "excluded": {
+          "outside_xnys_session": 8
+        }
+      }
+    }
+  },
+  "test_loaded": false
+}

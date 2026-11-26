@@ -1,3 +1,7 @@
+# Exact 8B input readiness — November 26
+
+Nicole verified and staged all three frozen CNN checkpoints and their saved forecasts for `Llama-3.1-8B(frozen)+CNN(frozen)~Pool~Add`. The real-input audit confirms 171/149 text rows, matching validation IDs and targets to numerical precision, and zero cross-split shared bars. The alignment table's canonical CRLF line endings were restored to match the existing frozen fingerprint. The shared paired scorer passes 15 tests. The exact one-GPU job remains user-held: Meta's access request is submitted and awaiting manual review. No GPU training, full 8B smoke, or test scoring has run. [Protocol and audit](experiments/fed-spx-text-llama31-8b-v1/README.md).
+
 # Paired scorer ready — November 25
 
 Adaeze packaged the shared Fed/SPX [paired scorer and forecast format](results/fed-spx-paired-scorer-v1/README.md) (#54), with the frozen `none+CNN~none~none`, `none+DLinear~none~none` and `none+Ridge~none~none` validation forecasts on `FED-PXTX-ALL-REL5-v2`. It reproduces `fed-spx-matched-control-v2` to within 2e-9 bp. No new model was trained; test was not loaded.

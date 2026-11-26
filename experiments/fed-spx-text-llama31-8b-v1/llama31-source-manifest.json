@@ -1,0 +1,69 @@
+{
+  "repo_id": "meta-llama/Llama-3.1-8B",
+  "revision": "d04e592bb4f6aa9cfee91e2e20afa771667e1d4b",
+  "gated": "manual",
+  "files": [
+    {
+      "path": "LICENSE",
+      "size": 7627,
+      "lfs_sha256": null
+    },
+    {
+      "path": "USE_POLICY.md",
+      "size": 4691,
+      "lfs_sha256": null
+    },
+    {
+      "path": "config.json",
+      "size": 826,
+      "lfs_sha256": null
+    },
+    {
+      "path": "generation_config.json",
+      "size": 185,
+      "lfs_sha256": null
+    },
+    {
+      "path": "model-00001-of-00004.safetensors",
+      "size": 4976698672,
+      "lfs_sha256": "f8b9704ab09cdeb097aa4a0a24bca96f906eec36bad63ab495bc21475058601b"
+    },
+    {
+      "path": "model-00002-of-00004.safetensors",
+      "size": 4999802720,
+      "lfs_sha256": "c28b25e7541751056ee126627e007f8d4288319733285e9f7b17b9ff6eb313f0"
+    },
+    {
+      "path": "model-00003-of-00004.safetensors",
+      "size": 4915916176,
+      "lfs_sha256": "d8e9504dd4e4a146d484c52a97584ec14dac92237c46b064934af67a85e7d383"
+    },
+    {
+      "path": "model-00004-of-00004.safetensors",
+      "size": 1168138808,
+      "lfs_sha256": "e4486f35c040f683f7d790354f66c169c109eb9fa0954a4a35d7c458a108405d"
+    },
+    {
+      "path": "model.safetensors.index.json",
+      "size": 23950,
+      "lfs_sha256": null
+    },
+    {
+      "path": "special_tokens_map.json",
+      "size": 73,
+      "lfs_sha256": null
+    },
+    {
+      "path": "tokenizer.json",
+      "size": 9085658,
+      "lfs_sha256": null
+    },
+    {
+      "path": "tokenizer_config.json",
+      "size": 50500,
+      "lfs_sha256": null
+    }
+  ],
+  "selected_bytes": 16069729886,
+  "downloaded": false
+}
