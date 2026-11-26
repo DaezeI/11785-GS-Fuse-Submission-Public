@@ -1,3 +1,7 @@
+# Frozen CNN bundle staged — November 25
+
+Adaeze staged the frozen `fed-spx-endpoints-price-v1` CNN bundle for Nicole's exact 8B arm (#55) in Drive `01 Results and Evidence/fed-spx-endpoints-price-v1-frozen-cnn.zip`. All three checkpoint hashes match the published metrics. The job stays on hold: the exact Llama-3.1-8B weights are still missing. See the [8B pilot protocol](experiments/fed-spx-text-llama31-8b-v1/README.md).
+
 # Exact 8B submission update — November 24
 
 Nicole's exact 8B job is submitted on user hold, with no GPU usage or training started. Release awaits the exact frozen CNN files and Llama-3.1-8B weights. Shared Delta searches found neither. Private scheduler receipt and recovery steps are in Nicole's handoff. The prepared runner and protocol merged in PR #63 at 013ca5c; test remains reserved.
