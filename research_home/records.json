@@ -2,7 +2,7 @@
   "title": "GS-Fuse Research Home",
   "stage": "Controlled experiments and final writing",
   "overview": "The last-price rule beat our trained price models. In Adaeze’s completed R3 return run, correct and shuffled articles gave nearly identical results, and predicting zero return had slightly lower error.",
-  "updated_at": "2026-11-26T01:43:32+00:00",
+  "updated_at": "2026-11-26T01:55:25+00:00",
   "source_url": "https://github.com/DaezeI/11785-GS-Fuse-Submission-Public/blob/main/research_home/records.json",
   "links": [
     {
@@ -60,6 +60,10 @@
         {
           "label": "Owner task #55",
           "url": "https://github.com/DaezeI/11785-GS-Fuse-Submission-Public/issues/55"
+        },
+        {
+          "label": "Paired scorer and forecast format (#54)",
+          "url": "https://github.com/DaezeI/11785-GS-Fuse-Submission-Public/blob/main/results/fed-spx-paired-scorer-v1/README.md"
         }
       ],
       "related": [],

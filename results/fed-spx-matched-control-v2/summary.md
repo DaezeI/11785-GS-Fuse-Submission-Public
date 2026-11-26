@@ -21,7 +21,9 @@ unchanged: every forecaster was fit on `FED-PX-REL5-v1` train (978 releases).
 | `none+Ridge~none~none @ train:FED-PX-REL5-v1 → score:FED-PXTX-ALL-REL5-v2 val` | 19.295 bp | 23.928 bp | −3.140 [−5.674, −1.055] / −3.444 [−7.174, −0.699] |
 
 149 releases, 139 release instants, 125 dates; each instant has unit weight. CNN and DLinear rows
-use the three-seed average forecast. Averaged over seeds instead, `none+CNN~none~none` has MAE
+use the three-seed average forecast for MAE. The gain column instead averages each release's loss over
+seeds; the gain of the seed-average forecast is +0.097 / +0.092 bp for the CNN (clarified November 25 in the
+[paired scorer](../fed-spx-paired-scorer-v1/README.md)). Averaged over seeds instead, `none+CNN~none~none` has MAE
 16.066 / 20.430 bp and direction accuracy 52.5% / 51.7%. Five-date blocks give similar intervals.
 The 27-release `FED-PXTX-STRICT-REL5-v2` subset is unchanged from v1.
 
