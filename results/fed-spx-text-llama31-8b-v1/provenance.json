@@ -1,0 +1,72 @@
+{
+  "owner": "Nicole",
+  "run_id": "fed-spx-text-llama31-8b-v1",
+  "status": "completed",
+  "scope": "train and validation only; test reserved",
+  "architecture": "Llama-3.1-8B(frozen)+CNN(frozen)~Pool~Add",
+  "runtime_code_commit": "013ca5c4e8bf595f7716aa2bf34cbddf555f4780",
+  "runner_sha256": "7f60c0d082eb499d0e170f73a7bb72ca277c9952dbbf7b2da1f15e4644b5f18a",
+  "scorer_code_commit": "7f37069391529c4211f85332220906f8d1314f5f",
+  "scorer_sha256": "6cd00fbbecbbce462c5c9eef60b4980fed67229bf297cfb1c68383f40971dd93",
+  "model_source_revision": "d04e592bb4f6aa9cfee91e2e20afa771667e1d4b",
+  "model_file_verification": "../../experiments/fed-spx-text-llama31-8b-v1/llama31-download-verification.json",
+  "train_cohort": "FED-PXTX-ALL-REL5-v2 minus 2 truncated train texts",
+  "price_train_cohort": "FED-PX-REL5-v1",
+  "score_cohort": "FED-PXTX-ALL-REL5-v2 val",
+  "input_jsonl_sha256": {
+    "train": "7d34c2a1f5a34ded2bc459cf1894f390048b2cb760479cd5475dc70aa7fc5760",
+    "val": "b2e52208741d3b1a4f32d55e5cd06292b275eaa92028b81b1d4aff8abd0495be"
+  },
+  "price_input_sha256": {
+    "prices": "6a873b1d72d27f9188c6bf12acb756775916be8ed9ff42d9e9dd98028f68de2a",
+    "catalog": "56157fe018beeba6f051f765e0f9d6763e839324b9d95ebbf49f15ec47c9d939",
+    "alignment": "0ab047bf9f918d798bd1c4f4eac8c6d59e0317c8d36fcb25c81a6801cfee0270"
+  },
+  "frozen_price_checkpoint_sha256": {
+    "0": "684bbd1d6c36cea4c37bb3a48f64e95127c5e7bb50001e922c12b37ef33d2ea8",
+    "1": "71942141e6cc8e8d705fb7604f22fab94cf374a67058383f865c699488d38497",
+    "2": "9eb4fc4c2b126c4e5a0c6d6168eac2ba2ea33696941c0572644fa13499d7b6bb"
+  },
+  "selected_epochs": {
+    "0": 1,
+    "1": 0,
+    "2": 0
+  },
+  "scheduler_exit_status": 0,
+  "allocated_walltime_seconds": 466,
+  "hardware": "one H200 on Nicole\u2019s personal GPU resource",
+  "runtime_environment": {
+    "torch": "2.8.0+cu128",
+    "transformers": "4.56.1",
+    "precision": "float32, no quantization"
+  },
+  "checks": {
+    "train_rows": 171,
+    "val_rows": 149,
+    "test_loaded": false,
+    "text_off_exact_for_loaded_CNN": true,
+    "frozen_price_unchanged": true,
+    "all_forecasts_finite": true,
+    "past_donor_rows": 148,
+    "cross_split_shared_bars": 0,
+    "max_target_difference_from_reference_bp": 4.481555038182705e-08,
+    "max_price_difference_from_packaged_original_bp": 5.815426952437974e-06,
+    "all_8_collected_artifacts_match_remote_hashes": true
+  },
+  "artifact_custodian": "Nicole",
+  "original_artifact_hashes": {
+    "donors.npz": "dbac2b10e3aa43528689d38d4e0528c2e33a2843562f4313ece0f51df10ffd5d",
+    "features.npz": "08caee4be44d4cab8908c5af34d30365920f1648f6dc085e42c5e1f4b308a88d",
+    "metrics.json": "4dc4e7deca6687043b9cc5564f15a3c0060dbd55b2edae72325cd823a52d72cd",
+    "text-scaler.npz": "cdfa58b6d505f5fea26a57b3a824d934b39ea080b12ff1650ecc6c1e66a53773",
+    "text-seed-0.pt": "278e9938c1aba4b9e2461a95eb8fc901791f57c6c097f7dd4b2cef5ec3a90155",
+    "text-seed-1.pt": "aa21624f6b27b91d53337d3a522960f6cb2f7bdb3b2e9d1d3c3bc9a3fa6e434c",
+    "text-seed-2.pt": "0fd93850c00390d90e87d8f42c76e39ca053b77d3cf8c268eb5119ccff063c76",
+    "val-paired.npz": "1b20167fc6a6d855c627d4ca48d7a665d559a69665aec1988ea79c7c5d0cdb54"
+  },
+  "private_forecasts_sha256": "fdef3d1b9619d7f6171830d39870912b9d5d2fec11bde05c7932e73060f1be94",
+  "original_shared_scorer_output_sha256": "faac5b79d76738012a438cc920c5bcb59d0539e68503bb233e00eea16c6906cd",
+  "public_shared_scorer_output_sha256": "008fadfeacac5e507f2a3025db6d27265323c3a5041df1a143e4d88f74d8bd3a",
+  "public_metadata_normalization": "Only absolute private forecast path replaced; numeric results unchanged.",
+  "test_status": "reserved pending team evidence-class/protocol freeze"
+}

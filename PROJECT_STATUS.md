@@ -1,3 +1,7 @@
+# Exact frozen 8B validation completed — November 26
+
+Nicole completed `Llama-3.1-8B(frozen)+CNN(frozen)~Pool~Add` on 171 training / 149 validation releases. MAE was 16.058/20.408 bp at 20/30 minutes versus the frozen CNN at 16.057/20.392. Paired comparisons with CNN, zero features and past-only shuffled text were inconclusive on ALL. All three seeds and frozen-price checks passed; the one-H200 job exited 0 in 7m46s. This is exploratory validation; test remains reserved pending the team freeze. [Result, metrics, plots and provenance](results/fed-spx-text-llama31-8b-v1/summary.md). Earlier running/held notes below are historical.
+
 # Exact frozen 8B run started — November 26
 
 Nicole’s exact `Llama-3.1-8B(frozen)+CNN(frozen)~Pool~Add` is running on one H200 after all 12 pinned files and train/validation inputs passed verification. The existing held job was released with its fixed three-hour cap. No accuracy result or test score is claimed. [Protocol and verified model files](experiments/fed-spx-text-llama31-8b-v1/README.md).

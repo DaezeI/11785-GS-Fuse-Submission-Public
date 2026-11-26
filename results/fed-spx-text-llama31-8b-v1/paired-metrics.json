@@ -1,0 +1,1923 @@
+{
+  "scorer": "scripts/score_fed_spx_paired.py",
+  "scorer_sha256": "6cd00fbbecbbce462c5c9eef60b4980fed67229bf297cfb1c68383f40971dd93",
+  "split": "val",
+  "horizons_minutes": [
+    20,
+    30
+  ],
+  "weighting": "unit weight per release instant within each scored row set",
+  "gain_sign": "loss(other) - loss(label); positive favours label",
+  "seed_handling": "primary metrics and gains use the seed-average forecast; seed_mean_loss_* gains average each release's loss over seeds instead",
+  "strict_subset_excludes": [
+    "eligible_document_release_line_release_day_capture",
+    "eligible_document_release_line_unmodified_file",
+    "eligible_official_release_record_unmodified_file"
+  ],
+  "bootstrap": {
+    "bootstrap_seed": 23,
+    "bootstrap_replicates": 2000
+  },
+  "reference": {
+    "path": "results/fed-spx-paired-scorer-v1/reference-FED-PXTX-ALL-REL5-v2-val.csv",
+    "sha256": "c61501996807cbef8c5d0bda423983614eccef63ed590c6fcdf80c0f79bf192b"
+  },
+  "forecast_files": [
+    {
+      "path": "results/fed-spx-paired-scorer-v1/baselines-FED-PXTX-ALL-REL5-v2-val.csv",
+      "sha256": "6eef4b9b0b3cad164736165890bdfc3833bb0fc2a5f3a860d0782f0e7da8e740"
+    },
+    {
+      "path": "<private-run-artifacts>/val-forecasts.csv",
+      "sha256": "fdef3d1b9619d7f6171830d39870912b9d5d2fec11bde05c7932e73060f1be94"
+    }
+  ],
+  "results": {
+    "ALL": {
+      "reference": {
+        "rows": 149,
+        "release_instants": 139,
+        "dates": 125
+      },
+      "forecasters": {
+        "Persistence": {
+          "rows": 149,
+          "release_instants": 139,
+          "dates": 125,
+          "seeds": [],
+          "metrics_seed_average_forecast": {
+            "20": {
+              "mae_bp": 16.154602195257553,
+              "direction_accuracy": 0.0,
+              "direction_eligible_rows": 149,
+              "predicted_flat_fraction": 1.0
+            },
+            "30": {
+              "mae_bp": 20.484242628864244,
+              "direction_accuracy": 0.0,
+              "direction_eligible_rows": 148,
+              "predicted_flat_fraction": 1.0
+            }
+          },
+          "mae_bp_mean_over_seeds": {
+            "20": 16.154602195257553,
+            "30": 20.484242628864244
+          },
+          "direction_accuracy_mean_over_seeds": {
+            "20": 0.0,
+            "30": 0.0
+          }
+        },
+        "Llama-3.1-8B(frozen)+CNN(frozen)~Pool~Add": {
+          "rows": 149,
+          "release_instants": 139,
+          "dates": 125,
+          "seeds": [
+            0,
+            1,
+            2
+          ],
+          "metrics_seed_average_forecast": {
+            "20": {
+              "mae_bp": 16.05790652514815,
+              "direction_accuracy": 0.5179856115107914,
+              "direction_eligible_rows": 149,
+              "predicted_flat_fraction": 0.0
+            },
+            "30": {
+              "mae_bp": 20.407936410846705,
+              "direction_accuracy": 0.5072463768115942,
+              "direction_eligible_rows": 148,
+              "predicted_flat_fraction": 0.0
+            }
+          },
+          "mae_bp_mean_over_seeds": {
+            "20": 16.066154442340686,
+            "30": 20.439671844024165
+          },
+          "direction_accuracy_mean_over_seeds": {
+            "20": 0.5419664268585132,
+            "30": 0.5072463768115942
+          }
+        },
+        "Llama-3.1-8B(frozen)+CNN(frozen)~Pool~Add[text=shuffled-11]": {
+          "rows": 148,
+          "release_instants": 138,
+          "dates": 125,
+          "seeds": [
+            0,
+            1,
+            2
+          ],
+          "metrics_seed_average_forecast": {
+            "20": {
+              "mae_bp": 16.13322877459685,
+              "direction_accuracy": 0.5217391304347826,
+              "direction_eligible_rows": 148,
+              "predicted_flat_fraction": 0.0
+            },
+            "30": {
+              "mae_bp": 20.56167744952043,
+              "direction_accuracy": 0.5109489051094891,
+              "direction_eligible_rows": 147,
+              "predicted_flat_fraction": 0.0
+            }
+          },
+          "mae_bp_mean_over_seeds": {
+            "20": 16.145993258409106,
+            "30": 20.5938034484214
+          },
+          "direction_accuracy_mean_over_seeds": {
+            "20": 0.5277777777777778,
+            "30": 0.5109489051094891
+          }
+        },
+        "Llama-3.1-8B(frozen)+CNN(frozen)~Pool~Add[text=shuffled-23]": {
+          "rows": 148,
+          "release_instants": 138,
+          "dates": 125,
+          "seeds": [
+            0,
+            1,
+            2
+          ],
+          "metrics_seed_average_forecast": {
+            "20": {
+              "mae_bp": 16.124740191550814,
+              "direction_accuracy": 0.5108695652173914,
+              "direction_eligible_rows": 148,
+              "predicted_flat_fraction": 0.0
+            },
+            "30": {
+              "mae_bp": 20.516329079196172,
+              "direction_accuracy": 0.5255474452554745,
+              "direction_eligible_rows": 147,
+              "predicted_flat_fraction": 0.0
+            }
+          },
+          "mae_bp_mean_over_seeds": {
+            "20": 16.133664219367414,
+            "30": 20.5553045761068
+          },
+          "direction_accuracy_mean_over_seeds": {
+            "20": 0.5217391304347827,
+            "30": 0.5121654501216545
+          }
+        },
+        "Llama-3.1-8B(frozen)+CNN(frozen)~Pool~Add[text=shuffled-37]": {
+          "rows": 148,
+          "release_instants": 138,
+          "dates": 125,
+          "seeds": [
+            0,
+            1,
+            2
+          ],
+          "metrics_seed_average_forecast": {
+            "20": {
+              "mae_bp": 16.098159311700762,
+              "direction_accuracy": 0.5314009661835749,
+              "direction_eligible_rows": 148,
+              "predicted_flat_fraction": 0.0
+            },
+            "30": {
+              "mae_bp": 20.524468676715586,
+              "direction_accuracy": 0.5109489051094891,
+              "direction_eligible_rows": 147,
+              "predicted_flat_fraction": 0.0
+            }
+          },
+          "mae_bp_mean_over_seeds": {
+            "20": 16.108120680762486,
+            "30": 20.553282746328634
+          },
+          "direction_accuracy_mean_over_seeds": {
+            "20": 0.5157004830917874,
+            "30": 0.5068937550689375
+          }
+        },
+        "Llama-3.1-8B(frozen)+CNN(frozen)~Pool~Add[text=zero]": {
+          "rows": 149,
+          "release_instants": 139,
+          "dates": 125,
+          "seeds": [
+            0,
+            1,
+            2
+          ],
+          "metrics_seed_average_forecast": {
+            "20": {
+              "mae_bp": 16.057077920362868,
+              "direction_accuracy": 0.5251798561151079,
+              "direction_eligible_rows": 149,
+              "predicted_flat_fraction": 0.0
+            },
+            "30": {
+              "mae_bp": 20.391843028311648,
+              "direction_accuracy": 0.5217391304347826,
+              "direction_eligible_rows": 148,
+              "predicted_flat_fraction": 0.0
+            }
+          },
+          "mae_bp_mean_over_seeds": {
+            "20": 16.065979749179032,
+            "30": 20.430452964665605
+          },
+          "direction_accuracy_mean_over_seeds": {
+            "20": 0.5251798561151079,
+            "30": 0.5169082125603865
+          }
+        },
+        "none+CNN~none~none": {
+          "rows": 149,
+          "release_instants": 139,
+          "dates": 125,
+          "seeds": [
+            0,
+            1,
+            2
+          ],
+          "metrics_seed_average_forecast": {
+            "20": {
+              "mae_bp": 16.057440134053426,
+              "direction_accuracy": 0.5251798561151079,
+              "direction_eligible_rows": 149,
+              "predicted_flat_fraction": 0.0
+            },
+            "30": {
+              "mae_bp": 20.392088530767293,
+              "direction_accuracy": 0.5217391304347826,
+              "direction_eligible_rows": 148,
+              "predicted_flat_fraction": 0.0
+            }
+          },
+          "mae_bp_mean_over_seeds": {
+            "20": 16.06619707262868,
+            "30": 20.430043720612854
+          },
+          "direction_accuracy_mean_over_seeds": {
+            "20": 0.5251798561151079,
+            "30": 0.5169082125603865
+          }
+        },
+        "none+DLinear~none~none": {
+          "rows": 149,
+          "release_instants": 139,
+          "dates": 125,
+          "seeds": [
+            0,
+            1,
+            2
+          ],
+          "metrics_seed_average_forecast": {
+            "20": {
+              "mae_bp": 16.751026454656518,
+              "direction_accuracy": 0.45323741007194246,
+              "direction_eligible_rows": 149,
+              "predicted_flat_fraction": 0.0
+            },
+            "30": {
+              "mae_bp": 20.89190475812902,
+              "direction_accuracy": 0.4782608695652174,
+              "direction_eligible_rows": 148,
+              "predicted_flat_fraction": 0.0
+            }
+          },
+          "mae_bp_mean_over_seeds": {
+            "20": 16.81963690167954,
+            "30": 21.01487340907851
+          },
+          "direction_accuracy_mean_over_seeds": {
+            "20": 0.4412470023980815,
+            "30": 0.5072463768115942
+          }
+        },
+        "none+Ridge~none~none": {
+          "rows": 149,
+          "release_instants": 139,
+          "dates": 125,
+          "seeds": [
+            0
+          ],
+          "metrics_seed_average_forecast": {
+            "20": {
+              "mae_bp": 19.294581920912297,
+              "direction_accuracy": 0.41007194244604317,
+              "direction_eligible_rows": 149,
+              "predicted_flat_fraction": 0.0
+            },
+            "30": {
+              "mae_bp": 23.9283702637218,
+              "direction_accuracy": 0.43478260869565216,
+              "direction_eligible_rows": 148,
+              "predicted_flat_fraction": 0.0
+            }
+          },
+          "mae_bp_mean_over_seeds": {
+            "20": 19.294581920912297,
+            "30": 23.9283702637218
+          },
+          "direction_accuracy_mean_over_seeds": {
+            "20": 0.41007194244604317,
+            "30": 0.43478260869565216
+          }
+        }
+      },
+      "comparisons": [
+        {
+          "label": "Llama-3.1-8B(frozen)+CNN(frozen)~Pool~Add",
+          "other": "Persistence",
+          "rows": 149,
+          "release_instants": 139,
+          "dates": 125,
+          "gain_bp_20_30": [
+            0.0966956701094005,
+            0.076306218017538
+          ],
+          "paired_gain_ci95_bp_by_block_20_30": {
+            "5": [
+              [
+                -0.09032013319058248,
+                0.33294295050519035
+              ],
+              [
+                -0.1857090260120745,
+                0.3921548341557671
+              ]
+            ],
+            "10": [
+              [
+                -0.08736911890294415,
+                0.3093223828138518
+              ],
+              [
+                -0.17491077842138295,
+                0.35366741701925697
+              ]
+            ]
+          },
+          "seed_mean_loss_gain_bp_20_30": [
+            0.08844775291686657,
+            0.04457078484008027
+          ],
+          "seed_mean_loss_paired_gain_ci95_bp_by_block_20_30": {
+            "5": [
+              [
+                -0.10170328890358511,
+                0.3290834017168348
+              ],
+              [
+                -0.2153414277206249,
+                0.36275803591548983
+              ]
+            ],
+            "10": [
+              [
+                -0.09770112374160422,
+                0.3030836814516216
+              ],
+              [
+                -0.20392158745594502,
+                0.3232586001390531
+              ]
+            ]
+          }
+        },
+        {
+          "label": "Llama-3.1-8B(frozen)+CNN(frozen)~Pool~Add[text=shuffled-11]",
+          "other": "Persistence",
+          "rows": 148,
+          "release_instants": 138,
+          "dates": 125,
+          "gain_bp_20_30": [
+            0.07368871193068585,
+            0.05851586033558241
+          ],
+          "paired_gain_ci95_bp_by_block_20_30": {
+            "5": [
+              [
+                -0.12364099533221967,
+                0.3230648701647052
+              ],
+              [
+                -0.22043517247747377,
+                0.3891697439493396
+              ]
+            ],
+            "10": [
+              [
+                -0.12377328929908218,
+                0.3112581836522535
+              ],
+              [
+                -0.2080785449875795,
+                0.3528920606442803
+              ]
+            ]
+          },
+          "seed_mean_loss_gain_bp_20_30": [
+            0.06092422811843173,
+            0.026389861434616548
+          ],
+          "seed_mean_loss_paired_gain_ci95_bp_by_block_20_30": {
+            "5": [
+              [
+                -0.13911598022615823,
+                0.3119753510786957
+              ],
+              [
+                -0.2482505634032194,
+                0.35920554854929326
+              ]
+            ],
+            "10": [
+              [
+                -0.13508430459364598,
+                0.29883296618043353
+              ],
+              [
+                -0.24106121085581944,
+                0.3141560020273069
+              ]
+            ]
+          }
+        },
+        {
+          "label": "Llama-3.1-8B(frozen)+CNN(frozen)~Pool~Add[text=shuffled-23]",
+          "other": "Persistence",
+          "rows": 148,
+          "release_instants": 138,
+          "dates": 125,
+          "gain_bp_20_30": [
+            0.08217729497672317,
+            0.10386423065984388
+          ],
+          "paired_gain_ci95_bp_by_block_20_30": {
+            "5": [
+              [
+                -0.10011313333025017,
+                0.30264011270380464
+              ],
+              [
+                -0.16653990064091495,
+                0.42193761125876417
+              ]
+            ],
+            "10": [
+              [
+                -0.09494882393420073,
+                0.2816021482342809
+              ],
+              [
+                -0.1550652509631442,
+                0.3796764815084863
+              ]
+            ]
+          },
+          "seed_mean_loss_gain_bp_20_30": [
+            0.07325326716012076,
+            0.06488873374921605
+          ],
+          "seed_mean_loss_paired_gain_ci95_bp_by_block_20_30": {
+            "5": [
+              [
+                -0.1113182319936831,
+                0.29779171854650893
+              ],
+              [
+                -0.19593124250562705,
+                0.3777885196753129
+              ]
+            ],
+            "10": [
+              [
+                -0.10534248215618014,
+                0.27478674247946017
+              ],
+              [
+                -0.19277809180235067,
+                0.3344431588141735
+              ]
+            ]
+          }
+        },
+        {
+          "label": "Llama-3.1-8B(frozen)+CNN(frozen)~Pool~Add[text=shuffled-37]",
+          "other": "Persistence",
+          "rows": 148,
+          "release_instants": 138,
+          "dates": 125,
+          "gain_bp_20_30": [
+            0.10875817482677162,
+            0.09572463314042344
+          ],
+          "paired_gain_ci95_bp_by_block_20_30": {
+            "5": [
+              [
+                -0.08719558905847496,
+                0.34734469446396427
+              ],
+              [
+                -0.17601459453271132,
+                0.4241167687344829
+              ]
+            ],
+            "10": [
+              [
+                -0.0821822901304044,
+                0.3349848932844565
+              ],
+              [
+                -0.17106800404479158,
+                0.39016008472685515
+              ]
+            ]
+          },
+          "seed_mean_loss_gain_bp_20_30": [
+            0.09879680576504862,
+            0.06691056352737991
+          ],
+          "seed_mean_loss_paired_gain_ci95_bp_by_block_20_30": {
+            "5": [
+              [
+                -0.10011399199263255,
+                0.3391962500133418
+              ],
+              [
+                -0.19871869906980633,
+                0.39374547230374474
+              ]
+            ],
+            "10": [
+              [
+                -0.08959936914936358,
+                0.32476061694519387
+              ],
+              [
+                -0.20140331251133894,
+                0.3658463696831966
+              ]
+            ]
+          }
+        },
+        {
+          "label": "Llama-3.1-8B(frozen)+CNN(frozen)~Pool~Add[text=zero]",
+          "other": "Persistence",
+          "rows": 149,
+          "release_instants": 139,
+          "dates": 125,
+          "gain_bp_20_30": [
+            0.09752427489468578,
+            0.09239960055259475
+          ],
+          "paired_gain_ci95_bp_by_block_20_30": {
+            "5": [
+              [
+                -0.10172197513264201,
+                0.3424043000616168
+              ],
+              [
+                -0.18310029674814485,
+                0.42887476949186487
+              ]
+            ],
+            "10": [
+              [
+                -0.09991590631840394,
+                0.3272274258015576
+              ],
+              [
+                -0.18266447230674415,
+                0.3826208356091734
+              ]
+            ]
+          },
+          "seed_mean_loss_gain_bp_20_30": [
+            0.08862244607852285,
+            0.05378966419863801
+          ],
+          "seed_mean_loss_paired_gain_ci95_bp_by_block_20_30": {
+            "5": [
+              [
+                -0.1103741001623592,
+                0.3382649489459184
+              ],
+              [
+                -0.21779886277898322,
+                0.3835291332710416
+              ]
+            ],
+            "10": [
+              [
+                -0.11192655154737272,
+                0.32144886119527494
+              ],
+              [
+                -0.22322997954476928,
+                0.3511602816531628
+              ]
+            ]
+          }
+        },
+        {
+          "label": "none+CNN~none~none",
+          "other": "Persistence",
+          "rows": 149,
+          "release_instants": 139,
+          "dates": 125,
+          "gain_bp_20_30": [
+            0.09716206120412464,
+            0.09215409809695461
+          ],
+          "paired_gain_ci95_bp_by_block_20_30": {
+            "5": [
+              [
+                -0.10133061608565963,
+                0.3404893341842078
+              ],
+              [
+                -0.1827804594034517,
+                0.4272674945890627
+              ]
+            ],
+            "10": [
+              [
+                -0.09912625949006655,
+                0.3268169348002107
+              ],
+              [
+                -0.1815152370673301,
+                0.3823025901212874
+              ]
+            ]
+          },
+          "seed_mean_loss_gain_bp_20_30": [
+            0.0884051226288728,
+            0.05419890825139064
+          ],
+          "seed_mean_loss_paired_gain_ci95_bp_by_block_20_30": {
+            "5": [
+              [
+                -0.11077366314291218,
+                0.3372219773447142
+              ],
+              [
+                -0.2163304288601615,
+                0.3821693586274566
+              ]
+            ],
+            "10": [
+              [
+                -0.1110953456041959,
+                0.32055832507565035
+              ],
+              [
+                -0.2219091326346144,
+                0.3502738500442895
+              ]
+            ]
+          }
+        },
+        {
+          "label": "none+DLinear~none~none",
+          "other": "Persistence",
+          "rows": 149,
+          "release_instants": 139,
+          "dates": 125,
+          "gain_bp_20_30": [
+            -0.5964242593989639,
+            -0.4076621292647721
+          ],
+          "paired_gain_ci95_bp_by_block_20_30": {
+            "5": [
+              [
+                -1.1258339021716248,
+                -0.17371357952063315
+              ],
+              [
+                -1.1127366444684097,
+                0.3062254885131935
+              ]
+            ],
+            "10": [
+              [
+                -1.1463957032713683,
+                -0.1302050933631473
+              ],
+              [
+                -1.1259848410998432,
+                0.29733486992780206
+              ]
+            ]
+          },
+          "seed_mean_loss_gain_bp_20_30": [
+            -0.6650347064219858,
+            -0.5306307802142686
+          ],
+          "seed_mean_loss_paired_gain_ci95_bp_by_block_20_30": {
+            "5": [
+              [
+                -1.2003488633286636,
+                -0.2302086114295333
+              ],
+              [
+                -1.2137731854807776,
+                0.12955907672889005
+              ]
+            ],
+            "10": [
+              [
+                -1.2142994085767442,
+                -0.19535541436817885
+              ],
+              [
+                -1.2211688580978066,
+                0.16026612932086065
+              ]
+            ]
+          }
+        },
+        {
+          "label": "none+Ridge~none~none",
+          "other": "Persistence",
+          "rows": 149,
+          "release_instants": 139,
+          "dates": 125,
+          "gain_bp_20_30": [
+            -3.1399797256547433,
+            -3.444127634857555
+          ],
+          "paired_gain_ci95_bp_by_block_20_30": {
+            "5": [
+              [
+                -5.716105506264396,
+                -1.011764578363737
+              ],
+              [
+                -7.038624336371892,
+                -0.7263942058569984
+              ]
+            ],
+            "10": [
+              [
+                -5.673674625462388,
+                -1.054614087196782
+              ],
+              [
+                -7.173888746038731,
+                -0.699238808823169
+              ]
+            ]
+          },
+          "seed_mean_loss_gain_bp_20_30": [
+            -3.1399797256547433,
+            -3.444127634857555
+          ],
+          "seed_mean_loss_paired_gain_ci95_bp_by_block_20_30": {
+            "5": [
+              [
+                -5.716105506264396,
+                -1.011764578363737
+              ],
+              [
+                -7.038624336371892,
+                -0.7263942058569984
+              ]
+            ],
+            "10": [
+              [
+                -5.673674625462388,
+                -1.054614087196782
+              ],
+              [
+                -7.173888746038731,
+                -0.699238808823169
+              ]
+            ]
+          }
+        },
+        {
+          "label": "Llama-3.1-8B(frozen)+CNN(frozen)~Pool~Add",
+          "other": "none+CNN~none~none",
+          "rows": 149,
+          "release_instants": 139,
+          "dates": 125,
+          "gain_bp_20_30": [
+            -0.00046639109472419336,
+            -0.0158478800794167
+          ],
+          "paired_gain_ci95_bp_by_block_20_30": {
+            "5": [
+              [
+                -0.05602800365889617,
+                0.05321710525363013
+              ],
+              [
+                -0.06416491224587953,
+                0.030963388491329392
+              ]
+            ],
+            "10": [
+              [
+                -0.04994570401361998,
+                0.044824901393610964
+              ],
+              [
+                -0.06741063975253077,
+                0.037223214233869546
+              ]
+            ]
+          },
+          "seed_mean_loss_gain_bp_20_30": [
+            4.26302879936804e-05,
+            -0.00962812341131042
+          ],
+          "seed_mean_loss_paired_gain_ci95_bp_by_block_20_30": {
+            "5": [
+              [
+                -0.0541133577662773,
+                0.05351573107081532
+              ],
+              [
+                -0.05509758527529958,
+                0.03594135161941085
+              ]
+            ],
+            "10": [
+              [
+                -0.04828135031441558,
+                0.04430827877099303
+              ],
+              [
+                -0.0590739888409913,
+                0.0400024588849958
+              ]
+            ]
+          }
+        },
+        {
+          "label": "Llama-3.1-8B(frozen)+CNN(frozen)~Pool~Add",
+          "other": "Llama-3.1-8B(frozen)+CNN(frozen)~Pool~Add[text=shuffled-11]",
+          "rows": 148,
+          "release_instants": 138,
+          "dates": 125,
+          "gain_bp_20_30": [
+            0.020650402271029114,
+            0.011803369141261427
+          ],
+          "paired_gain_ci95_bp_by_block_20_30": {
+            "5": [
+              [
+                -0.026010276505085885,
+                0.07147829384831246
+              ],
+              [
+                -0.03795947297040264,
+                0.0625515528011691
+              ]
+            ],
+            "10": [
+              [
+                -0.026903517436595616,
+                0.06998777946041532
+              ],
+              [
+                -0.04162255085327769,
+                0.06721498522417048
+              ]
+            ]
+          },
+          "seed_mean_loss_gain_bp_20_30": [
+            0.025107201374861367,
+            0.01196396795768645
+          ],
+          "seed_mean_loss_paired_gain_ci95_bp_by_block_20_30": {
+            "5": [
+              [
+                -0.01994778266767845,
+                0.07482203222900825
+              ],
+              [
+                -0.03431013621830918,
+                0.06237188102667295
+              ]
+            ],
+            "10": [
+              [
+                -0.020325014871606067,
+                0.07197976363181045
+              ],
+              [
+                -0.03959980704937323,
+                0.06681392926641998
+              ]
+            ]
+          }
+        },
+        {
+          "label": "Llama-3.1-8B(frozen)+CNN(frozen)~Pool~Add",
+          "other": "Llama-3.1-8B(frozen)+CNN(frozen)~Pool~Add[text=shuffled-23]",
+          "rows": 148,
+          "release_instants": 138,
+          "dates": 125,
+          "gain_bp_20_30": [
+            0.012161819224991821,
+            -0.033545001183000134
+          ],
+          "paired_gain_ci95_bp_by_block_20_30": {
+            "5": [
+              [
+                -0.0401272189646268,
+                0.0643627468418392
+              ],
+              [
+                -0.08798810558640179,
+                0.020361993577268308
+              ]
+            ],
+            "10": [
+              [
+                -0.033978731686518215,
+                0.061479327284969694
+              ],
+              [
+                -0.097227689104792,
+                0.02395049198274092
+              ]
+            ]
+          },
+          "seed_mean_loss_gain_bp_20_30": [
+            0.012778162333172331,
+            -0.026534904356912956
+          ],
+          "seed_mean_loss_paired_gain_ci95_bp_by_block_20_30": {
+            "5": [
+              [
+                -0.03945871394839112,
+                0.06450374699674115
+              ],
+              [
+                -0.0790223849172704,
+                0.024772622448458907
+              ]
+            ],
+            "10": [
+              [
+                -0.032783258184253254,
+                0.06127841176825945
+              ],
+              [
+                -0.087605209049277,
+                0.027256543445262627
+              ]
+            ]
+          }
+        },
+        {
+          "label": "Llama-3.1-8B(frozen)+CNN(frozen)~Pool~Add",
+          "other": "Llama-3.1-8B(frozen)+CNN(frozen)~Pool~Add[text=shuffled-37]",
+          "rows": 148,
+          "release_instants": 138,
+          "dates": 125,
+          "gain_bp_20_30": [
+            -0.014419060625056653,
+            -0.02540540366357961
+          ],
+          "paired_gain_ci95_bp_by_block_20_30": {
+            "5": [
+              [
+                -0.07730097423985081,
+                0.04616502563958828
+              ],
+              [
+                -0.07860967457691856,
+                0.026857846467738478
+              ]
+            ],
+            "10": [
+              [
+                -0.08046807429657618,
+                0.05187688566354933
+              ],
+              [
+                -0.08177002374383097,
+                0.03482233443363083
+              ]
+            ]
+          },
+          "seed_mean_loss_gain_bp_20_30": [
+            -0.012765376271755528,
+            -0.028556734135076905
+          ],
+          "seed_mean_loss_paired_gain_ci95_bp_by_block_20_30": {
+            "5": [
+              [
+                -0.07393182272225138,
+                0.04665447863530229
+              ],
+              [
+                -0.08108817755799812,
+                0.024191022872100405
+              ]
+            ],
+            "10": [
+              [
+                -0.0750430921657629,
+                0.050419159828322284
+              ],
+              [
+                -0.08370219056053385,
+                0.03128027461412493
+              ]
+            ]
+          }
+        },
+        {
+          "label": "Llama-3.1-8B(frozen)+CNN(frozen)~Pool~Add",
+          "other": "Llama-3.1-8B(frozen)+CNN(frozen)~Pool~Add[text=zero]",
+          "rows": 149,
+          "release_instants": 139,
+          "dates": 125,
+          "gain_bp_20_30": [
+            -0.0008286047852852723,
+            -0.0160933825350568
+          ],
+          "paired_gain_ci95_bp_by_block_20_30": {
+            "5": [
+              [
+                -0.057755303303491635,
+                0.05431411871131986
+              ],
+              [
+                -0.06553802378332871,
+                0.032192759725960494
+              ]
+            ],
+            "10": [
+              [
+                -0.05129794357379967,
+                0.045209029833469166
+              ],
+              [
+                -0.06934750145290446,
+                0.037956762048693526
+              ]
+            ]
+          },
+          "seed_mean_loss_gain_bp_20_30": [
+            -0.0001746931616563533,
+            -0.009218879358557735
+          ],
+          "seed_mean_loss_paired_gain_ci95_bp_by_block_20_30": {
+            "5": [
+              [
+                -0.05581369638966818,
+                0.054236993482912096
+              ],
+              [
+                -0.056544348379265204,
+                0.03839017346414904
+              ]
+            ],
+            "10": [
+              [
+                -0.04927233546581913,
+                0.04531069874304142
+              ],
+              [
+                -0.0594005989985585,
+                0.04198127702696913
+              ]
+            ]
+          }
+        }
+      ]
+    },
+    "STRICT": {
+      "reference": {
+        "rows": 27,
+        "release_instants": 27,
+        "dates": 27
+      },
+      "forecasters": {
+        "Persistence": {
+          "rows": 27,
+          "release_instants": 27,
+          "dates": 27,
+          "seeds": [],
+          "metrics_seed_average_forecast": {
+            "20": {
+              "mae_bp": 13.9770465189,
+              "direction_accuracy": 0.0,
+              "direction_eligible_rows": 27,
+              "predicted_flat_fraction": 1.0
+            },
+            "30": {
+              "mae_bp": 17.664369999574074,
+              "direction_accuracy": 0.0,
+              "direction_eligible_rows": 26,
+              "predicted_flat_fraction": 1.0
+            }
+          },
+          "mae_bp_mean_over_seeds": {
+            "20": 13.9770465189,
+            "30": 17.664369999574074
+          },
+          "direction_accuracy_mean_over_seeds": {
+            "20": 0.0,
+            "30": 0.0
+          }
+        },
+        "Llama-3.1-8B(frozen)+CNN(frozen)~Pool~Add": {
+          "rows": 27,
+          "release_instants": 27,
+          "dates": 27,
+          "seeds": [
+            0,
+            1,
+            2
+          ],
+          "metrics_seed_average_forecast": {
+            "20": {
+              "mae_bp": 14.091122517894567,
+              "direction_accuracy": 0.5555555555555556,
+              "direction_eligible_rows": 27,
+              "predicted_flat_fraction": 0.0
+            },
+            "30": {
+              "mae_bp": 18.077028272946173,
+              "direction_accuracy": 0.46153846153846156,
+              "direction_eligible_rows": 26,
+              "predicted_flat_fraction": 0.0
+            }
+          },
+          "mae_bp_mean_over_seeds": {
+            "20": 14.106783429685185,
+            "30": 18.077028272946176
+          },
+          "direction_accuracy_mean_over_seeds": {
+            "20": 0.5679012345679012,
+            "30": 0.5
+          }
+        },
+        "Llama-3.1-8B(frozen)+CNN(frozen)~Pool~Add[text=shuffled-11]": {
+          "rows": 27,
+          "release_instants": 27,
+          "dates": 27,
+          "seeds": [
+            0,
+            1,
+            2
+          ],
+          "metrics_seed_average_forecast": {
+            "20": {
+              "mae_bp": 14.18567676618543,
+              "direction_accuracy": 0.5185185185185185,
+              "direction_eligible_rows": 27,
+              "predicted_flat_fraction": 0.0
+            },
+            "30": {
+              "mae_bp": 18.013785088968273,
+              "direction_accuracy": 0.46153846153846156,
+              "direction_eligible_rows": 26,
+              "predicted_flat_fraction": 0.0
+            }
+          },
+          "mae_bp_mean_over_seeds": {
+            "20": 14.198439011338516,
+            "30": 18.03012019852383
+          },
+          "direction_accuracy_mean_over_seeds": {
+            "20": 0.5185185185185185,
+            "30": 0.5128205128205128
+          }
+        },
+        "Llama-3.1-8B(frozen)+CNN(frozen)~Pool~Add[text=shuffled-23]": {
+          "rows": 27,
+          "release_instants": 27,
+          "dates": 27,
+          "seeds": [
+            0,
+            1,
+            2
+          ],
+          "metrics_seed_average_forecast": {
+            "20": {
+              "mae_bp": 14.192959693675308,
+              "direction_accuracy": 0.4074074074074074,
+              "direction_eligible_rows": 27,
+              "predicted_flat_fraction": 0.0
+            },
+            "30": {
+              "mae_bp": 18.02642520493827,
+              "direction_accuracy": 0.5,
+              "direction_eligible_rows": 26,
+              "predicted_flat_fraction": 0.0
+            }
+          },
+          "mae_bp_mean_over_seeds": {
+            "20": 14.205721938828395,
+            "30": 18.026425204938267
+          },
+          "direction_accuracy_mean_over_seeds": {
+            "20": 0.5061728395061729,
+            "30": 0.4871794871794872
+          }
+        },
+        "Llama-3.1-8B(frozen)+CNN(frozen)~Pool~Add[text=shuffled-37]": {
+          "rows": 27,
+          "release_instants": 27,
+          "dates": 27,
+          "seeds": [
+            0,
+            1,
+            2
+          ],
+          "metrics_seed_average_forecast": {
+            "20": {
+              "mae_bp": 14.075449206707406,
+              "direction_accuracy": 0.5925925925925926,
+              "direction_eligible_rows": 27,
+              "predicted_flat_fraction": 0.0
+            },
+            "30": {
+              "mae_bp": 17.96307985243333,
+              "direction_accuracy": 0.46153846153846156,
+              "direction_eligible_rows": 26,
+              "predicted_flat_fraction": 0.0
+            }
+          },
+          "mae_bp_mean_over_seeds": {
+            "20": 14.075449206707406,
+            "30": 17.977720483428396
+          },
+          "direction_accuracy_mean_over_seeds": {
+            "20": 0.5308641975308642,
+            "30": 0.5256410256410255
+          }
+        },
+        "Llama-3.1-8B(frozen)+CNN(frozen)~Pool~Add[text=zero]": {
+          "rows": 27,
+          "release_instants": 27,
+          "dates": 27,
+          "seeds": [
+            0,
+            1,
+            2
+          ],
+          "metrics_seed_average_forecast": {
+            "20": {
+              "mae_bp": 14.093594317634073,
+              "direction_accuracy": 0.48148148148148145,
+              "direction_eligible_rows": 27,
+              "predicted_flat_fraction": 0.0
+            },
+            "30": {
+              "mae_bp": 17.988747369257162,
+              "direction_accuracy": 0.46153846153846156,
+              "direction_eligible_rows": 26,
+              "predicted_flat_fraction": 0.0
+            }
+          },
+          "mae_bp_mean_over_seeds": {
+            "20": 14.10600980856494,
+            "30": 17.996209337207777
+          },
+          "direction_accuracy_mean_over_seeds": {
+            "20": 0.5432098765432098,
+            "30": 0.5128205128205128
+          }
+        },
+        "none+CNN~none~none": {
+          "rows": 27,
+          "release_instants": 27,
+          "dates": 27,
+          "seeds": [
+            0,
+            1,
+            2
+          ],
+          "metrics_seed_average_forecast": {
+            "20": {
+              "mae_bp": 14.094713224051976,
+              "direction_accuracy": 0.48148148148148145,
+              "direction_eligible_rows": 27,
+              "predicted_flat_fraction": 0.0
+            },
+            "30": {
+              "mae_bp": 17.98916880593457,
+              "direction_accuracy": 0.46153846153846156,
+              "direction_eligible_rows": 26,
+              "predicted_flat_fraction": 0.0
+            }
+          },
+          "mae_bp_mean_over_seeds": {
+            "20": 14.106382799995183,
+            "30": 17.995788115539508
+          },
+          "direction_accuracy_mean_over_seeds": {
+            "20": 0.5308641975308642,
+            "30": 0.5128205128205128
+          }
+        },
+        "none+DLinear~none~none": {
+          "rows": 27,
+          "release_instants": 27,
+          "dates": 27,
+          "seeds": [
+            0,
+            1,
+            2
+          ],
+          "metrics_seed_average_forecast": {
+            "20": {
+              "mae_bp": 14.970732807992569,
+              "direction_accuracy": 0.48148148148148145,
+              "direction_eligible_rows": 27,
+              "predicted_flat_fraction": 0.0
+            },
+            "30": {
+              "mae_bp": 18.69934155631889,
+              "direction_accuracy": 0.46153846153846156,
+              "direction_eligible_rows": 26,
+              "predicted_flat_fraction": 0.0
+            }
+          },
+          "mae_bp_mean_over_seeds": {
+            "20": 14.970732807992569,
+            "30": 18.880343259025057
+          },
+          "direction_accuracy_mean_over_seeds": {
+            "20": 0.4567901234567901,
+            "30": 0.4615384615384615
+          }
+        },
+        "none+Ridge~none~none": {
+          "rows": 27,
+          "release_instants": 27,
+          "dates": 27,
+          "seeds": [
+            0
+          ],
+          "metrics_seed_average_forecast": {
+            "20": {
+              "mae_bp": 16.733178567118518,
+              "direction_accuracy": 0.2962962962962963,
+              "direction_eligible_rows": 27,
+              "predicted_flat_fraction": 0.0
+            },
+            "30": {
+              "mae_bp": 19.404188188177773,
+              "direction_accuracy": 0.5384615384615384,
+              "direction_eligible_rows": 26,
+              "predicted_flat_fraction": 0.0
+            }
+          },
+          "mae_bp_mean_over_seeds": {
+            "20": 16.733178567118518,
+            "30": 19.404188188177773
+          },
+          "direction_accuracy_mean_over_seeds": {
+            "20": 0.2962962962962963,
+            "30": 0.5384615384615384
+          }
+        }
+      },
+      "comparisons": [
+        {
+          "label": "Llama-3.1-8B(frozen)+CNN(frozen)~Pool~Add",
+          "other": "Persistence",
+          "rows": 27,
+          "release_instants": 27,
+          "dates": 27,
+          "gain_bp_20_30": [
+            -0.11407599899456795,
+            -0.4126582733720986
+          ],
+          "paired_gain_ci95_bp_by_block_20_30": {
+            "5": [
+              [
+                -0.5349496146337009,
+                0.3686600608255525
+              ],
+              [
+                -1.0976260937995928,
+                0.2599770420591671
+              ]
+            ],
+            "10": null
+          },
+          "seed_mean_loss_gain_bp_20_30": [
+            -0.12973691078518484,
+            -0.4126582733720992
+          ],
+          "seed_mean_loss_paired_gain_ci95_bp_by_block_20_30": {
+            "5": [
+              [
+                -0.5530515930595055,
+                0.3558627220564876
+              ],
+              [
+                -1.0976260937995925,
+                0.25997704205916566
+              ]
+            ],
+            "10": null
+          }
+        },
+        {
+          "label": "Llama-3.1-8B(frozen)+CNN(frozen)~Pool~Add[text=shuffled-11]",
+          "other": "Persistence",
+          "rows": 27,
+          "release_instants": 27,
+          "dates": 27,
+          "gain_bp_20_30": [
+            -0.20863024728543225,
+            -0.34941508939419735
+          ],
+          "paired_gain_ci95_bp_by_block_20_30": {
+            "5": [
+              [
+                -0.6687087042213768,
+                0.33808584403277453
+              ],
+              [
+                -1.026535927114207,
+                0.3048991542514799
+              ]
+            ],
+            "10": null
+          },
+          "seed_mean_loss_gain_bp_20_30": [
+            -0.22139249243851822,
+            -0.3657501989497526
+          ],
+          "seed_mean_loss_paired_gain_ci95_bp_by_block_20_30": {
+            "5": [
+              [
+                -0.6938049854377557,
+                0.33804534847992257
+              ],
+              [
+                -1.0407504786277035,
+                0.2959222489880862
+              ]
+            ],
+            "10": null
+          }
+        },
+        {
+          "label": "Llama-3.1-8B(frozen)+CNN(frozen)~Pool~Add[text=shuffled-23]",
+          "other": "Persistence",
+          "rows": 27,
+          "release_instants": 27,
+          "dates": 27,
+          "gain_bp_20_30": [
+            -0.21591317477530886,
+            -0.362055205364198
+          ],
+          "paired_gain_ci95_bp_by_block_20_30": {
+            "5": [
+              [
+                -0.6367527109693458,
+                0.24570390034573114
+              ],
+              [
+                -1.0273995497190744,
+                0.25988396318422746
+              ]
+            ],
+            "10": null
+          },
+          "seed_mean_loss_gain_bp_20_30": [
+            -0.22867541992839518,
+            -0.36205520536419683
+          ],
+          "seed_mean_loss_paired_gain_ci95_bp_by_block_20_30": {
+            "5": [
+              [
+                -0.6614902662830588,
+                0.23415064971745272
+              ],
+              [
+                -1.0273995497190733,
+                0.2598839631842294
+              ]
+            ],
+            "10": null
+          }
+        },
+        {
+          "label": "Llama-3.1-8B(frozen)+CNN(frozen)~Pool~Add[text=shuffled-37]",
+          "other": "Persistence",
+          "rows": 27,
+          "release_instants": 27,
+          "dates": 27,
+          "gain_bp_20_30": [
+            -0.09840268780740719,
+            -0.29870985285925933
+          ],
+          "paired_gain_ci95_bp_by_block_20_30": {
+            "5": [
+              [
+                -0.5368434288179657,
+                0.46912320343353386
+              ],
+              [
+                -0.9991593823844754,
+                0.3691239509344446
+              ]
+            ],
+            "10": null
+          },
+          "seed_mean_loss_gain_bp_20_30": [
+            -0.09840268780740756,
+            -0.31335048385432124
+          ],
+          "seed_mean_loss_paired_gain_ci95_bp_by_block_20_30": {
+            "5": [
+              [
+                -0.5368434288179658,
+                0.4691232034335335
+              ],
+              [
+                -1.0024596648894446,
+                0.33310095658299393
+              ]
+            ],
+            "10": null
+          }
+        },
+        {
+          "label": "Llama-3.1-8B(frozen)+CNN(frozen)~Pool~Add[text=zero]",
+          "other": "Persistence",
+          "rows": 27,
+          "release_instants": 27,
+          "dates": 27,
+          "gain_bp_20_30": [
+            -0.11654779873407414,
+            -0.3243773696830864
+          ],
+          "paired_gain_ci95_bp_by_block_20_30": {
+            "5": [
+              [
+                -0.5267199925796602,
+                0.37499218692259845
+              ],
+              [
+                -1.0223036749260497,
+                0.3365707603135181
+              ]
+            ],
+            "10": null
+          },
+          "seed_mean_loss_gain_bp_20_30": [
+            -0.12896328966493803,
+            -0.33183933763370305
+          ],
+          "seed_mean_loss_paired_gain_ci95_bp_by_block_20_30": {
+            "5": [
+              [
+                -0.5456324459498207,
+                0.36436263017188875
+              ],
+              [
+                -1.0224285493532712,
+                0.3323006451737041
+              ]
+            ],
+            "10": null
+          }
+        },
+        {
+          "label": "none+CNN~none~none",
+          "other": "Persistence",
+          "rows": 27,
+          "release_instants": 27,
+          "dates": 27,
+          "gain_bp_20_30": [
+            -0.11766670515197546,
+            -0.3247988063604937
+          ],
+          "paired_gain_ci95_bp_by_block_20_30": {
+            "5": [
+              [
+                -0.5278190293468924,
+                0.373183375884944
+              ],
+              [
+                -1.0219036601909566,
+                0.33733767837827144
+              ]
+            ],
+            "10": null
+          },
+          "seed_mean_loss_gain_bp_20_30": [
+            -0.1293362810951853,
+            -0.33141811596543236
+          ],
+          "seed_mean_loss_paired_gain_ci95_bp_by_block_20_30": {
+            "5": [
+              [
+                -0.5445322851684505,
+                0.36695470900730803
+              ],
+              [
+                -1.0219864011212654,
+                0.3330509581458941
+              ]
+            ],
+            "10": null
+          }
+        },
+        {
+          "label": "none+DLinear~none~none",
+          "other": "Persistence",
+          "rows": 27,
+          "release_instants": 27,
+          "dates": 27,
+          "gain_bp_20_30": [
+            -0.9936862890925676,
+            -1.0349715567448148
+          ],
+          "paired_gain_ci95_bp_by_block_20_30": {
+            "5": [
+              [
+                -2.251889737223941,
+                0.05835874214968966
+              ],
+              [
+                -2.746343207224834,
+                0.6033073914960086
+              ]
+            ],
+            "10": null
+          },
+          "seed_mean_loss_gain_bp_20_30": [
+            -0.9936862890925676,
+            -1.2159732594509878
+          ],
+          "seed_mean_loss_paired_gain_ci95_bp_by_block_20_30": {
+            "5": [
+              [
+                -2.2518897372239404,
+                0.05835874214968872
+              ],
+              [
+                -2.8615915882662653,
+                0.19222096764910215
+              ]
+            ],
+            "10": null
+          }
+        },
+        {
+          "label": "none+Ridge~none~none",
+          "other": "Persistence",
+          "rows": 27,
+          "release_instants": 27,
+          "dates": 27,
+          "gain_bp_20_30": [
+            -2.756132048218519,
+            -1.7398181886037036
+          ],
+          "paired_gain_ci95_bp_by_block_20_30": {
+            "5": [
+              [
+                -5.755203580228057,
+                -0.08742445697916797
+              ],
+              [
+                -5.276323537815185,
+                1.8397393419377768
+              ]
+            ],
+            "10": null
+          },
+          "seed_mean_loss_gain_bp_20_30": [
+            -2.756132048218519,
+            -1.7398181886037036
+          ],
+          "seed_mean_loss_paired_gain_ci95_bp_by_block_20_30": {
+            "5": [
+              [
+                -5.755203580228057,
+                -0.08742445697916797
+              ],
+              [
+                -5.276323537815185,
+                1.8397393419377768
+              ]
+            ],
+            "10": null
+          }
+        },
+        {
+          "label": "Llama-3.1-8B(frozen)+CNN(frozen)~Pool~Add",
+          "other": "none+CNN~none~none",
+          "rows": 27,
+          "release_instants": 27,
+          "dates": 27,
+          "gain_bp_20_30": [
+            0.003590706157407436,
+            -0.08785946701160477
+          ],
+          "paired_gain_ci95_bp_by_block_20_30": {
+            "5": [
+              [
+                -0.08196710929896885,
+                0.10055555532744129
+              ],
+              [
+                -0.1661140360072715,
+                -0.009168821964272171
+              ]
+            ],
+            "10": null
+          },
+          "seed_mean_loss_gain_bp_20_30": [
+            -0.0004006296899995596,
+            -0.08124015740666693
+          ],
+          "seed_mean_loss_paired_gain_ci95_bp_by_block_20_30": {
+            "5": [
+              [
+                -0.0884925902032806,
+                0.09915264258880897
+              ],
+              [
+                -0.15363002532596906,
+                -0.007997082007839875
+              ]
+            ],
+            "10": null
+          }
+        },
+        {
+          "label": "Llama-3.1-8B(frozen)+CNN(frozen)~Pool~Add",
+          "other": "Llama-3.1-8B(frozen)+CNN(frozen)~Pool~Add[text=shuffled-11]",
+          "rows": 27,
+          "release_instants": 27,
+          "dates": 27,
+          "gain_bp_20_30": [
+            0.09455424829086431,
+            -0.06324318397790117
+          ],
+          "paired_gain_ci95_bp_by_block_20_30": {
+            "5": [
+              [
+                -0.042811388003431775,
+                0.2117747242148273
+              ],
+              [
+                -0.16012288922786408,
+                0.03760163658433335
+              ]
+            ],
+            "10": null
+          },
+          "seed_mean_loss_gain_bp_20_30": [
+            0.09165558165333333,
+            -0.04690807442234655
+          ],
+          "seed_mean_loss_paired_gain_ci95_bp_by_block_20_30": {
+            "5": [
+              [
+                -0.0428113880034322,
+                0.20764884223610525
+              ],
+              [
+                -0.1278672928051032,
+                0.04073197230857047
+              ]
+            ],
+            "10": null
+          }
+        },
+        {
+          "label": "Llama-3.1-8B(frozen)+CNN(frozen)~Pool~Add",
+          "other": "Llama-3.1-8B(frozen)+CNN(frozen)~Pool~Add[text=shuffled-23]",
+          "rows": 27,
+          "release_instants": 27,
+          "dates": 27,
+          "gain_bp_20_30": [
+            0.10183717578074089,
+            -0.05060306800790051
+          ],
+          "paired_gain_ci95_bp_by_block_20_30": {
+            "5": [
+              [
+                -0.01013772283370376,
+                0.21922106673373493
+              ],
+              [
+                -0.17192504408056147,
+                0.05555606681097101
+              ]
+            ],
+            "10": null
+          },
+          "seed_mean_loss_gain_bp_20_30": [
+            0.09893850914321033,
+            -0.050603068007902374
+          ],
+          "seed_mean_loss_paired_gain_ci95_bp_by_block_20_30": {
+            "5": [
+              [
+                -0.012853271139104725,
+                0.21711240357623518
+              ],
+              [
+                -0.1719250440805621,
+                0.05555606681096716
+              ]
+            ],
+            "10": null
+          }
+        },
+        {
+          "label": "Llama-3.1-8B(frozen)+CNN(frozen)~Pool~Add",
+          "other": "Llama-3.1-8B(frozen)+CNN(frozen)~Pool~Add[text=shuffled-37]",
+          "rows": 27,
+          "release_instants": 27,
+          "dates": 27,
+          "gain_bp_20_30": [
+            -0.015673311187160796,
+            -0.11394842051283914
+          ],
+          "paired_gain_ci95_bp_by_block_20_30": {
+            "5": [
+              [
+                -0.20880440417253085,
+                0.1285147364583757
+              ],
+              [
+                -0.2727932746809067,
+                0.031196140806858036
+              ]
+            ],
+            "10": null
+          },
+          "seed_mean_loss_gain_bp_20_30": [
+            -0.03133422297777728,
+            -0.09930778951777797
+          ],
+          "seed_mean_loss_paired_gain_ci95_bp_by_block_20_30": {
+            "5": [
+              [
+                -0.21753894232030802,
+                0.1148608623037658
+              ],
+              [
+                -0.23981450523560568,
+                0.033485818458672933
+              ]
+            ],
+            "10": null
+          }
+        },
+        {
+          "label": "Llama-3.1-8B(frozen)+CNN(frozen)~Pool~Add",
+          "other": "Llama-3.1-8B(frozen)+CNN(frozen)~Pool~Add[text=zero]",
+          "rows": 27,
+          "release_instants": 27,
+          "dates": 27,
+          "gain_bp_20_30": [
+            0.002471799739506101,
+            -0.08828090368901202
+          ],
+          "paired_gain_ci95_bp_by_block_20_30": {
+            "5": [
+              [
+                -0.08424304272319841,
+                0.10160128671523455
+              ],
+              [
+                -0.16805905092514456,
+                -0.008278989666811483
+              ]
+            ],
+            "10": null
+          },
+          "seed_mean_loss_gain_bp_20_30": [
+            -0.0007736211202468146,
+            -0.08081893573839606
+          ],
+          "seed_mean_loss_paired_gain_ci95_bp_by_block_20_30": {
+            "5": [
+              [
+                -0.08984522673141992,
+                0.10008260663920389
+              ],
+              [
+                -0.15387271161429097,
+                -0.00715695010577245
+              ]
+            ],
+            "10": null
+          }
+        }
+      ]
+    }
+  }
+}

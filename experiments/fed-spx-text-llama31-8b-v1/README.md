@@ -1,6 +1,6 @@
 # Nicole's exact 8B text arm (#55)
 
-Status: running November 26 after pinned model/tokenizer verification and full real-input preflight. The existing one-H200 job has started with the fixed three-hour cap. Accuracy results are pending; test remains reserved. Earlier dated preparation notes below are historical.
+Status: **training and validation completed November 26**. The exact frozen 8B arm showed no measurable incremental validation gain. [Completed result pack](../../results/fed-spx-text-llama31-8b-v1/summary.md). Test remains reserved pending the team freeze; earlier preparation/running notes below are historical.
 
 Architecture: `Llama-3.1-8B(frozen)+CNN(frozen)~Pool~Add`.
 The frozen `none+CNN~none~none` was trained on `FED-PX-REL5-v1` (978 training releases).
@@ -51,3 +51,7 @@ The refreshed authenticated model page confirms access has been granted. The exi
 ## November 26 exact model staged and run started
 
 All 12 pinned files passed size and SHA256 verification (16,069,729,886 bytes), and the tokenizer loaded successfully. See [file identities](llama31-download-verification.json). The full real-input preflight passed 171 training and 149 validation releases. The existing one-H200 job was released and is running; no duplicate was submitted. Results are pending and test remains reserved.
+
+## November 26 completed validation
+
+All three seeds finished, with selected epochs 1/0/0. Text-off bypass and every frozen-price tensor check passed. The shared scorer reports 20/30-minute MAE 16.058/20.408 bp for matched text and 16.057/20.392 for the frozen CNN; all ALL-cohort matched comparisons have intervals spanning zero. The single-H200 run exited 0 after 7m46s. See the [result pack](../../results/fed-spx-text-llama31-8b-v1/summary.md) for common-row comparisons, STRICT sensitivity, exact hashes, figures and limitations. No test was opened or scored.
