@@ -1,3 +1,7 @@
+# Paired scorer ready — November 25
+
+Adaeze packaged the shared Fed/SPX [paired scorer and forecast format](results/fed-spx-paired-scorer-v1/README.md) (#54), with the frozen `none+CNN~none~none`, `none+DLinear~none~none` and `none+Ridge~none~none` validation forecasts on `FED-PXTX-ALL-REL5-v2`. It reproduces `fed-spx-matched-control-v2` to within 2e-9 bp. No new model was trained; test was not loaded.
+
 # Frozen CNN bundle staged — November 25
 
 Adaeze staged the frozen `fed-spx-endpoints-price-v1` CNN bundle for Nicole's exact 8B arm (#55) in Drive `01 Results and Evidence/fed-spx-endpoints-price-v1-frozen-cnn.zip`. All three checkpoint hashes match the published metrics. The job stays on hold: the exact Llama-3.1-8B weights are still missing. See the [8B pilot protocol](experiments/fed-spx-text-llama31-8b-v1/README.md).

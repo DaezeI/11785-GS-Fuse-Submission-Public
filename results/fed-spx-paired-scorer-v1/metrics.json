@@ -1,0 +1,599 @@
+{
+  "scorer": "scripts/score_fed_spx_paired.py",
+  "scorer_sha256": "6cd00fbbecbbce462c5c9eef60b4980fed67229bf297cfb1c68383f40971dd93",
+  "split": "val",
+  "horizons_minutes": [
+    20,
+    30
+  ],
+  "weighting": "unit weight per release instant within each scored row set",
+  "gain_sign": "loss(other) - loss(label); positive favours label",
+  "seed_handling": "primary metrics and gains use the seed-average forecast; seed_mean_loss_* gains average each release's loss over seeds instead",
+  "strict_subset_excludes": [
+    "eligible_document_release_line_release_day_capture",
+    "eligible_document_release_line_unmodified_file",
+    "eligible_official_release_record_unmodified_file"
+  ],
+  "bootstrap": {
+    "bootstrap_seed": 23,
+    "bootstrap_replicates": 2000
+  },
+  "reference": {
+    "path": "results/fed-spx-paired-scorer-v1/reference-FED-PXTX-ALL-REL5-v2-val.csv",
+    "sha256": "c61501996807cbef8c5d0bda423983614eccef63ed590c6fcdf80c0f79bf192b"
+  },
+  "forecast_files": [
+    {
+      "path": "results/fed-spx-paired-scorer-v1/baselines-FED-PXTX-ALL-REL5-v2-val.csv",
+      "sha256": "6eef4b9b0b3cad164736165890bdfc3833bb0fc2a5f3a860d0782f0e7da8e740"
+    }
+  ],
+  "results": {
+    "ALL": {
+      "reference": {
+        "rows": 149,
+        "release_instants": 139,
+        "dates": 125
+      },
+      "forecasters": {
+        "Persistence": {
+          "rows": 149,
+          "release_instants": 139,
+          "dates": 125,
+          "seeds": [],
+          "metrics_seed_average_forecast": {
+            "20": {
+              "mae_bp": 16.154602195257553,
+              "direction_accuracy": 0.0,
+              "direction_eligible_rows": 149,
+              "predicted_flat_fraction": 1.0
+            },
+            "30": {
+              "mae_bp": 20.484242628864244,
+              "direction_accuracy": 0.0,
+              "direction_eligible_rows": 148,
+              "predicted_flat_fraction": 1.0
+            }
+          },
+          "mae_bp_mean_over_seeds": {
+            "20": 16.154602195257553,
+            "30": 20.484242628864244
+          },
+          "direction_accuracy_mean_over_seeds": {
+            "20": 0.0,
+            "30": 0.0
+          }
+        },
+        "none+CNN~none~none": {
+          "rows": 149,
+          "release_instants": 139,
+          "dates": 125,
+          "seeds": [
+            0,
+            1,
+            2
+          ],
+          "metrics_seed_average_forecast": {
+            "20": {
+              "mae_bp": 16.057440134053426,
+              "direction_accuracy": 0.5251798561151079,
+              "direction_eligible_rows": 149,
+              "predicted_flat_fraction": 0.0
+            },
+            "30": {
+              "mae_bp": 20.392088530767293,
+              "direction_accuracy": 0.5217391304347826,
+              "direction_eligible_rows": 148,
+              "predicted_flat_fraction": 0.0
+            }
+          },
+          "mae_bp_mean_over_seeds": {
+            "20": 16.06619707262868,
+            "30": 20.430043720612854
+          },
+          "direction_accuracy_mean_over_seeds": {
+            "20": 0.5251798561151079,
+            "30": 0.5169082125603865
+          }
+        },
+        "none+DLinear~none~none": {
+          "rows": 149,
+          "release_instants": 139,
+          "dates": 125,
+          "seeds": [
+            0,
+            1,
+            2
+          ],
+          "metrics_seed_average_forecast": {
+            "20": {
+              "mae_bp": 16.751026454656518,
+              "direction_accuracy": 0.45323741007194246,
+              "direction_eligible_rows": 149,
+              "predicted_flat_fraction": 0.0
+            },
+            "30": {
+              "mae_bp": 20.89190475812902,
+              "direction_accuracy": 0.4782608695652174,
+              "direction_eligible_rows": 148,
+              "predicted_flat_fraction": 0.0
+            }
+          },
+          "mae_bp_mean_over_seeds": {
+            "20": 16.81963690167954,
+            "30": 21.01487340907851
+          },
+          "direction_accuracy_mean_over_seeds": {
+            "20": 0.4412470023980815,
+            "30": 0.5072463768115942
+          }
+        },
+        "none+Ridge~none~none": {
+          "rows": 149,
+          "release_instants": 139,
+          "dates": 125,
+          "seeds": [
+            0
+          ],
+          "metrics_seed_average_forecast": {
+            "20": {
+              "mae_bp": 19.294581920912297,
+              "direction_accuracy": 0.41007194244604317,
+              "direction_eligible_rows": 149,
+              "predicted_flat_fraction": 0.0
+            },
+            "30": {
+              "mae_bp": 23.9283702637218,
+              "direction_accuracy": 0.43478260869565216,
+              "direction_eligible_rows": 148,
+              "predicted_flat_fraction": 0.0
+            }
+          },
+          "mae_bp_mean_over_seeds": {
+            "20": 19.294581920912297,
+            "30": 23.9283702637218
+          },
+          "direction_accuracy_mean_over_seeds": {
+            "20": 0.41007194244604317,
+            "30": 0.43478260869565216
+          }
+        }
+      },
+      "comparisons": [
+        {
+          "label": "none+CNN~none~none",
+          "other": "Persistence",
+          "rows": 149,
+          "release_instants": 139,
+          "dates": 125,
+          "gain_bp_20_30": [
+            0.09716206120412464,
+            0.09215409809695461
+          ],
+          "paired_gain_ci95_bp_by_block_20_30": {
+            "5": [
+              [
+                -0.10133061608565963,
+                0.3404893341842078
+              ],
+              [
+                -0.1827804594034517,
+                0.4272674945890627
+              ]
+            ],
+            "10": [
+              [
+                -0.09912625949006655,
+                0.3268169348002107
+              ],
+              [
+                -0.1815152370673301,
+                0.3823025901212874
+              ]
+            ]
+          },
+          "seed_mean_loss_gain_bp_20_30": [
+            0.0884051226288728,
+            0.05419890825139064
+          ],
+          "seed_mean_loss_paired_gain_ci95_bp_by_block_20_30": {
+            "5": [
+              [
+                -0.11077366314291218,
+                0.3372219773447142
+              ],
+              [
+                -0.2163304288601615,
+                0.3821693586274566
+              ]
+            ],
+            "10": [
+              [
+                -0.1110953456041959,
+                0.32055832507565035
+              ],
+              [
+                -0.2219091326346144,
+                0.3502738500442895
+              ]
+            ]
+          }
+        },
+        {
+          "label": "none+DLinear~none~none",
+          "other": "Persistence",
+          "rows": 149,
+          "release_instants": 139,
+          "dates": 125,
+          "gain_bp_20_30": [
+            -0.5964242593989639,
+            -0.4076621292647721
+          ],
+          "paired_gain_ci95_bp_by_block_20_30": {
+            "5": [
+              [
+                -1.1258339021716248,
+                -0.17371357952063315
+              ],
+              [
+                -1.1127366444684097,
+                0.3062254885131935
+              ]
+            ],
+            "10": [
+              [
+                -1.1463957032713683,
+                -0.1302050933631473
+              ],
+              [
+                -1.1259848410998432,
+                0.29733486992780206
+              ]
+            ]
+          },
+          "seed_mean_loss_gain_bp_20_30": [
+            -0.6650347064219858,
+            -0.5306307802142686
+          ],
+          "seed_mean_loss_paired_gain_ci95_bp_by_block_20_30": {
+            "5": [
+              [
+                -1.2003488633286636,
+                -0.2302086114295333
+              ],
+              [
+                -1.2137731854807776,
+                0.12955907672889005
+              ]
+            ],
+            "10": [
+              [
+                -1.2142994085767442,
+                -0.19535541436817885
+              ],
+              [
+                -1.2211688580978066,
+                0.16026612932086065
+              ]
+            ]
+          }
+        },
+        {
+          "label": "none+Ridge~none~none",
+          "other": "Persistence",
+          "rows": 149,
+          "release_instants": 139,
+          "dates": 125,
+          "gain_bp_20_30": [
+            -3.1399797256547433,
+            -3.444127634857555
+          ],
+          "paired_gain_ci95_bp_by_block_20_30": {
+            "5": [
+              [
+                -5.716105506264396,
+                -1.011764578363737
+              ],
+              [
+                -7.038624336371892,
+                -0.7263942058569984
+              ]
+            ],
+            "10": [
+              [
+                -5.673674625462388,
+                -1.054614087196782
+              ],
+              [
+                -7.173888746038731,
+                -0.699238808823169
+              ]
+            ]
+          },
+          "seed_mean_loss_gain_bp_20_30": [
+            -3.1399797256547433,
+            -3.444127634857555
+          ],
+          "seed_mean_loss_paired_gain_ci95_bp_by_block_20_30": {
+            "5": [
+              [
+                -5.716105506264396,
+                -1.011764578363737
+              ],
+              [
+                -7.038624336371892,
+                -0.7263942058569984
+              ]
+            ],
+            "10": [
+              [
+                -5.673674625462388,
+                -1.054614087196782
+              ],
+              [
+                -7.173888746038731,
+                -0.699238808823169
+              ]
+            ]
+          }
+        }
+      ]
+    },
+    "STRICT": {
+      "reference": {
+        "rows": 27,
+        "release_instants": 27,
+        "dates": 27
+      },
+      "forecasters": {
+        "Persistence": {
+          "rows": 27,
+          "release_instants": 27,
+          "dates": 27,
+          "seeds": [],
+          "metrics_seed_average_forecast": {
+            "20": {
+              "mae_bp": 13.9770465189,
+              "direction_accuracy": 0.0,
+              "direction_eligible_rows": 27,
+              "predicted_flat_fraction": 1.0
+            },
+            "30": {
+              "mae_bp": 17.664369999574074,
+              "direction_accuracy": 0.0,
+              "direction_eligible_rows": 26,
+              "predicted_flat_fraction": 1.0
+            }
+          },
+          "mae_bp_mean_over_seeds": {
+            "20": 13.9770465189,
+            "30": 17.664369999574074
+          },
+          "direction_accuracy_mean_over_seeds": {
+            "20": 0.0,
+            "30": 0.0
+          }
+        },
+        "none+CNN~none~none": {
+          "rows": 27,
+          "release_instants": 27,
+          "dates": 27,
+          "seeds": [
+            0,
+            1,
+            2
+          ],
+          "metrics_seed_average_forecast": {
+            "20": {
+              "mae_bp": 14.094713224051976,
+              "direction_accuracy": 0.48148148148148145,
+              "direction_eligible_rows": 27,
+              "predicted_flat_fraction": 0.0
+            },
+            "30": {
+              "mae_bp": 17.98916880593457,
+              "direction_accuracy": 0.46153846153846156,
+              "direction_eligible_rows": 26,
+              "predicted_flat_fraction": 0.0
+            }
+          },
+          "mae_bp_mean_over_seeds": {
+            "20": 14.106382799995183,
+            "30": 17.995788115539508
+          },
+          "direction_accuracy_mean_over_seeds": {
+            "20": 0.5308641975308642,
+            "30": 0.5128205128205128
+          }
+        },
+        "none+DLinear~none~none": {
+          "rows": 27,
+          "release_instants": 27,
+          "dates": 27,
+          "seeds": [
+            0,
+            1,
+            2
+          ],
+          "metrics_seed_average_forecast": {
+            "20": {
+              "mae_bp": 14.970732807992569,
+              "direction_accuracy": 0.48148148148148145,
+              "direction_eligible_rows": 27,
+              "predicted_flat_fraction": 0.0
+            },
+            "30": {
+              "mae_bp": 18.69934155631889,
+              "direction_accuracy": 0.46153846153846156,
+              "direction_eligible_rows": 26,
+              "predicted_flat_fraction": 0.0
+            }
+          },
+          "mae_bp_mean_over_seeds": {
+            "20": 14.970732807992569,
+            "30": 18.880343259025057
+          },
+          "direction_accuracy_mean_over_seeds": {
+            "20": 0.4567901234567901,
+            "30": 0.4615384615384615
+          }
+        },
+        "none+Ridge~none~none": {
+          "rows": 27,
+          "release_instants": 27,
+          "dates": 27,
+          "seeds": [
+            0
+          ],
+          "metrics_seed_average_forecast": {
+            "20": {
+              "mae_bp": 16.733178567118518,
+              "direction_accuracy": 0.2962962962962963,
+              "direction_eligible_rows": 27,
+              "predicted_flat_fraction": 0.0
+            },
+            "30": {
+              "mae_bp": 19.404188188177773,
+              "direction_accuracy": 0.5384615384615384,
+              "direction_eligible_rows": 26,
+              "predicted_flat_fraction": 0.0
+            }
+          },
+          "mae_bp_mean_over_seeds": {
+            "20": 16.733178567118518,
+            "30": 19.404188188177773
+          },
+          "direction_accuracy_mean_over_seeds": {
+            "20": 0.2962962962962963,
+            "30": 0.5384615384615384
+          }
+        }
+      },
+      "comparisons": [
+        {
+          "label": "none+CNN~none~none",
+          "other": "Persistence",
+          "rows": 27,
+          "release_instants": 27,
+          "dates": 27,
+          "gain_bp_20_30": [
+            -0.11766670515197546,
+            -0.3247988063604937
+          ],
+          "paired_gain_ci95_bp_by_block_20_30": {
+            "5": [
+              [
+                -0.5278190293468924,
+                0.373183375884944
+              ],
+              [
+                -1.0219036601909566,
+                0.33733767837827144
+              ]
+            ],
+            "10": null
+          },
+          "seed_mean_loss_gain_bp_20_30": [
+            -0.1293362810951853,
+            -0.33141811596543236
+          ],
+          "seed_mean_loss_paired_gain_ci95_bp_by_block_20_30": {
+            "5": [
+              [
+                -0.5445322851684505,
+                0.36695470900730803
+              ],
+              [
+                -1.0219864011212654,
+                0.3330509581458941
+              ]
+            ],
+            "10": null
+          }
+        },
+        {
+          "label": "none+DLinear~none~none",
+          "other": "Persistence",
+          "rows": 27,
+          "release_instants": 27,
+          "dates": 27,
+          "gain_bp_20_30": [
+            -0.9936862890925676,
+            -1.0349715567448148
+          ],
+          "paired_gain_ci95_bp_by_block_20_30": {
+            "5": [
+              [
+                -2.251889737223941,
+                0.05835874214968966
+              ],
+              [
+                -2.746343207224834,
+                0.6033073914960086
+              ]
+            ],
+            "10": null
+          },
+          "seed_mean_loss_gain_bp_20_30": [
+            -0.9936862890925676,
+            -1.2159732594509878
+          ],
+          "seed_mean_loss_paired_gain_ci95_bp_by_block_20_30": {
+            "5": [
+              [
+                -2.2518897372239404,
+                0.05835874214968872
+              ],
+              [
+                -2.8615915882662653,
+                0.19222096764910215
+              ]
+            ],
+            "10": null
+          }
+        },
+        {
+          "label": "none+Ridge~none~none",
+          "other": "Persistence",
+          "rows": 27,
+          "release_instants": 27,
+          "dates": 27,
+          "gain_bp_20_30": [
+            -2.756132048218519,
+            -1.7398181886037036
+          ],
+          "paired_gain_ci95_bp_by_block_20_30": {
+            "5": [
+              [
+                -5.755203580228057,
+                -0.08742445697916797
+              ],
+              [
+                -5.276323537815185,
+                1.8397393419377768
+              ]
+            ],
+            "10": null
+          },
+          "seed_mean_loss_gain_bp_20_30": [
+            -2.756132048218519,
+            -1.7398181886037036
+          ],
+          "seed_mean_loss_paired_gain_ci95_bp_by_block_20_30": {
+            "5": [
+              [
+                -5.755203580228057,
+                -0.08742445697916797
+              ],
+              [
+                -5.276323537815185,
+                1.8397393419377768
+              ]
+            ],
+            "10": null
+          }
+        }
+      ]
+    }
+  }
+}

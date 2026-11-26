@@ -3,7 +3,6 @@
 
 import argparse
 import json
-import math
 import os
 from pathlib import Path
 import platform
@@ -25,42 +24,7 @@ if __package__ in (None, ""):
 from data.fed_spx_endpoints import HORIZONS, load_endpoint_cohorts
 from model.compact_return import CompactReturn
 from scripts.build_fed_price_alignment import sha256_file
-
-
-def endpoint_metrics(truth, forecast, weights):
-    if truth.shape != forecast.shape or truth.shape != (len(weights), len(HORIZONS)):
-        raise ValueError("Expected matched [event, horizon] arrays")
-    if not np.isfinite(truth).all() or not np.isfinite(forecast).all():
-        raise ValueError("Non-finite endpoint value")
-    result = {}
-    for col, horizon in enumerate(HORIZONS):
-        actual, predicted = truth[:, col], forecast[:, col]
-        eligible = actual != 0
-        hits = np.sign(actual[eligible]) == np.sign(predicted[eligible])
-        result[str(horizon)] = {
-            "mae_bp": float(np.average(np.abs(actual - predicted), weights=weights)),
-            "direction_accuracy": float(np.average(hits, weights=weights[eligible])) if eligible.any() else None,
-            "direction_eligible_rows": int(eligible.sum()),
-            "predicted_flat_fraction": float(np.average(predicted == 0, weights=weights)),
-        }
-    return result
-
-
-def bootstrap_gain(gain, dates, weights, config):
-    days, idx = np.unique(dates, return_inverse=True)
-    day_weights = np.bincount(idx, weights=weights)
-    day_gain = np.stack([np.bincount(idx, weights=weights * col) for col in gain.T], axis=1)
-    intervals = {}
-    for block in (5, 10):
-        if len(days) < 3 * block:
-            intervals[str(block)] = None
-            continue
-        rng = np.random.default_rng(config["bootstrap_seed"])
-        start = rng.integers(len(days), size=(config["bootstrap_replicates"], math.ceil(len(days) / block)))
-        chosen = ((start[..., None] + np.arange(block)) % len(days)).reshape(len(start), -1)[:, :len(days)]
-        draws = day_gain[chosen].sum(axis=1) / day_weights[chosen].sum(axis=1, keepdims=True)
-        intervals[str(block)] = np.quantile(draws, [0.025, 0.975], axis=0).T.tolist()
-    return intervals
+from scripts.score_fed_spx_paired import bootstrap_gain, endpoint_metrics  # noqa: F401  (re-exported)
 
 
 def run_seed(train, val, input_scale, target_scale, config, seed, device):
