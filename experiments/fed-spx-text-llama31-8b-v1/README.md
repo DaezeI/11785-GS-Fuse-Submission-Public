@@ -35,3 +35,11 @@ Run preflight before reserving a GPU; remove `--preflight-only` for training aft
 ## Verification and limits
 
 Upstream Fed integration passed 40 focused tests and validated 48 research records before PR #62 merged. The new unit tests exercise frozen-price parity after head learning and the no-future donor rule. Real-input preflight stopped at the missing CNN/8B artifacts; the CNN bundle is now staged, and the 8B weights remain missing; no end-to-end 8B smoke or result is claimed. Score with the [paired scorer](../../results/fed-spx-paired-scorer-v1/README.md) (#54): convert `val-paired.npz` with `from-text-run`, then run `score` with the packaged `none+CNN~none~none` baselines and `--text-arm`. Retain raw per-release outputs. An inference control is not an independently trained baseline.
+
+## November 26 input readiness
+
+The new frozen CNN Drive bundle was verified against all three published checkpoint hashes and every checksum in its manifest, then staged for the held run. The shared scorer from #54 is merged and all 15 scorer tests pass.
+
+The alignment CSV was originally fingerprinted with CRLF line endings. Git stores its normalized LF form; `.gitattributes` now restores CRLF on checkout so the exact existing frozen SHA-256 (`0ab047bf…0270`) passes on all platforms. No cells, event membership, windows, price values, or expected hash were changed. The saved validation IDs match exactly; recomputed targets differ by at most 2.84e-14 bp due to cross-platform floating-point arithmetic, below the audit tolerance of 1e-9 bp and the shared scorer tolerance of 1e-6 bp.
+
+The exact job remains on user hold with zero GPU usage. Meta's model page confirms the user's access request is submitted and awaiting review. Full-precision Llama-3.1-8B weights/tokenizer and source revision verification remain pending; an approved account and authenticated download are required. No alternate backbone, retrained price reference, GPU smoke, or held-out score is implied.

@@ -1,0 +1,3 @@
+
+# Preserve the frozen Fed/SPX alignment byte fingerprint across platforms.
+analysis/macro_releases/price_alignment_v1/fed_price_alignment_v1.csv text eol=crlf
