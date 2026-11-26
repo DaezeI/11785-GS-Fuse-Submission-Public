@@ -1,6 +1,6 @@
 # Nicole's exact 8B text arm (#55)
 
-Status: prepared; execution awaits the exact frozen price checkpoints and Llama-3.1-8B weights. No GPU training or held-out scoring has run.
+Status: prepared; execution awaits the exact Llama-3.1-8B weights. The frozen price checkpoints were staged on Drive on November 25. No GPU training or held-out scoring has run.
 
 Architecture: `Llama-3.1-8B(frozen)+CNN(frozen)~Pool~Add`.
 The frozen `none+CNN~none~none` was trained on `FED-PX-REL5-v1` (978 training releases).
@@ -19,7 +19,7 @@ The additive text correction trains on `FED-PXTX-ALL-REL5-v2`, excluding the two
 
 ## Required artifacts
 
-1. `compact-price-seed-{0,1,2}.pt`, `metrics.json`, `val-paired.npz` from `fed-spx-endpoints-price-v1`. Obtain the actual frozen checkpoint bytes; do not retrain substitutes.
+1. `compact-price-seed-{0,1,2}.pt`, `metrics.json`, `val-paired.npz` from `fed-spx-endpoints-price-v1`. Obtain the actual frozen checkpoint bytes; do not retrain substitutes. **Staged November 25:** Drive `01 Results and Evidence/fed-spx-endpoints-price-v1-frozen-cnn.zip` (228,762 bytes, SHA-256 `9b0eab4daaa3183095f14ad28d539730ac087b8acae9dfe8550e9b12bcd3358d`) holds the three checkpoints, `metrics.json`, `val-paired.npz`, `population.csv` and `SHA256SUMS.txt`. Before packaging, all three checkpoint SHA-256s matched the published `results/fed-spx-endpoints-price-v1/metrics.json`, the local `metrics.json` was byte-identical to it, and `population.csv` matched its recorded hash. `val-paired.npz` has no published hash; it came from the same run folder. Verify `SHA256SUMS.txt` after unzipping.
 2. Complete local full-precision Llama-3.1-8B weights and tokenizer, with the source identity verified when staged.
 3. Frozen SP500.csv and v2 train.jsonl/val.jsonl. Do not regenerate texts from today's pages.
 
@@ -34,4 +34,4 @@ Run preflight before reserving a GPU; remove `--preflight-only` for training aft
 
 ## Verification and limits
 
-Upstream Fed integration passed 40 focused tests and validated 48 research records before PR #62 merged. The new unit tests exercise frozen-price parity after head learning and the no-future donor rule. Real-input preflight currently stops at the missing CNN/8B artifacts; no end-to-end 8B smoke or result is claimed. The final shared scorer/forecast package is still tracked by Adaeze in #54; retain raw per-release outputs for pairing. An inference control is not an independently trained baseline.
+Upstream Fed integration passed 40 focused tests and validated 48 research records before PR #62 merged. The new unit tests exercise frozen-price parity after head learning and the no-future donor rule. Real-input preflight stopped at the missing CNN/8B artifacts; the CNN bundle is now staged, and the 8B weights remain missing; no end-to-end 8B smoke or result is claimed. The final shared scorer/forecast package is still tracked by Adaeze in #54; retain raw per-release outputs for pairing. An inference control is not an independently trained baseline.

@@ -2,7 +2,7 @@
   "title": "GS-Fuse Research Home",
   "stage": "Controlled experiments and final writing",
   "overview": "The last-price rule beat our trained price models. In Adaeze’s completed R3 return run, correct and shuffled articles gave nearly identical results, and predicting zero return had slightly lower error.",
-  "updated_at": "2026-11-24T18:43:54+00:00",
+  "updated_at": "2026-11-26T01:43:32+00:00",
   "source_url": "https://github.com/DaezeI/11785-GS-Fuse-Submission-Public/blob/main/research_home/records.json",
   "links": [
     {
@@ -43,14 +43,14 @@
   "experiments": [
     {
       "id": "fed-spx-text-llama31-8b-v1",
-      "title": "Nicole’s 8B Fed text arm awaits frozen inputs",
+      "title": "Nicole’s 8B Fed text arm awaits Llama-3.1-8B weights",
       "kind": "Experiment",
       "status": "submitted",
       "owner": "Nicole",
       "question": "Does Llama-3.1-8B(frozen)+CNN(frozen)~Pool~Add improve 20/30-minute forecasts over the frozen price baseline on FED-PXTX-ALL-REL5-v2 validation?",
       "configuration": "Frozen full-float32 Llama-3.1-8B; masked mean, first 2048 tokens; frozen CNN seeds 0/1/2 trained on FED-PX-REL5-v1; text head trains on 171 FED-PXTX-ALL-REL5-v2 rows after 2 exclusions; scores 149 validation rows. Fixed 30-epoch pilot, train-only text scaling, real/zero/past-only shuffled text.",
-      "finding": "Exact one-H200 training job submitted on explicit user hold, pinned to merged main 013ca5c. Training has not started and no GPU time is consumed. Release awaits the frozen CNN checkpoint bundle and exact Llama-3.1-8B weights; Delta login works but shared project searches found neither artifact.",
-      "limitations": "No end-to-end 8B smoke or accuracy result. Validation is exploratory; ALL contains inferred evidence classes. The exact required artifacts remain missing after shared Delta searches. Final test remains reserved and final evidence level remains undecided.",
+      "finding": "Exact one-H200 training job submitted on explicit user hold, pinned to merged main 013ca5c. Training has not started and no GPU time is consumed. On November 25 Adaeze staged the frozen CNN bundle on Drive (01 Results and Evidence/fed-spx-endpoints-price-v1-frozen-cnn.zip); its three checkpoint SHA-256s match the published metrics.json. Release still awaits the exact Llama-3.1-8B weights, which are not on Adaeze's laptop or shared Delta.",
+      "limitations": "No end-to-end 8B smoke or accuracy result. Validation is exploratory; ALL contains inferred evidence classes. Exact Llama-3.1-8B weights remain missing; val-paired.npz in the CNN bundle has no published hash. Final test remains reserved and final evidence level remains undecided.",
       "figure": null,
       "evidence": [
         {
