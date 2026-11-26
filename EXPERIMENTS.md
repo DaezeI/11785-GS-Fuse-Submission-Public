@@ -34,7 +34,7 @@ population into another run's row.
 
 ## Nicole's Fed text pilot (November 24)
 
-[Exact 8B pilot](experiments/fed-spx-text-llama31-8b-v1/README.md), owner Nicole, #55: running November 26 on one H200 after verified exact model/tokenizer staging and the 171/149 real-input preflight. Three-hour cap, fixed configuration, no duplicate submission. Accuracy outputs pending; test reserved.
+[Exact 8B pilot](experiments/fed-spx-text-llama31-8b-v1/README.md), owner Nicole, #55: **training and validation completed November 26**. The 171/149 text arm essentially ties CNN at 20 minutes and is slightly worse at 30; all ALL-cohort matching comparisons are inconclusive. Frozen-price checks passed; one H200, exit 0, 7m46s. [Result pack](results/fed-spx-text-llama31-8b-v1/summary.md). Test remains reserved pending the team freeze.
 
 ## Current comparison index
 

@@ -1,0 +1,10 @@
+{
+  "donors.npz": "dbac2b10e3aa43528689d38d4e0528c2e33a2843562f4313ece0f51df10ffd5d",
+  "features.npz": "08caee4be44d4cab8908c5af34d30365920f1648f6dc085e42c5e1f4b308a88d",
+  "metrics.json": "4dc4e7deca6687043b9cc5564f15a3c0060dbd55b2edae72325cd823a52d72cd",
+  "text-scaler.npz": "cdfa58b6d505f5fea26a57b3a824d934b39ea080b12ff1650ecc6c1e66a53773",
+  "text-seed-0.pt": "278e9938c1aba4b9e2461a95eb8fc901791f57c6c097f7dd4b2cef5ec3a90155",
+  "text-seed-1.pt": "aa21624f6b27b91d53337d3a522960f6cb2f7bdb3b2e9d1d3c3bc9a3fa6e434c",
+  "text-seed-2.pt": "0fd93850c00390d90e87d8f42c76e39ca053b77d3cf8c268eb5119ccff063c76",
+  "val-paired.npz": "1b20167fc6a6d855c627d4ca48d7a665d559a69665aec1988ea79c7c5d0cdb54"
+}

@@ -80,4 +80,4 @@ the text arm will reuse it as its frozen price encoder.
 
 `FED-PXTX-ALL-REL5-v2`: 173 / 149 / 172 releases, defined by the merged v2 ledgers and verified-text manifest. The #55 training configuration drops the two documented truncated train texts (171 used); validation is unchanged. Preserve that exclusion in every comparison label/provenance record.
 
-`Llama-3.1-8B(frozen)+CNN(frozen)~Pool~Add`: Nicole's exact #55 architecture, implemented in `scripts/run_fed_spx_text.py`, using the frozen `none+CNN~none~none` checkpoints. Prepared, not trained. See the registered pilot for token budget, preprocessing and evaluation controls.
+`Llama-3.1-8B(frozen)+CNN(frozen)~Pool~Add`: Nicole's exact #55 architecture, implemented in `scripts/run_fed_spx_text.py`, using the frozen `none+CNN~none~none` checkpoints. Training and validation completed November 26; see `results/fed-spx-text-llama31-8b-v1/summary.md`. Test remains reserved. The registered pilot records token budget, preprocessing and evaluation controls.

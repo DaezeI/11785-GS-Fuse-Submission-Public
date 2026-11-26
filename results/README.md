@@ -7,6 +7,8 @@ team's agreed storage. Overleaf is for final polishing and submission exports.
 
 ## Current evidence
 
+- [Exact frozen 8B Fed text arm](fed-spx-text-llama31-8b-v1/summary.md): 171 train / 149 validation, three seeds completed. No measurable incremental validation gain over frozen CNN or past-text controls. Test remains reserved.
+
 See the [research decision brief](../docs/RESEARCH_DECISION_BRIEF.md) for
 comparison validity and the proposed next batch.
 
