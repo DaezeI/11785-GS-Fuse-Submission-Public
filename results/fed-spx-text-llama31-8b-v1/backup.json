@@ -1,0 +1,12 @@
+{
+  "source_commit": "131984081dc4b7effd46d66eac0a1d6db6425b75",
+  "archive_name": "fed-spx-text-llama31-8b-v1-validation-20261126.zip",
+  "bytes": 149594,
+  "sha256_local_archive": "fdf660b8d60ee6c184d955fb197afb38b5ac935011963324882acc833f5b9512",
+  "md5_local_archive": "f2073b493c71383421ae6e13553208dd",
+  "drive_url": "https://drive.google.com/file/d/1zGVoSV3b5jEb2Ih71GBf2HPzBtd8cdKL/view",
+  "drive_parent": "https://drive.google.com/drive/folders/1qpVCQDpEJmke26zNhrnBpYH3Vkd2dYmy",
+  "verification": "Local archive CRC checked; Drive metadata readback matches filename, application/zip, 149594 bytes and expected parent folder. Remote checksum not exposed by connector.",
+  "contents": "Published aggregate result, figures, numeric metrics, provenance and fixed protocol; no model weights, checkpoints, embeddings, per-release forecasts or raw texts.",
+  "recorded_at": "2026-11-26T22:04:38.999613+00:00"
+}

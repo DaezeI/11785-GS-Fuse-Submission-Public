@@ -58,3 +58,7 @@ Validation was already used for the CNN and text-head selection. ALL includes in
 Keep this bounded pilot as completed evidence; do not start a search for a positive result. The trained head selection and source identities are recorded. Final test scoring remains pending the team's evidence-class/protocol freeze in #53; this result does not close that task. Optional Gate-Learned or trainable-CNN arms were not run.
 
 Use [paired-metrics.json](paired-metrics.json) for reported comparisons. [training-metrics.json](training-metrics.json) retains the runner's selection traces and checks; its shuffled aggregate uses a different averaging/weighting convention, so it is supplementary. [Provenance](provenance.json) records exact versions and private-artifact hashes. Numeric shared-scorer output is unchanged; only the private forecast-input path is normalized in the public copy. Raw forecasts, embeddings and checkpoints remain in Nicole's run storage and verified local backup.
+
+## Verified aggregate backup
+
+The [versioned Drive evidence ZIP](https://drive.google.com/file/d/1zGVoSV3b5jEb2Ih71GBf2HPzBtd8cdKL/view) contains the published result and fixed protocol from commit `131984081dc4b7effd46d66eac0a1d6db6425b75`. Its filename, 149,594-byte size and Results/Evidence parent were confirmed by destination metadata readback; [backup receipt](backup.json) records local checksums and the verification limit. Checkpoints, embeddings and per-release forecasts are excluded from this shareable ZIP.
