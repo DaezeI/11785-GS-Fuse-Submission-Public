@@ -43,3 +43,7 @@ The new frozen CNN Drive bundle was verified against all three published checkpo
 The alignment CSV was originally fingerprinted with CRLF line endings. Git stores its normalized LF form; `.gitattributes` now restores CRLF on checkout so the exact existing frozen SHA-256 (`0ab047bf…0270`) passes on all platforms. No cells, event membership, windows, price values, or expected hash were changed. The saved validation IDs match exactly; recomputed targets differ by at most 2.84e-14 bp due to cross-platform floating-point arithmetic, below the audit tolerance of 1e-9 bp and the shared scorer tolerance of 1e-6 bp.
 
 The exact job remains on user hold with zero GPU usage. Meta's model page confirms the user's access request is submitted and awaiting review. Full-precision Llama-3.1-8B weights/tokenizer and source revision verification remain pending; an approved account and authenticated download are required. No alternate backbone, retrained price reference, GPU smoke, or held-out score is implied.
+
+## November 26 Meta approval
+
+The refreshed authenticated model page confirms access has been granted. The existing job remains held until personal download authentication, pinned full model/tokenizer staging and size/hash checks pass. No GPU training or test scoring has started. The source revision and fixed pilot are unchanged.

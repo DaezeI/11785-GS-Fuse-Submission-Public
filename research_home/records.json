@@ -2,7 +2,7 @@
   "title": "GS-Fuse Research Home",
   "stage": "Controlled experiments and final writing",
   "overview": "The last-price rule beat our trained price models. In Adaeze’s completed R3 return run, correct and shuffled articles gave nearly identical results, and predicting zero return had slightly lower error.",
-  "updated_at": "2026-11-26T19:52:07+00:00",
+  "updated_at": "2026-11-26T21:41:32+00:00",
   "source_url": "https://github.com/DaezeI/11785-GS-Fuse-Submission-Public/blob/main/research_home/records.json",
   "links": [
     {
@@ -43,14 +43,14 @@
   "experiments": [
     {
       "id": "fed-spx-text-llama31-8b-v1",
-      "title": "Frozen Fed inputs verified; exact 8B access awaits Meta review",
+      "title": "Meta access approved; exact 8B staging awaits personal CLI sign-in",
       "kind": "Experiment",
       "status": "submitted",
       "owner": "Nicole",
       "question": "Does Llama-3.1-8B(frozen)+CNN(frozen)~Pool~Add improve 20/30-minute forecasts over the frozen price baseline on FED-PXTX-ALL-REL5-v2 validation?",
       "configuration": "Frozen full-float32 Llama-3.1-8B; masked mean, first 2048 tokens; frozen CNN seeds 0/1/2 trained on FED-PX-REL5-v1; text head trains on 171 FED-PXTX-ALL-REL5-v2 rows after 2 exclusions; scores 149 validation rows. Fixed 30-epoch pilot, train-only text scaling, real/zero/past-only shuffled text.",
-      "finding": "The frozen CNN bundle is hash-verified and staged. The input audit confirms 171 text-training and 149 text-validation releases, exact saved validation IDs, targets agreeing within 2.84e-14 bp, and zero shared train/validation price bars. The exact one-H200 job remains user-held: Meta confirms the account access request is submitted and awaiting manual review. No GPU training or test scoring has started.",
-      "limitations": "Full-precision Llama-3.1-8B weights and tokenizer still require approved access and authenticated download. Official source revision d04e592bb4f6aa9cfee91e2e20afa771667e1d4b is recorded from public metadata; files have not been downloaded. No end-to-end 8B smoke or accuracy finding. Validation is exploratory and ALL includes inferred evidence classes. Test remains reserved.",
+      "finding": "Meta model access was verified as granted on November 26. Frozen CNN checkpoints and the 171/149 train/validation input audit are ready. The existing one-H200 job remains user-held while personal download authentication and pinned model staging are completed. No GPU training or test scoring has started.",
+      "limitations": "Exact Llama-3.1-8B weights/tokenizer still need authenticated staging and size/hash verification at pinned revision d04e592bb4f6aa9cfee91e2e20afa771667e1d4b. No end-to-end 8B smoke or accuracy finding. Validation is exploratory; ALL includes inferred evidence classes. Test remains reserved.",
       "figure": null,
       "evidence": [
         {
@@ -71,7 +71,7 @@
         }
       ],
       "related": [],
-      "updated_at": "2026-11-26T19:51:43.378447+00:00"
+      "updated_at": "2026-11-26T21:41:32.513337+00:00"
     },
     {
       "id": "fed-spx-matched-control-v2",

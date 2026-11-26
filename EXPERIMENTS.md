@@ -34,7 +34,7 @@ population into another run's row.
 
 ## Nicole's Fed text pilot (November 24)
 
-[Exact 8B pilot](experiments/fed-spx-text-llama31-8b-v1/README.md), owner Nicole, #55: submitted on user hold; frozen CNN checkpoints and real-input audit verified November 26. Exact Llama-3.1-8B weights await Meta access approval and authenticated download. No training or accuracy finding. Train 171 / validation 149 on FED-PXTX-ALL-REL5-v2 after two documented train exclusions; test reserved.
+[Exact 8B pilot](experiments/fed-spx-text-llama31-8b-v1/README.md), owner Nicole, #55: submitted on user hold; frozen CNN checkpoints and real-input audit verified November 26. Meta access was verified as granted November 26; exact Llama-3.1-8B weights await personal authenticated staging and hash verification. No training or accuracy finding. Train 171 / validation 149 on FED-PXTX-ALL-REL5-v2 after two documented train exclusions; test reserved.
 
 ## Current comparison index
 
