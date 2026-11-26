@@ -2,7 +2,7 @@
   "title": "GS-Fuse Research Home",
   "stage": "Controlled experiments and final writing",
   "overview": "The last-price rule beat our trained price models. In Adaeze’s completed R3 return run, correct and shuffled articles gave nearly identical results, and predicting zero return had slightly lower error.",
-  "updated_at": "2026-11-26T22:01:04+00:00",
+  "updated_at": "2026-11-26T22:04:39+00:00",
   "source_url": "https://github.com/DaezeI/11785-GS-Fuse-Submission-Public/blob/main/research_home/records.json",
   "links": [
     {
@@ -75,13 +75,17 @@
         {
           "label": "Owner task #55; test freeze remains pending",
           "url": "https://github.com/DaezeI/11785-GS-Fuse-Submission-Public/issues/55"
+        },
+        {
+          "label": "Verified Drive evidence ZIP",
+          "url": "https://drive.google.com/file/d/1zGVoSV3b5jEb2Ih71GBf2HPzBtd8cdKL/view"
         }
       ],
       "related": [
         "fed-spx-matched-control-v2",
         "fed-spx-endpoints-price-v1"
       ],
-      "updated_at": "2026-11-26T22:01:04.926416+00:00"
+      "updated_at": "2026-11-26T22:04:39.001537+00:00"
     },
     {
       "id": "fed-spx-matched-control-v2",
