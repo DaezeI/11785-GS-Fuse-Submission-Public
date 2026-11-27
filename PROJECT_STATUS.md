@@ -1,6 +1,6 @@
-# November 27 shared-query Transformer — running
+# November 27 shared-query Transformer — completed
 
-`none+Transformer128x4~none~none` uses linear OHLC embedding, four width-128 Transformer layers, one learned query expanded over six future positions, and shared linear readout. All +5/+10/+15/+20/+25/+30-minute outputs are supervised on `SPX-PX6-GRID5-v1`. The single-H200 job confirmed batch 204,694 with activation checkpointing and ten full BF16 training updates (22.482 GiB allocated / 30.711 GiB reserved). Formal training was running at the last check. Repeated local monitoring stopped at the user’s request; final result collection is pending. [Protocol](experiments/shared-token-transformer-v1/README.md); no forecasting result yet.
+`none+Transformer128x4~none~none @ train:SPX-PX6-GRID5-v1 → score:SPX-PX6-GRID5-v1 val` completed 1,000 full-batch updates on one H200, exit 0. The selected update 50 mean six-horizon MAE is 11.689790 bp versus Persistence 11.706526 bp, a 0.143% validation gain. Training loss kept declining, while late validation error increased. Date-block intervals condition on checkpoint selection; reused validation is exploratory. No reserved test was scored. [Full result and curves](results/shared-token-transformer-v1/summary.md).
 
 # November 26 rolling-price CNN experiment — completed
 

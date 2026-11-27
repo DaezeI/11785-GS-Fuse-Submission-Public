@@ -46,4 +46,4 @@ not account for selection. It cannot establish the benefit of adding text.
 
 ## Verified batch calibration
 
-The [ten-update confirmation](batch-confirmation.json) passed with 204,694 unique windows, activation checkpointing and BF16 autocast. Peak allocated memory was 24,140,269,056 bytes; peak PyTorch reserved memory was 32,975,618,048 bytes. This is dataset-limited full-batch training. Formal training was running at the last check. Repeated local polling stopped at the user’s request; final accuracy and convergence evidence remain pending collection.
+The [ten-update confirmation](batch-confirmation.json) passed with 204,694 unique windows, activation checkpointing and BF16 autocast. Peak allocated memory was 24,140,269,056 bytes; peak PyTorch reserved memory was 32,975,618,048 bytes. This is dataset-limited full-batch training. Formal training subsequently completed all 1,000 updates. [Verified result, training curves and limitations](../../results/shared-token-transformer-v1/summary.md). Repeated local polling remains disabled at the user’s request.

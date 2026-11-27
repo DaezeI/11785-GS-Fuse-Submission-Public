@@ -2,7 +2,7 @@
   "title": "GS-Fuse Research Home",
   "stage": "Controlled experiments and final writing",
   "overview": "Rolling-price CNN training produced small ordinary-market validation gains, while matched Fed validation did not improve over Persistence. Earlier controlled text comparisons found little reliable benefit from the matched report. These findings remain scoped to their protocols; the Fed test is reserved.",
-  "updated_at": "2026-11-27T06:32:34+00:00",
+  "updated_at": "2026-11-27T07:31:06+00:00",
   "source_url": "https://github.com/DaezeI/11785-GS-Fuse-Submission-Public/blob/main/research_home/records.json",
   "links": [
     {
@@ -43,29 +43,40 @@
   "experiments": [
     {
       "id": "shared-token-transformer-v1",
-      "title": "Six-position shared-query Transformer: implementation and training",
+      "title": "Full-batch Transformer completed; validation gain over Persistence remains small",
       "owner": "Nicole",
       "kind": "Experiment",
-      "status": "running",
+      "status": "completed",
       "question": "How does a width-128, depth-four shared-query Transformer train and predict on all five-minute SPX windows?",
-      "configuration": "none+Transformer128x4~none~none; SPX-PX6-GRID5-v1: 204,694 train / 40,548 val; six outputs through 30 minutes; one H200, calibrated maximum unique batch; 1,000 optimizer updates capped at 90 minutes.",
-      "finding": "One H200 confirmed a full batch of 204,694 distinct windows for ten complete BF16 forward/backward/AdamW updates with activation checkpointing. Peak allocated/reserved memory was 22.482/30.711 GiB. Formal 1,000-update training was running at the last check; repeated polling stopped at the user’s request. Final results are pending.",
-      "limitations": "Exploratory reused validation, six-target objective and optimization changed together. No reserved test or text experiment.",
-      "figure": null,
+      "configuration": "none+Transformer128x4~none~none @ train:SPX-PX6-GRID5-v1 → score:SPX-PX6-GRID5-v1 val; 204,694 training / 40,548 validation windows, six supervised outputs through 30 minutes, one H200, BF16, activation checkpointing, batch 204,694 and 1,000 optimizer updates.",
+      "finding": "Completed 1,000 full-batch updates, scheduler exit 0 in 31m32s. Selected update 50 has mean six-horizon MAE 11.689790 bp versus Persistence 11.706526 bp (0.143% lower). All six conditional date-block intervals exclude zero but do not adjust checkpoint selection. Training loss continued falling through update 1,000 while late validation error increased; longer fitting did not improve validation.",
+      "limitations": "Exploratory reused validation with checkpoint selection; conditional bootstrap does not adjust selection. Adjacent rolling windows overlap. Architecture, six-target objective, batch and optimizer settings change together. No text experiment or reserved-test scoring.",
+      "figure": {
+        "url": "https://raw.githubusercontent.com/DaezeI/11785-GS-Fuse-Submission-Public/main/results/shared-token-transformer-v1/learning-curves.png",
+        "alt": "Full-data training loss continues downward, while mean six-horizon validation MAE worsens late; selected checkpoint is update50."
+      },
       "evidence": [
         {
-          "label": "Bounded protocol and configuration",
-          "url": "https://github.com/DaezeI/11785-GS-Fuse-Submission-Public/blob/main/experiments/shared-token-transformer-v1/README.md"
+          "label": "Completed result and interpretation",
+          "url": "https://github.com/DaezeI/11785-GS-Fuse-Submission-Public/blob/main/results/shared-token-transformer-v1/summary.md"
         },
         {
-          "label": "Actual ten-update batch confirmation",
-          "url": "https://github.com/DaezeI/11785-GS-Fuse-Submission-Public/blob/main/experiments/shared-token-transformer-v1/batch-confirmation.json"
+          "label": "Six-horizon metrics and conditional intervals",
+          "url": "https://github.com/DaezeI/11785-GS-Fuse-Submission-Public/blob/main/results/shared-token-transformer-v1/metrics.json"
+        },
+        {
+          "label": "Full-data learning curves",
+          "url": "https://github.com/DaezeI/11785-GS-Fuse-Submission-Public/blob/main/results/shared-token-transformer-v1/learning-curves.csv"
+        },
+        {
+          "label": "Fixed training protocol",
+          "url": "https://github.com/DaezeI/11785-GS-Fuse-Submission-Public/blob/main/experiments/shared-token-transformer-v1/README.md"
         }
       ],
       "related": [
         "dense-price-grid-v1"
       ],
-      "updated_at": "2026-11-27T06:32:33.947573+00:00"
+      "updated_at": "2026-11-27T07:30:28.100967+00:00"
     },
     {
       "id": "dense-price-grid-v1",

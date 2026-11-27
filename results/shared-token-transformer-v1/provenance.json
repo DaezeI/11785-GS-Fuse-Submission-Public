@@ -1,0 +1,18 @@
+{
+  "run_id": "shared-token-transformer-v1",
+  "owner": "Nicole",
+  "status": "completed",
+  "hardware": "one H200",
+  "runtime_code_commit": "e1c5375359b0faf05e240f95fa175d8604df6d4e",
+  "model_sha256": "4ca79cfc25c7f09564906fae230b9cd39a182676eef16082aebb918eee95c032",
+  "runner_sha256": "0e294a0d73422e683ac901da2a38e2bc622d0e02ccc1155900ef57c94bed760d",
+  "checkpoint_sha256": "93c1455ab761cbd061a66d3fad83bf0554969c54c896e4c32ebf4ea637f64540",
+  "scheduler_exit_status": 0,
+  "artifact_files_sha256_verified": 36,
+  "test_scored": false,
+  "independent_verification": "Recomputed all six validation and persistence MAEs from private per-window forecasts; verified checkpoint and source hashes; verified 1000 contiguous optimizer updates.",
+  "private_artifacts": "Selected and continuation weights, optimizer state, initial state and per-window forecasts retained in Nicole private run storage and verified local backup. Normalized training tensors remain on compute storage.",
+  "aggregate_backup": "Pending versioned Drive upload after publication.",
+  "allocated_walltime": "00:31:32",
+  "runtime_seconds": 1613.5145800479804
+}
