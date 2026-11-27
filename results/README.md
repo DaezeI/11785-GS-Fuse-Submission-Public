@@ -7,6 +7,9 @@ team's agreed storage. Overleaf is for final polishing and submission exports.
 
 ## Current evidence
 
+- [Rolling-price CNN comparison](dense-price-grid-v1/summary.md): 204,694/68,219 rolling training windows, full loss curves and verified checkpoints. Small common rolling-validation gains do not carry to the matched Fed validation population. No test scoring.
+- [Training-loss diagnostic](fed-training-diagnostics-v1/summary.md): original-budget CPU replays plus ten updates, and the audit explaining event-conditioned sampling of only 978 price windows. The text training objective continues to fall while validation worsens.
+
 - [Exact frozen 8B Fed text arm](fed-spx-text-llama31-8b-v1/summary.md): 171 train / 149 validation, three seeds completed. No measurable incremental validation gain over frozen CNN or past-text controls. Test remains reserved.
 
 See the [research decision brief](../docs/RESEARCH_DECISION_BRIEF.md) for

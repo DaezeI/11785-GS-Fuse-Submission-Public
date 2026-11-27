@@ -1,0 +1,50 @@
+{
+  "id": "dense-price-grid-v1",
+  "title": "Rolling-price training completed; small general-price validation gain",
+  "kind": "Experiment",
+  "status": "completed",
+  "owner": "Nicole",
+  "question": "Does dense price-only training establish useful forecasting compared with the previous event-only CNN training?",
+  "configuration": "none+CNN~none~none on SPX-PX-GRID5-v1 (204,694 train) or SPX-PX-GRID15-v1 (68,219 train), common SPX-PX-GRID5-v1 validation (40,548), 35 historical bars, 20/30-minute returns, original five-minute processing lag, batch 64, AdamW 0.001, 30 epochs. One bounded single-GPU job planned.",
+  "finding": "Both rolling-price fits completed 30 epochs (95,970 and 31,980 updates). Selected GRID15 CNN MAE on common 40,548-window rolling validation was 12.8773/15.8309 bp versus Persistence 12.9076/15.8647. Date-block intervals for these small gains exclude zero but do not adjust validation checkpoint selection. On the 149 matched Fed validation releases, neither selected fit improved over Persistence; all paired intervals span zero. Training losses continued downward while late validation error worsened.",
+  "limitations": "Exploratory validation used for checkpoint and stride comparison; intervals condition on selected fits. Overlapping rolling windows are correlated. Dense training changes population, fitted scaling and selection population together. Price timing assumptions remain. No text arm or reserved-test scoring.",
+  "figure": {
+    "url": "https://raw.githubusercontent.com/DaezeI/11785-GS-Fuse-Submission-Public/main/results/dense-price-grid-v1/learning-curves.png",
+    "alt": "Full training loss and common rolling-validation MAE through 30 epochs for five- and fifteen-minute training strides."
+  },
+  "evidence": [
+    {
+      "label": "Completed comparison and interpretation",
+      "url": "https://github.com/DaezeI/11785-GS-Fuse-Submission-Public/blob/main/results/dense-price-grid-v1/summary.md"
+    },
+    {
+      "label": "Fixed training protocol",
+      "url": "https://github.com/DaezeI/11785-GS-Fuse-Submission-Public/blob/main/experiments/dense-price-grid-v1/config.json"
+    },
+    {
+      "label": "Real-input window audit",
+      "url": "https://github.com/DaezeI/11785-GS-Fuse-Submission-Public/blob/main/results/dense-price-grid-v1/audit.json"
+    },
+    {
+      "label": "Training runner",
+      "url": "https://github.com/DaezeI/11785-GS-Fuse-Submission-Public/blob/main/scripts/train_dense_price.py"
+    },
+    {
+      "label": "Measured metrics",
+      "url": "https://github.com/DaezeI/11785-GS-Fuse-Submission-Public/blob/main/results/dense-price-grid-v1/metrics.json"
+    },
+    {
+      "label": "Verified provenance",
+      "url": "https://github.com/DaezeI/11785-GS-Fuse-Submission-Public/blob/main/results/dense-price-grid-v1/provenance.json"
+    },
+    {
+      "label": "Verified aggregate Drive backup",
+      "url": "https://drive.google.com/file/d/1oicRd6YPws6966Ejl7-_pIiwmRlL_LvP/view?usp=drivesdk"
+    }
+  ],
+  "related": [
+    "fed-training-diagnostics-v1",
+    "fed-spx-endpoints-price-v1"
+  ],
+  "updated_at": "2026-11-27T04:09:55.789925+00:00"
+}

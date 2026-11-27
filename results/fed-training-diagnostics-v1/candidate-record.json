@@ -1,0 +1,38 @@
+{
+  "id": "fed-training-diagnostics-v1",
+  "title": "Training-loss replay and the 978-window selection audit",
+  "kind": "Analysis",
+  "status": "completed",
+  "owner": "Nicole",
+  "question": "Do the original training objectives flatten at the recorded budget, and why were only 978 price windows used?",
+  "configuration": "CPU replay of none+CNN~none~none on FED-PX-REL5-v1 and Llama-3.1-8B(frozen)+CNN(frozen)~Pool~Add on FED-PXTX-ALL-REL5-v2 minus two exclusions; original budgets plus exactly ten updates, same cached features and optimization. No test scoring.",
+  "finding": "The text-head full-training Smooth L1 fell 10.33% over ten extra updates, while validation MAE20 rose from 25.0641 to 26.1795 bp. The price extension increased training loss by 1.71%. The original price loader selected 978 announcement windows despite 225,561 training-period price bars.",
+  "limitations": "CPU replay, not original W&B history or exact optimizer-state resume; original CUDA validation traces are reproduced within 0.000417 bp. Ten extra updates cannot certify convergence or generalization. The original selected checkpoints were preserved.",
+  "figure": {
+    "url": "https://raw.githubusercontent.com/DaezeI/11785-GS-Fuse-Submission-Public/main/results/fed-training-diagnostics-v1/training-curves.png",
+    "alt": "Full-training and validation Smooth L1 during CPU replays, and ten-update extension close-ups."
+  },
+  "evidence": [
+    {
+      "label": "Diagnostic and selection audit",
+      "url": "https://github.com/DaezeI/11785-GS-Fuse-Submission-Public/blob/main/results/fed-training-diagnostics-v1/summary.md"
+    },
+    {
+      "label": "Measured metrics",
+      "url": "https://github.com/DaezeI/11785-GS-Fuse-Submission-Public/blob/main/results/fed-training-diagnostics-v1/metrics.json"
+    },
+    {
+      "label": "Reproducible diagnostic runner",
+      "url": "https://github.com/DaezeI/11785-GS-Fuse-Submission-Public/blob/main/scripts/diagnose_fed_training.py"
+    },
+    {
+      "label": "Verified aggregate Drive backup",
+      "url": "https://drive.google.com/file/d/1oicRd6YPws6966Ejl7-_pIiwmRlL_LvP/view?usp=drivesdk"
+    }
+  ],
+  "related": [
+    "fed-spx-text-llama31-8b-v1",
+    "fed-spx-endpoints-price-v1"
+  ],
+  "updated_at": "2026-11-27T04:09:55.790722+00:00"
+}

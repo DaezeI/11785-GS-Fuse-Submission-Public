@@ -1,0 +1,353 @@
+{
+  "id": "dense-price-grid-v1",
+  "architecture": "none+CNN~none~none",
+  "status": "completed",
+  "test_loaded": false,
+  "code_commit": "3254193cb007088212a77011a03c6dbeb3d775cd",
+  "script_sha256": "c9fc2310b50d5e0a9b172899d9ebff2bcdd088ed3cfc38bba0c555bbad5d3534",
+  "dataset_script_sha256": "da83f23c9f220de8a620628f08e599afa5355c298b1b2df167c4b0a0ac3e1302",
+  "audit": {
+    "grid5": {
+      "price_sha256": "6a873b1d72d27f9188c6bf12acb756775916be8ed9ff42d9e9dd98028f68de2a",
+      "stride_minutes": 5,
+      "raw_price_rows": 331256,
+      "regular_session_bars": 322783,
+      "input_bars": 35,
+      "horizons_minutes": [
+        20,
+        30
+      ],
+      "processing_lag_minutes": 5,
+      "train_upper_bar_end_inclusive": "2019-05-22 14:05:00",
+      "validation_upper_bar_end_inclusive": "2021-08-24 11:05:00",
+      "cross_split_shared_bars": 0,
+      "test_loaded": false,
+      "inherited_price_cleaning": "09:30 through 16:00 bar-start filter, as in the original loader; actual calendar constrains targets",
+      "splits": {
+        "train": {
+          "rows": 204694,
+          "dates": 2865,
+          "first_anchor": "2008-01-02T12:25:00.000000000",
+          "last_anchor": "2019-05-22T13:30:00.000000000",
+          "first_used_bar": "2008-01-02T09:30:00.000000000",
+          "last_used_bar": "2019-05-22T14:00:00.000000000"
+        },
+        "val": {
+          "rows": 40548,
+          "dates": 569,
+          "first_anchor": "2019-05-23T10:25:00.000000000",
+          "last_anchor": "2021-08-24T10:30:00.000000000",
+          "first_used_bar": "2019-05-22T14:05:00.000000000",
+          "last_used_bar": "2021-08-24T11:00:00.000000000"
+        }
+      }
+    },
+    "grid15_train_rows": 68219,
+    "fed": {
+      "calendar": "XNYS",
+      "exchange_calendars_version": "4.13.3",
+      "input_sha256": {
+        "prices": "6a873b1d72d27f9188c6bf12acb756775916be8ed9ff42d9e9dd98028f68de2a",
+        "catalog": "56157fe018beeba6f051f765e0f9d6763e839324b9d95ebbf49f15ec47c9d939",
+        "alignment": "0ab047bf9f918d798bd1c4f4eac8c6d59e0317c8d36fcb25c81a6801cfee0270"
+      },
+      "cross_split_shared_bars": 0,
+      "splits": {
+        "train": {
+          "main_input_rows": 1013,
+          "eligible_rows": 978,
+          "distinct_instants": 929,
+          "dates": 787,
+          "excluded": {
+            "outside_xnys_session": 35
+          }
+        },
+        "val": {
+          "main_input_rows": 215,
+          "eligible_rows": 207,
+          "distinct_instants": 192,
+          "dates": 165,
+          "excluded": {
+            "outside_xnys_session": 8
+          }
+        }
+      }
+    },
+    "test_loaded": false,
+    "selection": "Lowest 20-minute MAE on common SPX-PX-GRID5-v1 validation; Fed validation is scored only after selection",
+    "dense_train_before_first_fed_validation_bar": "2019-05-28 11:05:00",
+    "validation_before_first_reserved_test_bar": "2021-08-24 11:05:00"
+  },
+  "input_scale": 54.52524563392658,
+  "target_scale": [
+    20.484776735877194,
+    25.204145340161027
+  ],
+  "configuration": {
+    "epochs": 30,
+    "batch_size": 64,
+    "learning_rate": 0.001,
+    "weight_decay": 0.001,
+    "gradient_clip": 1,
+    "selection": "Lowest 20-minute MAE on common SPX-PX-GRID5-v1 validation; Fed validation is scored only after selection"
+  },
+  "environment": {
+    "python": "3.12.9",
+    "torch": "2.8.0+cu128",
+    "numpy": "2.5.5",
+    "device": "cuda",
+    "gpu": "NVIDIA H200"
+  },
+  "runtime_seconds": 383.7948225099826,
+  "runs": [
+    {
+      "architecture": "none+CNN~none~none",
+      "train_cohort": "SPX-PX-GRID5-v1",
+      "selection_cohort": "SPX-PX-GRID5-v1 val",
+      "train_rows": 204694,
+      "total_updates": 95970,
+      "selected_epoch": 5,
+      "grid5_validation": {
+        "smooth_l1": 0.3368872044153525,
+        "20": {
+          "mae_bp": 12.887367376208553,
+          "direction_accuracy": 0.5252642497283414,
+          "direction_eligible_rows": 40492,
+          "predicted_flat_fraction": 0.0
+        },
+        "30": {
+          "mae_bp": 15.844811403618818,
+          "direction_accuracy": 0.5265717177202379,
+          "direction_eligible_rows": 40513,
+          "predicted_flat_fraction": 0.0
+        }
+      },
+      "grid5_validation_paired": {
+        "gain_over_persistence_bp_20_30": [
+          0.020197960534788364,
+          0.019867826927690024
+        ],
+        "paired_ci95_bp_by_date_block": {
+          "5": [
+            [
+              0.0030750616404201887,
+              0.0411181473057334
+            ],
+            [
+              -0.012137455507151992,
+              0.054068667410616104
+            ]
+          ],
+          "10": [
+            [
+              0.006318310353126307,
+              0.036722094654626676
+            ],
+            [
+              -0.007383805805410713,
+              0.047740796675234634
+            ]
+          ]
+        }
+      },
+      "fed_validation": {
+        "smooth_l1": 0.4513345936815972,
+        "20": {
+          "mae_bp": 15.380294057828442,
+          "direction_accuracy": 0.546875,
+          "direction_eligible_rows": 207,
+          "predicted_flat_fraction": 0.0
+        },
+        "30": {
+          "mae_bp": 19.74679827764673,
+          "direction_accuracy": 0.5445026178010471,
+          "direction_eligible_rows": 206,
+          "predicted_flat_fraction": 0.0
+        }
+      },
+      "matched_fed_validation": {
+        "20": {
+          "mae_bp": 16.248200206443617,
+          "direction_accuracy": 0.5107913669064749,
+          "direction_eligible_rows": 149,
+          "predicted_flat_fraction": 0.0
+        },
+        "30": {
+          "mae_bp": 20.57775376001094,
+          "direction_accuracy": 0.5434782608695652,
+          "direction_eligible_rows": 148,
+          "predicted_flat_fraction": 0.0
+        }
+      },
+      "matched_fed_paired": {
+        "gain_over_persistence_bp_20_30": [
+          -0.09359801094375843,
+          -0.0935111312193447
+        ],
+        "paired_ci95_bp_by_date_block": {
+          "5": [
+            [
+              -0.3125304793278157,
+              0.05460948613359887
+            ],
+            [
+              -0.3952625485531957,
+              0.13772698411299167
+            ]
+          ],
+          "10": [
+            [
+              -0.315187577116468,
+              0.05639707623849099
+            ],
+            [
+              -0.42435624064283894,
+              0.14173476696741347
+            ]
+          ]
+        }
+      },
+      "final_training_row": {
+        "stride_minutes": 5,
+        "epoch": 30,
+        "updates": 95970,
+        "train_smooth_l1": 0.2758811678115439,
+        "val_smooth_l1": 0.3650360211059742,
+        "train_mae20_bp": 11.68213283637263,
+        "val_mae20_bp": 13.436935770235461,
+        "train_mae30_bp": 14.315980956905577,
+        "val_mae30_bp": 16.628323860851236,
+        "seconds": 9.18883623596048
+      },
+      "checkpoint_sha256": "f7bb36e81f3b51f5fe4c7b593836aa0138fafa0313750aa69e602de17c0b8931"
+    },
+    {
+      "architecture": "none+CNN~none~none",
+      "train_cohort": "SPX-PX-GRID15-v1",
+      "selection_cohort": "SPX-PX-GRID5-v1 val",
+      "train_rows": 68219,
+      "total_updates": 31980,
+      "selected_epoch": 8,
+      "grid5_validation": {
+        "smooth_l1": 0.33657519401806396,
+        "20": {
+          "mae_bp": 12.877295161090332,
+          "direction_accuracy": 0.5260051368171491,
+          "direction_eligible_rows": 40492,
+          "predicted_flat_fraction": 0.0
+        },
+        "30": {
+          "mae_bp": 15.830943124895452,
+          "direction_accuracy": 0.5298546145681633,
+          "direction_eligible_rows": 40513,
+          "predicted_flat_fraction": 0.0
+        }
+      },
+      "grid5_validation_paired": {
+        "gain_over_persistence_bp_20_30": [
+          0.030270175653008043,
+          0.03373610565105755
+        ],
+        "paired_ci95_bp_by_date_block": {
+          "5": [
+            [
+              0.013594489052588428,
+              0.04996698947640559
+            ],
+            [
+              0.003052868748247295,
+              0.06293015835687478
+            ]
+          ],
+          "10": [
+            [
+              0.014489189766581485,
+              0.049807296462714354
+            ],
+            [
+              0.003453329576695076,
+              0.06377315933735
+            ]
+          ]
+        }
+      },
+      "fed_validation": {
+        "smooth_l1": 0.4531095317100405,
+        "20": {
+          "mae_bp": 15.351527053982373,
+          "direction_accuracy": 0.546875,
+          "direction_eligible_rows": 207,
+          "predicted_flat_fraction": 0.0
+        },
+        "30": {
+          "mae_bp": 19.819915230058715,
+          "direction_accuracy": 0.5130890052356021,
+          "direction_eligible_rows": 206,
+          "predicted_flat_fraction": 0.0
+        }
+      },
+      "matched_fed_validation": {
+        "20": {
+          "mae_bp": 16.23289104689612,
+          "direction_accuracy": 0.5179856115107914,
+          "direction_eligible_rows": 149,
+          "predicted_flat_fraction": 0.0
+        },
+        "30": {
+          "mae_bp": 20.579922632169392,
+          "direction_accuracy": 0.5144927536231884,
+          "direction_eligible_rows": 148,
+          "predicted_flat_fraction": 0.0
+        }
+      },
+      "matched_fed_paired": {
+        "gain_over_persistence_bp_20_30": [
+          -0.07828885139626604,
+          -0.09568000337779939
+        ],
+        "paired_ci95_bp_by_date_block": {
+          "5": [
+            [
+              -0.26855034447129944,
+              0.07831707966895948
+            ],
+            [
+              -0.36343021657957303,
+              0.14220134686352293
+            ]
+          ],
+          "10": [
+            [
+              -0.25635301351849527,
+              0.07685195383634554
+            ],
+            [
+              -0.34871024723743466,
+              0.16581203296470637
+            ]
+          ]
+        }
+      },
+      "final_training_row": {
+        "stride_minutes": 15,
+        "epoch": 30,
+        "updates": 31980,
+        "train_smooth_l1": 0.26215979588405913,
+        "val_smooth_l1": 0.3805856922836149,
+        "train_mae20_bp": 11.335173662694146,
+        "val_mae20_bp": 13.794896702309929,
+        "train_mae30_bp": 13.975994090367292,
+        "val_mae30_bp": 16.976962931946627,
+        "seconds": 3.0790709430002607
+      },
+      "checkpoint_sha256": "d3988bf01ef59b44620f94449069b484b54e00a9646deae1e868e8ba25c97ec0"
+    }
+  ],
+  "limitations": [
+    "Exploratory validation; no reserved test scoring.",
+    "Training-population package: dense prices and dense-training RMS scaling replace event-only fitting.",
+    "Adjacent rolling windows overlap and are not independent observations.",
+    "Price clock and bar-start convention remain inherited assumptions.",
+    "No text encoder or fusion arm was trained in this experiment."
+  ]
+}

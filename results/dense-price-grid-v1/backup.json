@@ -1,0 +1,13 @@
+{
+  "source_commit": "743c24a7b2a986c0ab2d8c25c98aeedf2954f0c2",
+  "archive_name": "rolling-price-and-training-diagnostics-evidence-20261126.zip",
+  "bytes": 605603,
+  "sha256_local_archive": "4a16bb44bc5263488a2d3bca668eace686e6fd4877c6a1641f310ed4c6e2d172",
+  "md5_local_archive": "d2ae826626c2bc5afb95423f01390167",
+  "zip_members": 22,
+  "drive_url": "https://drive.google.com/file/d/1oicRd6YPws6966Ejl7-_pIiwmRlL_LvP/view?usp=drivesdk",
+  "drive_parent": "https://drive.google.com/drive/folders/1qpVCQDpEJmke26zNhrnBpYH3Vkd2dYmy",
+  "verification": "ZIP CRC checked locally. Drive metadata readback confirms the exact filename, application/zip, 605603 bytes and expected Results/Evidence parent. Destination checksum was not exposed by the connector.",
+  "contents": "Aggregate metrics, curves, source plot scripts, protocols and provenance for both completed experiments; no raw prices, raw text, model weights, optimizer states or per-window predictions.",
+  "recorded_at": "2026-11-27T04:09:55.788865+00:00"
+}
