@@ -146,12 +146,15 @@ def main():
             pd.DataFrame(epoch_rows).to_csv(directory / "learning-curves.csv", index=False)
         arm.load_state_dict(checkpoint)
         forecast, fm = evaluate(arm, fx, fed["val"].returns, target_scale, fed["val"].weights)
-        _, grid_vm = evaluate(arm, xval, val5.returns, target_scale)
+        grid_forecast, grid_vm = evaluate(arm, xval, val5.returns, target_scale)
         mw = matched_weights
         record = {"architecture": "none+CNN~none~none", "train_cohort": f"SPX-PX-GRID{stride}-v1",
                   "selection_cohort": "SPX-PX-GRID5-v1 val", "train_rows": len(x),
                   "total_updates": step, "selected_epoch": chosen_epoch,
-                  "grid5_validation": grid_vm, "fed_validation": fm,
+                  "grid5_validation": grid_vm,
+                  "grid5_validation_paired": paired(val5.returns, grid_forecast, np.ones(len(val5.returns)),
+                                                    pd.DatetimeIndex(val5.times).strftime("%Y-%m-%d").to_numpy()),
+                  "fed_validation": fm,
                   "matched_fed_validation": endpoint_metrics(fed["val"].returns[matched_ix], forecast[matched_ix], mw),
                   "matched_fed_paired": paired(fed["val"].returns[matched_ix], forecast[matched_ix], mw, reference.market_et.str[:10].to_numpy()),
                   "final_training_row": epoch_rows[-1], "checkpoint_sha256": None}
@@ -163,6 +166,8 @@ def main():
         pd.DataFrame(step_rows).to_csv(directory / "optimizer-steps.csv", index=False)
         np.savez_compressed(directory / "fed-validation.npz", predictions=forecast, targets=fed["val"].returns,
                             event_ids=fed["val"].rows.event_id.to_numpy(str))
+        np.savez_compressed(directory / "grid-validation.npz", predictions=grid_forecast, targets=val5.returns,
+                            anchor_times=val5.times.astype(str))
         results.append(record); curves.extend(epoch_rows)
         (directory / "metrics.json").write_text(json.dumps(record, indent=2, allow_nan=False) + "\n")
     result = {"id": "dense-price-grid-v1", "architecture": "none+CNN~none~none", "status": "completed",
