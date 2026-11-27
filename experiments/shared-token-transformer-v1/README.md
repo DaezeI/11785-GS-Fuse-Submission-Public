@@ -43,3 +43,7 @@ endpoints to the earlier CNN changes architecture, supervision and optimization
 together. It cannot attribute a gain to any one component. This reused validation
 is exploratory; date-block intervals condition on the selected checkpoint and do
 not account for selection. It cannot establish the benefit of adding text.
+
+## Verified batch calibration
+
+The [ten-update confirmation](batch-confirmation.json) passed with 204,694 unique windows, activation checkpointing and BF16 autocast. Peak allocated memory was 24,140,269,056 bytes; peak PyTorch reserved memory was 32,975,618,048 bytes. This is dataset-limited full-batch training. Formal training was running at the last check. Repeated local polling stopped at the user’s request; final accuracy and convergence evidence remain pending collection.

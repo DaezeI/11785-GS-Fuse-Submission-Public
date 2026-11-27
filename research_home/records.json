@@ -2,7 +2,7 @@
   "title": "GS-Fuse Research Home",
   "stage": "Controlled experiments and final writing",
   "overview": "Rolling-price CNN training produced small ordinary-market validation gains, while matched Fed validation did not improve over Persistence. Earlier controlled text comparisons found little reliable benefit from the matched report. These findings remain scoped to their protocols; the Fed test is reserved.",
-  "updated_at": "2026-11-27T06:17:37+00:00",
+  "updated_at": "2026-11-27T06:32:34+00:00",
   "source_url": "https://github.com/DaezeI/11785-GS-Fuse-Submission-Public/blob/main/research_home/records.json",
   "links": [
     {
@@ -49,19 +49,23 @@
       "status": "running",
       "question": "How does a width-128, depth-four shared-query Transformer train and predict on all five-minute SPX windows?",
       "configuration": "none+Transformer128x4~none~none; SPX-PX6-GRID5-v1: 204,694 train / 40,548 val; six outputs through 30 minutes; one H200, calibrated maximum unique batch; 1,000 optimizer updates capped at 90 minutes.",
-      "finding": "The single-H200 job is verified running. Full training-update batch calibration is in progress; no forecasting result yet.",
+      "finding": "One H200 confirmed a full batch of 204,694 distinct windows for ten complete BF16 forward/backward/AdamW updates with activation checkpointing. Peak allocated/reserved memory was 22.482/30.712 GiB. Formal 1,000-update training was running at the last check; repeated polling stopped at the user’s request. Final results are pending.",
       "limitations": "Exploratory reused validation, six-target objective and optimization changed together. No reserved test or text experiment.",
       "figure": null,
       "evidence": [
         {
           "label": "Bounded protocol and configuration",
           "url": "https://github.com/DaezeI/11785-GS-Fuse-Submission-Public/blob/main/experiments/shared-token-transformer-v1/README.md"
+        },
+        {
+          "label": "Actual ten-update batch confirmation",
+          "url": "https://github.com/DaezeI/11785-GS-Fuse-Submission-Public/blob/main/experiments/shared-token-transformer-v1/batch-confirmation.json"
         }
       ],
       "related": [
         "dense-price-grid-v1"
       ],
-      "updated_at": "2026-11-27T06:17:37.914575+00:00"
+      "updated_at": "2026-11-27T06:32:33.947573+00:00"
     },
     {
       "id": "dense-price-grid-v1",
