@@ -36,7 +36,7 @@ population into another run's row.
 
 Nicole completed a [CPU training diagnostic](results/fed-training-diagnostics-v1/summary.md): the text-head training loss fell another 10.33% over ten extra updates while validation error rose. This is not an original W&B history or a new selected checkpoint. The loader audit explains 978 as event-window subsampling despite 225,561 available training-period price bars.
 
-At the user's request, a separate [rolling-price training comparison](experiments/dense-price-grid-v1/config.json) replaces event-only training with 204,694 five-minute-grid windows or 68,219 fifteen-minute-grid windows. Both use the same `none+CNN~none~none`, common rolling validation, original target clock and detailed training-loss logging. Real-input separation audit and four focused boundary tests passed. Status is planned until submission is recorded; no test scoring is authorized by this experiment.
+At the user's request, a separate [rolling-price training comparison](experiments/dense-price-grid-v1/config.json) replaces event-only training with 204,694 five-minute-grid windows or 68,219 fifteen-minute-grid windows. Both use the same `none+CNN~none~none`, common rolling validation, original target clock and detailed training-loss logging. Real-input separation audit and four focused boundary tests passed. Both fits completed on one H200 in 6m43s allocated time. Selected forecasts have small ordinary rolling-validation gains, but no improvement on the 149 matched Fed validation releases. Continued fitting worsened late validation. [Completed result](results/dense-price-grid-v1/summary.md). No test scoring was performed.
 
 ## Nicole's Fed text pilot (November 24)
 

@@ -1,0 +1,16 @@
+{
+  "run_id": "dense-price-grid-v1",
+  "owner": "Nicole",
+  "status": "completed",
+  "hardware": "one H200",
+  "runtime_code_commit": "3254193cb007088212a77011a03c6dbeb3d775cd",
+  "runtime_script_sha256": "c9fc2310b50d5e0a9b172899d9ebff2bcdd088ed3cfc38bba0c555bbad5d3534",
+  "dataset_script_sha256": "da83f23c9f220de8a620628f08e599afa5355c298b1b2df167c4b0a0ac3e1302",
+  "scheduler_exit_status": 0,
+  "allocated_walltime": "00:06:43",
+  "runtime_seconds": 383.7948225099826,
+  "test_scored": false,
+  "artifact_files_sha256_verified": 19,
+  "independent_verification": "Recomputed full-grid and matched-release MAE from saved per-example predictions; verified both checkpoint hashes and runtime source hashes.",
+  "artifacts": "Private prediction, optimizer-state and checkpoint backup retained by Nicole; aggregate evidence only in this directory."
+}

@@ -4,7 +4,7 @@ Owner Nicole. Completed local CPU diagnostic, November 26, 2026. No GPU job and 
 
 ## Question and protocol
 
-The user requested an actual training-curve check and ten additional optimization updates, and asked why more than ten years of SPX prices produced only 978 CNN training windows. The original endpoint runners and exact 8B batch wrapper did not log training loss to W&B. The available local W&B API authentication failed. The remote original training log contained embedding progress and final selection summaries, not training-loss curves. Original final optimizer states were not saved.
+The user requested an actual training-curve check and ten additional optimization updates, and asked why more than ten years of SPX prices produced only 978 CNN training windows. The original endpoint runners and exact 8B batch wrapper did not log training loss to W&B. The remote original training log contained embedding progress and final selection summaries, not training-loss curves. Original final optimizer states were not saved.
 
 We therefore replayed the first recorded configuration of each architecture on CPU, with the original data, cached features, normalization, architecture, optimization and training order, and then performed exactly ten additional updates. This is a replay, not an exact continuation of the original CUDA execution. See [protocol](protocol.json), [metrics](metrics.json), [epoch/extension traces](training-traces.csv) and [runner](../../scripts/diagnose_fed_training.py).
 
