@@ -1,6 +1,6 @@
-## November 27 controlled Transformer depth comparison — planned
+## November 27 Transformer depth comparison — concurrent replacement
 
-Nicole will reuse completed `none+Transformer128x4~none~none` and train `none+Transformer128x8~none~none` / `none+Transformer128x12~none~none` sequentially on one H200. Width, six-target task, cohort, batch 204,694, 1,000 updates, optimizer and selection stay fixed. [Protocol](experiments/transformer-depth-sweep-v1/README.md). The remote pipeline generates a paired comparison table and curves after both fits complete; no ongoing local polling. No depth-8/12 result yet.
+The user requested concurrent depth8/12 starts on one H200. The sequential attempt was canceled after depth8 entered formal training; its partial outputs remain private and are excluded. [Concurrent v2](experiments/transformer-depth-sweep-v2/README.md) reuses completed depth4 and retains all scientific settings. The remote controller starts two children on one GPU and automatically compares them after both finish. No depth8/12 result yet.
 
 ## November 27 shared-query Transformer — completed
 

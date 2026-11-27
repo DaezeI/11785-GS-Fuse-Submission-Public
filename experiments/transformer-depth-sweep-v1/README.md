@@ -44,3 +44,7 @@ not imply equal FLOPs or runtime, and a depth that needs different optimization
 is not tested by this comparison. No text experiment or reserved test is scored.
 Repeated local progress polling remains disabled at the user's request; the
 remote batch pipeline automatically generates the comparison when both fits finish.
+
+## Superseded before comparison
+
+The user requested concurrent starts. The sequential job was canceled after depth8 entered training; partial artifacts remain private and are excluded. Continue with [concurrent v2](../transformer-depth-sweep-v2/README.md).

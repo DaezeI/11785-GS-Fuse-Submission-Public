@@ -29,6 +29,7 @@ def main():
     for depth in (4, 8, 12):
         p.add_argument(f"--depth{depth}", type=Path, required=True)
     p.add_argument("--out", type=Path, required=True)
+    p.add_argument("--run-id", default="transformer-depth-sweep-v1")
     a = p.parse_args()
     runs = {d: getattr(a, f"depth{d}") for d in (4, 8, 12)}
     metrics = {d: json.loads((path / "metrics.json").read_text()) for d, path in runs.items()}
@@ -86,7 +87,7 @@ def main():
     table = pd.DataFrame(rows)
     table.to_csv(a.out / "depth-comparison.csv", index=False)
     pd.concat(curves).to_csv(a.out / "learning-curves.csv", index=False)
-    result = dict(id="transformer-depth-sweep-v1", status="completed", rows=rows,
+    result = dict(id=a.run_id, status="completed", rows=rows,
                   persistence=metrics[4]["persistence"], paired=paired,
                   score_cohort="SPX-PX6-GRID5-v1 val", test_scored=False,
                   limitations=["Each depth has one fit; this is a bounded comparison under one optimization recipe.",

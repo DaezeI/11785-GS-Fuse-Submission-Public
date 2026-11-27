@@ -1,0 +1,23 @@
+{
+  "id": "transformer-depth-sweep-v2",
+  "title": "Compare depths8 and12 concurrently with the depth4 reference",
+  "owner": "Nicole",
+  "kind": "Experiment",
+  "status": "planned",
+  "question": "Does increasing depth from4 to8 or12 reduce validation MAE with the existing fixed training recipe?",
+  "configuration": "SPX-PX6-GRID5-v1: 204,694 training /40,548 validation; width128, four heads, FFN512, six supervised outputs. Reuse completed depth4; concurrent depth8/12 on one H200, each batch204,694 and1,000 updates. Exact optimizer/schedule, checkpointing and selection retained.",
+  "finding": "Prepared concurrent single-H200 replacement; no new depth comparison result yet.",
+  "limitations": "One fit per depth with one fixed optimization recipe. Reused validation selects checkpoints/depth; intervals do not adjust selection. Equal updates are not equal compute. No reserved test.",
+  "figure": null,
+  "evidence": [
+    {
+      "label": "Concurrent comparison protocol",
+      "url": "https://github.com/DaezeI/11785-GS-Fuse-Submission-Public/blob/main/experiments/transformer-depth-sweep-v2/README.md"
+    }
+  ],
+  "related": [
+    "shared-token-transformer-v1",
+    "transformer-depth-sweep-v1"
+  ],
+  "updated_at": "2026-11-27T07:44:54.851330+00:00"
+}

@@ -137,3 +137,5 @@ The depth comparison adds `none+Transformer128x8~none~none` and
 six targets, full batch and update budget. `transformer-depth-sweep-v1` reuses
 the completed depth-4 fit and runs depths 8/12 sequentially on one H200.
 [Fixed comparison](../experiments/transformer-depth-sweep-v1/README.md).
+
+`transformer-depth-sweep-v2` supersedes the canceled sequential attempt: depths8/12 run concurrently as two processes sharing one H200, with all scientific settings retained. [Concurrent protocol](../experiments/transformer-depth-sweep-v2/README.md).
