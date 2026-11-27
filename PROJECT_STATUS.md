@@ -1,3 +1,7 @@
+# November 27 shared-query Transformer — running
+
+`none+Transformer128x4~none~none` uses linear OHLC embedding, four width-128 Transformer layers, one learned query expanded over six future positions, and shared linear readout. All +5/+10/+15/+20/+25/+30-minute outputs are supervised on `SPX-PX6-GRID5-v1`. The single-H200 job is running batch calibration before the separate bounded training budget. [Protocol](experiments/shared-token-transformer-v1/README.md); no forecasting result yet.
+
 # November 26 rolling-price CNN experiment — completed
 
 Nicole completed both `none+CNN~none~none` fits on the full permitted rolling-price training population: 204,694 GRID5 windows / 95,970 updates and 68,219 GRID15 windows / 31,980 updates. Common rolling validation has 40,548 windows. Selected GRID15 MAE20/30 was 12.8773/15.8309 bp versus Persistence 12.9076/15.8647, with conditional date-block intervals excluding zero. These are small validation gains and the intervals do not adjust checkpoint selection. On the 149 matched Fed validation releases, neither selected fit improved over Persistence. Training loss kept falling while late validation worsened. One H200, exit 0, 6m43s. No text training or test scoring. [Result and provenance](results/dense-price-grid-v1/summary.md).

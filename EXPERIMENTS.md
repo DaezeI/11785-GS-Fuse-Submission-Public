@@ -1,3 +1,7 @@
+## November 27 shared-query Transformer
+
+Nicole is running `none+Transformer128x4~none~none` on `SPX-PX6-GRID5-v1` (204,694 train / 40,548 validation windows), with six supervised positions from +5 to +30 minutes. [Protocol and configuration](experiments/shared-token-transformer-v1/README.md). One H200, actual forward/backward/AdamW batch calibration, followed by a separate 1,000-update budget capped at 90 minutes. Runtime commit `e1c5375359b0faf05e240f95fa175d8604df6d4e`. Thirteen focused tests and real-input split audit passed. GPU job is running; no accuracy result or convergence claim yet. Reserved test remains untouched.
+
 # Experiment register and reporting rule
 
 This is the protocol and citation index for team experiments. Use the
