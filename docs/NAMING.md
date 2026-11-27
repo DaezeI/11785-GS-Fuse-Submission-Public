@@ -81,3 +81,24 @@ the text arm will reuse it as its frozen price encoder.
 `FED-PXTX-ALL-REL5-v2`: 173 / 149 / 172 releases, defined by the merged v2 ledgers and verified-text manifest. The #55 training configuration drops the two documented truncated train texts (171 used); validation is unchanged. Preserve that exclusion in every comparison label/provenance record.
 
 `Llama-3.1-8B(frozen)+CNN(frozen)~Pool~Add`: Nicole's exact #55 architecture, implemented in `scripts/run_fed_spx_text.py`, using the frozen `none+CNN~none~none` checkpoints. Training and validation completed November 26; see `results/fed-spx-text-llama31-8b-v1/summary.md`. Test remains reserved. The registered pilot records token budget, preprocessing and evaluation controls.
+
+## November 26 rolling-price cohorts
+
+`SPX` denotes the existing cash-index OHLC file, without an event/text filter.
+`GRID5` and `GRID15` select hypothetical release anchors every 5 or 15 minutes,
+aligned to 09:30 ET. The decision time is five minutes after that anchor,
+preserving the original 35-bar information cutoff and 20/30-minute labels.
+No component-stock panel is implied.
+
+- `SPX-PX-GRID5-v1`: 204,694 training windows and 40,548 validation windows,
+  constructed by `data/dense_price_endpoints.py`. Full price support stays
+  within each temporal partition. No test cohort is constructed.
+- `SPX-PX-GRID15-v1`: 68,219 training windows, the 15-minute subset of GRID5
+  training anchors. The initial training comparison selects and scores on
+  the common `SPX-PX-GRID5-v1 val`, not a separate GRID15 validation score.
+
+The architecture remains `none+CNN~none~none`. Dense-training RMS scaling and
+the training population differ from the earlier Fed-event-only experiment;
+report this as a training-population package comparison. Validation selection
+uses the common rolling-price grid; `FED-PX-REL5-v1 val` and
+`FED-PXTX-ALL-REL5-v2 val` are scored after checkpoint selection.

@@ -2,7 +2,7 @@
   "title": "GS-Fuse Research Home",
   "stage": "Controlled experiments and final writing",
   "overview": "The last-price rule beat our trained price models. In Adaeze’s completed R3 return run, correct and shuffled articles gave nearly identical results, and predicting zero return had slightly lower error.",
-  "updated_at": "2026-11-26T22:04:39+00:00",
+  "updated_at": "2026-11-27T03:49:46+00:00",
   "source_url": "https://github.com/DaezeI/11785-GS-Fuse-Submission-Public/blob/main/research_home/records.json",
   "links": [
     {
@@ -41,6 +41,71 @@
     }
   ],
   "experiments": [
+    {
+      "id": "dense-price-grid-v1",
+      "title": "Train the price CNN on all eligible rolling price windows",
+      "kind": "Experiment",
+      "status": "planned",
+      "owner": "Nicole",
+      "question": "Does dense price-only training establish useful forecasting compared with the previous event-only CNN training?",
+      "configuration": "none+CNN~none~none on SPX-PX-GRID5-v1 (204,694 train) or SPX-PX-GRID15-v1 (68,219 train), common SPX-PX-GRID5-v1 validation (40,548), 35 historical bars, 20/30-minute returns, original five-minute processing lag, batch 64, AdamW 0.001, 30 epochs. One bounded single-GPU job planned.",
+      "finding": "Real-input audit passed with zero shared train/validation bars and explicit separation from reserved test support. Four focused clock, purging, stride and missing-bar checks passed. Training has not been submitted.",
+      "limitations": "Correlated overlapping windows; dense-training RMS scaling and training population change together. Validation is exploratory. No text arm or reserved-test result is included.",
+      "figure": null,
+      "evidence": [
+        {
+          "label": "Fixed training protocol",
+          "url": "https://github.com/DaezeI/11785-GS-Fuse-Submission-Public/blob/main/experiments/dense-price-grid-v1/config.json"
+        },
+        {
+          "label": "Real-input window audit",
+          "url": "https://github.com/DaezeI/11785-GS-Fuse-Submission-Public/blob/main/results/dense-price-grid-v1/audit.json"
+        },
+        {
+          "label": "Training runner",
+          "url": "https://github.com/DaezeI/11785-GS-Fuse-Submission-Public/blob/main/scripts/train_dense_price.py"
+        }
+      ],
+      "related": [
+        "fed-training-diagnostics-v1",
+        "fed-spx-endpoints-price-v1"
+      ],
+      "updated_at": "2026-11-27T03:49:46.039957+00:00"
+    },
+    {
+      "id": "fed-training-diagnostics-v1",
+      "title": "Training-loss replay and the 978-window selection audit",
+      "kind": "Analysis",
+      "status": "completed",
+      "owner": "Nicole",
+      "question": "Do the original training objectives flatten at the recorded budget, and why were only 978 price windows used?",
+      "configuration": "CPU replay of none+CNN~none~none on FED-PX-REL5-v1 and Llama-3.1-8B(frozen)+CNN(frozen)~Pool~Add on FED-PXTX-ALL-REL5-v2 minus two exclusions; original budgets plus exactly ten updates, same cached features and optimization. No test scoring.",
+      "finding": "The text-head full-training Smooth L1 fell 10.33% over ten extra updates, while validation MAE20 rose from 25.0641 to 26.1795 bp. The price extension increased training loss by 1.71%. The original price loader selected 978 announcement windows despite 225,561 training-period price bars.",
+      "limitations": "CPU replay, not original W&B history or exact optimizer-state resume; original CUDA validation traces are reproduced within 0.000417 bp. Ten extra updates cannot certify convergence or generalization. The original selected checkpoints were preserved.",
+      "figure": {
+        "url": "https://raw.githubusercontent.com/DaezeI/11785-GS-Fuse-Submission-Public/main/results/fed-training-diagnostics-v1/training-curves.png",
+        "alt": "Full-training and validation Smooth L1 during CPU replays, and ten-update extension close-ups."
+      },
+      "evidence": [
+        {
+          "label": "Diagnostic and selection audit",
+          "url": "https://github.com/DaezeI/11785-GS-Fuse-Submission-Public/blob/main/results/fed-training-diagnostics-v1/summary.md"
+        },
+        {
+          "label": "Measured metrics",
+          "url": "https://github.com/DaezeI/11785-GS-Fuse-Submission-Public/blob/main/results/fed-training-diagnostics-v1/metrics.json"
+        },
+        {
+          "label": "Reproducible diagnostic runner",
+          "url": "https://github.com/DaezeI/11785-GS-Fuse-Submission-Public/blob/main/scripts/diagnose_fed_training.py"
+        }
+      ],
+      "related": [
+        "fed-spx-text-llama31-8b-v1",
+        "fed-spx-endpoints-price-v1"
+      ],
+      "updated_at": "2026-11-27T03:49:46.039957+00:00"
+    },
     {
       "id": "fed-spx-text-llama31-8b-v1",
       "title": "Exact 8B text arm completed without a measurable validation gain",

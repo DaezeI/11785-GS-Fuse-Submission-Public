@@ -1,0 +1,200 @@
+{
+  "id": "fed-training-diagnostics-v1",
+  "status": "completed",
+  "test_loaded": false,
+  "execution": "Local CPU replay, first recorded configuration, original budgets plus 10 updates",
+  "environment": {
+    "python": "3.11.11",
+    "torch": "2.5.1",
+    "numpy": "1.24.3",
+    "pandas": "2.1.4",
+    "device": "cpu",
+    "threads": 2
+  },
+  "source_commit": "110490a4e5ccb1a6cdaeab5b43fb5442f984ae62",
+  "script_sha256": "3edeee9adbf118f809f33147925be793ffe9b263264bbd8334e22369edb9ceac",
+  "price_sha256": "6a873b1d72d27f9188c6bf12acb756775916be8ed9ff42d9e9dd98028f68de2a",
+  "frozen_price_sha256": "684bbd1d6c36cea4c37bb3a48f64e95127c5e7bb50001e922c12b37ef33d2ea8",
+  "feature_cache_sha256": "08caee4be44d4cab8908c5af34d30365920f1648f6dc085e42c5e1f4b308a88d",
+  "data_audit": {
+    "calendar": "XNYS",
+    "exchange_calendars_version": "4.13.3",
+    "input_sha256": {
+      "prices": "6a873b1d72d27f9188c6bf12acb756775916be8ed9ff42d9e9dd98028f68de2a",
+      "catalog": "56157fe018beeba6f051f765e0f9d6763e839324b9d95ebbf49f15ec47c9d939",
+      "alignment": "0ab047bf9f918d798bd1c4f4eac8c6d59e0317c8d36fcb25c81a6801cfee0270"
+    },
+    "cross_split_shared_bars": 0,
+    "splits": {
+      "train": {
+        "main_input_rows": 1013,
+        "eligible_rows": 978,
+        "distinct_instants": 929,
+        "dates": 787,
+        "excluded": {
+          "outside_xnys_session": 35
+        }
+      },
+      "val": {
+        "main_input_rows": 215,
+        "eligible_rows": 207,
+        "distinct_instants": 192,
+        "dates": 165,
+        "excluded": {
+          "outside_xnys_session": 8
+        }
+      }
+    }
+  },
+  "selection_funnel": {
+    "raw_price_rows": 331256,
+    "regular_session_price_rows_all_years": 322783,
+    "price_first": "2008-01-02 09:30:00",
+    "price_last": "2024-04-17 16:15:00",
+    "training_period_regular_session_bars": 225561,
+    "training_bar_cutoff_exclusive": "2019-05-22 14:05:00",
+    "training_catalog_rows": 1409,
+    "main_candidate_rows": 1013,
+    "endpoint_eligible_training_rows": 978,
+    "endpoint_exclusions": {
+      "outside_xnys_session": 35
+    },
+    "distinct_training_instants": 929,
+    "distinct_training_dates": 787,
+    "continuous_windows_trained_in_this_run": false
+  },
+  "price": {
+    "original_budget": {
+      "arm": "price",
+      "step": 480,
+      "epoch": 30,
+      "train_smooth_l1": 0.269359827041626,
+      "val_smooth_l1": 0.30913811922073364,
+      "train_mae20_bp": 15.74386943802225,
+      "train_mae30_bp": 17.80550623426779,
+      "val_mae20_bp": 15.954115919873724,
+      "val_mae30_bp": 19.914687291905654,
+      "last_minibatch_grad_norm": 1.2112118005752563,
+      "last_minibatch_loss": 0.1656695157289505
+    },
+    "after_10_extra_updates": {
+      "arm": "price",
+      "step": 490,
+      "epoch": 30.625,
+      "train_smooth_l1": 0.2739662528038025,
+      "val_smooth_l1": 0.31915271282196045,
+      "train_mae20_bp": 15.970979653012375,
+      "train_mae30_bp": 18.10824187328639,
+      "val_mae20_bp": 16.19658929671795,
+      "val_mae30_bp": 20.44080406399255,
+      "last_minibatch_grad_norm": 0.21920013427734375,
+      "last_minibatch_loss": 0.38198018074035645
+    },
+    "train_loss_relative_reduction_extra": -0.01710138372439871,
+    "validation_mae20_trace": [
+      15.342788201097225,
+      15.392125111404837,
+      15.587407301768632,
+      15.739420612333427,
+      15.422260340048043,
+      15.482933961755919,
+      15.556617381784578,
+      15.415423702492374,
+      15.400646504521848,
+      15.664419115600023,
+      15.520603234644065,
+      15.669200394435371,
+      15.721745599628596,
+      15.685082534606448,
+      15.515698266685717,
+      15.531882362190034,
+      15.489879425219543,
+      15.308240465144483,
+      15.651170648086243,
+      15.50784646542988,
+      15.37323029407429,
+      15.6480948812207,
+      16.129132060592024,
+      15.541757382686146,
+      16.009073347439752,
+      15.570313482282781,
+      16.187242378937963,
+      15.810297010246044,
+      16.015953734614055,
+      16.296439728044383,
+      15.954115919873724
+    ],
+    "trainable_parameters": 16866,
+    "published_val_trace_max_abs_difference_bp": 0.00041639301830898034
+  },
+  "text": {
+    "original_budget": {
+      "arm": "text",
+      "step": 90,
+      "epoch": 30,
+      "train_smooth_l1": 0.20305564999580383,
+      "val_smooth_l1": 0.6525204181671143,
+      "train_mae20_bp": 13.302199431510562,
+      "train_mae30_bp": 13.320982059438677,
+      "val_mae20_bp": 25.064134218310183,
+      "val_mae30_bp": 37.35055563263984,
+      "last_minibatch_grad_norm": 1.0002517700195312,
+      "last_minibatch_loss": 0.2556185722351074
+    },
+    "after_10_extra_updates": {
+      "arm": "text",
+      "step": 100,
+      "epoch": 33.333333333333336,
+      "train_smooth_l1": 0.18207329511642456,
+      "val_smooth_l1": 0.6817086338996887,
+      "train_mae20_bp": 12.500129133792441,
+      "train_mae30_bp": 13.153878527141206,
+      "val_mae20_bp": 26.17952853422966,
+      "val_mae30_bp": 38.063637107132045,
+      "last_minibatch_grad_norm": 1.5503898859024048,
+      "last_minibatch_loss": 0.1432029753923416
+    },
+    "train_loss_relative_reduction_extra": 0.10333302658563244,
+    "validation_mae20_trace": [
+      15.912931509911806,
+      15.912803579869292,
+      15.997144028836413,
+      15.945515462326158,
+      16.18211720144897,
+      16.641057750698355,
+      17.349449296084316,
+      18.160111667682887,
+      18.875603180575652,
+      19.680760308407574,
+      20.640616476892152,
+      21.79341995204649,
+      22.988040135891694,
+      23.494515801483143,
+      22.66495204533146,
+      22.548409650207493,
+      23.48037876524905,
+      22.547993528050732,
+      22.186993591719,
+      23.07460137896053,
+      22.370707758637383,
+      22.510991746008386,
+      22.32358446168517,
+      22.950003490390678,
+      24.800266196195594,
+      23.4849762993288,
+      24.857094613673304,
+      24.914722766773767,
+      24.269036538418888,
+      24.461470034747403,
+      25.064134218310183
+    ],
+    "trainable_parameters": 131170,
+    "published_val_trace_max_abs_difference_bp": 6.915002427376749e-05
+  },
+  "limits": [
+    "CPU replay is not the original CUDA trajectory; trace differences are reported.",
+    "Original final optimizer states were not retained, so this is replay rather than exact resume.",
+    "Ten additional updates diagnose local loss movement and cannot certify convergence.",
+    "No new checkpoint was selected for deployment or reserved-test scoring."
+  ]
+}

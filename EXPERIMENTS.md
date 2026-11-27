@@ -32,6 +32,12 @@ Use `PENDING` for unknown fields. A queued job has no result. A smoke run checks
 execution, not model quality. Do not copy a result from one checkpoint or data
 population into another run's row.
 
+## November 26 training diagnostics and rolling-price comparison
+
+Nicole completed a [CPU training diagnostic](results/fed-training-diagnostics-v1/summary.md): the text-head training loss fell another 10.33% over ten extra updates while validation error rose. This is not an original W&B history or a new selected checkpoint. The loader audit explains 978 as event-window subsampling despite 225,561 available training-period price bars.
+
+At the user's request, a separate [rolling-price training comparison](experiments/dense-price-grid-v1/config.json) replaces event-only training with 204,694 five-minute-grid windows or 68,219 fifteen-minute-grid windows. Both use the same `none+CNN~none~none`, common rolling validation, original target clock and detailed training-loss logging. Real-input separation audit and four focused boundary tests passed. Status is planned until submission is recorded; no test scoring is authorized by this experiment.
+
 ## Nicole's Fed text pilot (November 24)
 
 [Exact 8B pilot](experiments/fed-spx-text-llama31-8b-v1/README.md), owner Nicole, #55: **training and validation completed November 26**. The 171/149 text arm essentially ties CNN at 20 minutes and is slightly worse at 30; all ALL-cohort matching comparisons are inconclusive. Frozen-price checks passed; one H200, exit 0, 7m46s. [Result pack](results/fed-spx-text-llama31-8b-v1/summary.md). Test remains reserved pending the team freeze.

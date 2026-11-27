@@ -1,0 +1,38 @@
+{
+  "id": "fed-training-diagnostics-v1",
+  "owner": "Nicole",
+  "status": "completed",
+  "question": "Are the original training objectives still decreasing at the recorded budget, and why did the price loader emit only 978 training examples?",
+  "architectures": [
+    "none+CNN~none~none",
+    "Llama-3.1-8B(frozen)+CNN(frozen)~Pool~Add"
+  ],
+  "price_train_cohort": "FED-PX-REL5-v1",
+  "text_train_cohort": "FED-PXTX-ALL-REL5-v2 minus 2 documented truncated training texts",
+  "comparison": "CPU replay of the first recorded configuration, original 30 epochs, then exactly 10 additional optimizer steps; no checkpoint selection from the extension",
+  "fixed": [
+    "original inputs and fingerprints",
+    "cached 4096-dimensional Llama features",
+    "architecture",
+    "batch size 64",
+    "AdamW learning rate 0.001 and weight decay 0.001",
+    "gradient clipping 1",
+    "training-only scaling",
+    "original training order generator"
+  ],
+  "measurements": [
+    "full-training Smooth L1 at epoch boundaries and every extra step",
+    "training and validation MAE",
+    "minibatch gradient norms",
+    "replay difference from published validation traces",
+    "row-selection funnel and training-period price-bar count"
+  ],
+  "budget": "one local CPU replay per architecture, at most 490 price updates and 100 text-head updates; no GPU allocation",
+  "test_access": false,
+  "limitations": [
+    "CPU replay differs from the original CUDA runtime",
+    "original final optimizer states and training-loss histories were not saved",
+    "ten extra updates cannot certify convergence or establish generalization",
+    "raw sliding-window counts do not measure independent sample size"
+  ]
+}
