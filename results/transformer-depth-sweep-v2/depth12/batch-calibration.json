@@ -1,0 +1,34 @@
+[
+  {
+    "batch_size": 204694,
+    "updates_requested": 10,
+    "depth": 12,
+    "device_name": "NVIDIA H200",
+    "device_total_bytes": 150111977472,
+    "precision": "BF16 autocast, FP32 parameters/AdamW states",
+    "activation_checkpointing": true,
+    "attention_batch_chunk": 8192,
+    "gradient_accumulation": false,
+    "accepted": true,
+    "peak_allocated_bytes": 41350268416,
+    "peak_reserved_bytes": 50197430272,
+    "untracked_context_bytes": 1275527168,
+    "reserved_headroom_bytes": 7505598873,
+    "reason": "fits",
+    "seconds_per_update": [
+      10.37387066707015,
+      10.13168758014217,
+      10.08572129206732,
+      10.085740479873493,
+      10.087086635874584,
+      10.095578930806369,
+      8.544359544059262,
+      8.261628081090748,
+      10.013508192030713,
+      10.092818293953314
+    ],
+    "last_loss": 0.41511020064353943,
+    "last_gradient_norm": 4.783315181732178,
+    "samples_per_second": 20295.386383228404
+  }
+]

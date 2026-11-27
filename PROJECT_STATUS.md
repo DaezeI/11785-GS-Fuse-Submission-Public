@@ -1,3 +1,7 @@
+# November 27 Transformer depth comparison — completed
+
+All three `none+Transformer128x4~none~none`, `none+Transformer128x8~none~none`, and `none+Transformer128x12~none~none` fits completed 1,000 full-batch updates on `SPX-PX6-GRID5-v1`. Selected mean validation MAE is 11.689790 / 11.692259 / 11.687593 bp. Depth12 gains only 0.0188% over depth4, with the paired mean-MAE interval spanning zero. Deeper fits lower training loss but show larger late validation deterioration. The concurrent one-H200 job exited 0 in 2h22m10s. No test scored. [Verified result](results/transformer-depth-sweep-v2/summary.md).
+
 # November 27 shared-query Transformer — completed
 
 `none+Transformer128x4~none~none @ train:SPX-PX6-GRID5-v1 → score:SPX-PX6-GRID5-v1 val` completed 1,000 full-batch updates on one H200, exit 0. The selected update 50 mean six-horizon MAE is 11.689790 bp versus Persistence 11.706526 bp, a 0.143% validation gain. Training loss kept declining, while late validation error increased. Date-block intervals condition on checkpoint selection; reused validation is exploratory. No reserved test was scored. [Full result and curves](results/shared-token-transformer-v1/summary.md).

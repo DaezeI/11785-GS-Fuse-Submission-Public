@@ -1,0 +1,52 @@
+{
+  "status": "training_started",
+  "hardware": "one H200 shared by two concurrent training processes",
+  "batch_size_per_process": 204694,
+  "verification": "First five formal updates have finite loss and finite nonzero gradient norm; checkpoint written for both depths.",
+  "depths": {
+    "8": {
+      "recorded_updates": 19,
+      "first_five_finite": true,
+      "first_five_losses": [
+        0.48602965474128723,
+        0.4577142000198364,
+        0.4126497507095337,
+        0.37654441595077515,
+        0.3793077766895294
+      ],
+      "checkpoint_written": true,
+      "last_update": {
+        "update": "19",
+        "examples_seen": "3889186",
+        "batch_size": "204694",
+        "loss": "0.32829931378364563",
+        "gradient_norm": "0.9539650082588196",
+        "learning_rate": "0.00011399999999999999",
+        "seconds": "6.779028184013441"
+      }
+    },
+    "12": {
+      "recorded_updates": 9,
+      "first_five_finite": true,
+      "first_five_losses": [
+        0.3657684624195099,
+        0.3537840247154236,
+        0.3447699546813965,
+        0.34684789180755615,
+        0.34308409690856934
+      ],
+      "checkpoint_written": true,
+      "last_update": {
+        "update": "9",
+        "examples_seen": "1842246",
+        "batch_size": "204694",
+        "loss": "0.33573609590530396",
+        "gradient_norm": "1.4345057010650635",
+        "learning_rate": "5.399999999999999e-05",
+        "seconds": "10.115620027063414"
+      }
+    }
+  },
+  "checked_at": "2026-11-27T07:52:01.543391+00:00",
+  "monitoring": "Stopped after both startup checks; remote controller continues and writes final comparison."
+}

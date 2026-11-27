@@ -1,0 +1,42 @@
+{
+  "price_sha256": "6a873b1d72d27f9188c6bf12acb756775916be8ed9ff42d9e9dd98028f68de2a",
+  "stride_minutes": 5,
+  "raw_price_rows": 331256,
+  "regular_session_bars": 322783,
+  "input_bars": 35,
+  "horizons_minutes": [
+    5,
+    10,
+    15,
+    20,
+    25,
+    30
+  ],
+  "processing_lag_minutes": 5,
+  "train_upper_bar_end_inclusive": "2019-05-22 14:05:00",
+  "validation_upper_bar_end_inclusive": "2021-08-24 11:05:00",
+  "cross_split_shared_bars": 0,
+  "test_loaded": false,
+  "inherited_price_cleaning": "09:30 through 16:00 bar-start filter, as in the original loader; actual calendar constrains targets",
+  "splits": {
+    "train": {
+      "rows": 204694,
+      "dates": 2865,
+      "first_anchor": "2008-01-02T12:25:00.000000000",
+      "last_anchor": "2019-05-22T13:30:00.000000000",
+      "first_used_bar": "2008-01-02T09:30:00.000000000",
+      "last_used_bar": "2019-05-22T14:00:00.000000000"
+    },
+    "val": {
+      "rows": 40548,
+      "dates": 569,
+      "first_anchor": "2019-05-23T10:25:00.000000000",
+      "last_anchor": "2021-08-24T10:30:00.000000000",
+      "first_used_bar": "2019-05-22T14:05:00.000000000",
+      "last_used_bar": "2021-08-24T11:00:00.000000000"
+    }
+  },
+  "train_cohort": "SPX-PX6-GRID5-v1",
+  "score_cohort": "SPX-PX6-GRID5-v1 val",
+  "time_embedding": "sinusoidal UTC elapsed minutes / five, measured from forecast origin"
+}

@@ -1,0 +1,26 @@
+{
+  "id": "transformer-depth-sweep-v1",
+  "title": "Sequential depth comparison superseded by concurrent execution",
+  "owner": "Nicole",
+  "kind": "Experiment",
+  "status": "canceled",
+  "question": "Does increasing depth from4 to8 or12 reduce validation MAE with the existing fixed training recipe?",
+  "configuration": "SPX-PX6-GRID5-v1: 204,694 training /40,548 validation; width128, four heads, FFN512, six supervised outputs. Reuse completed depth4; sequential depth8/12 on one H200, each batch204,694 and1,000 updates. Exact optimizer/schedule, checkpointing and selection retained.",
+  "finding": "The depth8 fit entered formal training with finite losses and nonzero gradients. The user requested concurrent starts; the sequential job was canceled and its partial outputs preserved. No completed depth8/12 comparison.",
+  "limitations": "One fit per depth with one fixed optimization recipe. Reused validation selects checkpoints/depth; intervals do not adjust selection. Equal updates are not equal compute. No reserved test.",
+  "figure": null,
+  "evidence": [
+    {
+      "label": "Fixed depth-comparison protocol",
+      "url": "https://github.com/DaezeI/11785-GS-Fuse-Submission-Public/blob/main/experiments/transformer-depth-sweep-v1/README.md"
+    },
+    {
+      "label": "Completed depth4 reference",
+      "url": "https://github.com/DaezeI/11785-GS-Fuse-Submission-Public/blob/main/results/shared-token-transformer-v1/summary.md"
+    }
+  ],
+  "related": [
+    "shared-token-transformer-v1"
+  ],
+  "updated_at": "2026-11-27T07:44:54.851330+00:00"
+}

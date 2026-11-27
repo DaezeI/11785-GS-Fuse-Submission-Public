@@ -95,6 +95,10 @@ def main():
     p.add_argument("--prices", type=Path, required=True)
     p.add_argument("--out", type=Path, required=True)
     p.add_argument("--code-commit", required=True)
+    p.add_argument("--depth", type=int, choices=(4, 8, 12), default=4)
+    p.add_argument("--run-id", default=None)
+    p.add_argument("--fixed-batch-size", type=int, default=None,
+                   help="Confirm this exact checkpointed batch; fail rather than change a controlled comparison")
     p.add_argument("--max-updates", type=int, default=1000)
     p.add_argument("--eval-every", type=int, default=25)
     p.add_argument("--max-training-seconds", type=int, default=5400)
@@ -115,17 +119,18 @@ def main():
     normalized = a.out / "training-tensors.npz"
     np.savez(normalized, x=(train.history / input_scale).astype(np.float32),
              t=train.past_minutes, y=(train.returns / target_scale).astype(np.float32))
-    initial = PredictionTokenTransformer(activation_checkpointing=True, attention_batch_chunk=8192)
+    initial = PredictionTokenTransformer(depth=a.depth, activation_checkpointing=True, attention_batch_chunk=8192)
     initial_path = a.out / "initial-state.pt"
     torch.save(initial.state_dict(), initial_path)
-    architecture = "none+Transformer128x4~none~none"
+    architecture = f"none+Transformer128x{a.depth}~none~none"
     calibration = []
 
     def probe(batch, updates=3, activation_checkpointing=False):
         path = a.out / "calibration" / f"checkpoint-{int(activation_checkpointing)}-batch-{batch}-updates-{updates}.json"
         command = [sys.executable, str(ROOT / "scripts/profile_prediction_token_batch.py"),
                         "--data", str(normalized), "--initial", str(initial_path),
-                        "--batch-size", str(batch), "--updates", str(updates), "--out", str(path)]
+                        "--batch-size", str(batch), "--depth", str(a.depth),
+                        "--updates", str(updates), "--out", str(path)]
         if activation_checkpointing:
             command.append("--activation-checkpointing")
         subprocess.run(command, check=True)
@@ -134,16 +139,23 @@ def main():
         (a.out / "batch-calibration.json").write_text(json.dumps(calibration, indent=2) + "\n")
         return report["accepted"]
 
-    chosen_batch = largest_batch(len(train.history), probe)
-    activation_checkpointing = False
-    if chosen_batch < len(train.history):
-        with_checkpoint = largest_batch(len(train.history), lambda batch: probe(batch, activation_checkpointing=True))
-        if with_checkpoint > chosen_batch:
-            chosen_batch, activation_checkpointing = with_checkpoint, True
-    while not probe(chosen_batch, updates=10, activation_checkpointing=activation_checkpointing):
-        chosen_batch = (int(chosen_batch * .95) // 256) * 256
-        if chosen_batch < 1:
-            raise RuntimeError("No stable confirmed batch")
+    if a.fixed_batch_size is not None:
+        if not 1 <= a.fixed_batch_size <= len(train.history):
+            raise ValueError("Fixed batch must contain valid distinct training windows")
+        chosen_batch, activation_checkpointing = a.fixed_batch_size, True
+        if not probe(chosen_batch, updates=10, activation_checkpointing=True):
+            raise RuntimeError("Controlled fixed batch did not fit; no batch-size substitution permitted")
+    else:
+        chosen_batch = largest_batch(len(train.history), probe)
+        activation_checkpointing = False
+        if chosen_batch < len(train.history):
+            with_checkpoint = largest_batch(len(train.history), lambda batch: probe(batch, activation_checkpointing=True))
+            if with_checkpoint > chosen_batch:
+                chosen_batch, activation_checkpointing = with_checkpoint, True
+        while not probe(chosen_batch, updates=10, activation_checkpointing=activation_checkpointing):
+            chosen_batch = (int(chosen_batch * .95) // 256) * 256
+            if chosen_batch < 1:
+                raise RuntimeError("No stable confirmed batch")
     print(json.dumps({"selected_batch_size": chosen_batch, "data_limited": chosen_batch == len(train.history),
                       "activation_checkpointing": activation_checkpointing}), flush=True)
     if torch.cuda.device_count() != 1:
@@ -154,7 +166,8 @@ def main():
     x, t, y = (torch.as_tensor(arrays[k], device=device) for k in ("x", "t", "y"))
     vx = torch.as_tensor((val.history / input_scale).astype(np.float32), device=device)
     vt = torch.as_tensor(val.past_minutes, device=device)
-    model = PredictionTokenTransformer(activation_checkpointing=activation_checkpointing, attention_batch_chunk=8192).to(device)
+    model = PredictionTokenTransformer(depth=a.depth, activation_checkpointing=activation_checkpointing,
+                                      attention_batch_chunk=8192).to(device)
     model.load_state_dict(torch.load(initial_path, map_location="cpu", weights_only=True))
     opt = torch.optim.AdamW(model.parameters(), lr=3e-4, weight_decay=.01, fused=True)
     generator = torch.Generator().manual_seed(0)
@@ -232,11 +245,12 @@ def main():
                                np.ones(len(val.times)), {"bootstrap_seed": 23, "bootstrap_replicates": 2000})
     np.savez_compressed(a.out / "validation-forecasts.npz", forecast=forecast, truth=val.returns,
                         anchor_times=val.times.astype(str))
-    result = {"id": "shared-token-transformer-v1", "architecture": architecture,
+    result = {"id": a.run_id or ("shared-token-transformer-v1" if a.depth == 4
+                                else f"shared-token-transformer-depth{a.depth}-v1"), "architecture": architecture,
               "status": "completed" if completed == a.max_updates else "budget_limited",
               "train_cohort": "SPX-PX6-GRID5-v1", "score_cohort": "SPX-PX6-GRID5-v1 val",
               "audit": audit, "horizons_minutes": HORIZONS, "test_scored": False,
-              "configuration": {"d_model": 128, "depth": 4, "nhead": 4, "ffn": 512, "dropout": .1,
+              "configuration": {"d_model": 128, "depth": a.depth, "nhead": 4, "ffn": 512, "dropout": .1,
                   "shared_query_parameters": 128, "linear_readout": "128 -> 1 per future position",
                   "maximum_batch_size": chosen_batch, "max_updates": a.max_updates,
                   "activation_checkpointing": activation_checkpointing, "attention_batch_chunk": 8192,
@@ -251,7 +265,7 @@ def main():
               "environment": {"torch": torch.__version__, "numpy": np.__version__, "python": platform.python_version(),
                               "gpu": props.name, "total_memory_bytes": props.total_memory},
               "limitations": ["Validation selected the checkpoint; paired intervals do not adjust selection.",
-                              "Six-target supervision, architecture, batch and optimizer settings change together.",
+                              "Relative to the earlier CNN, supervision, architecture, batch and optimizer settings change together.",
                               "Overlapping windows are correlated; no test was scored.",
                               "Largest confirmed batch is capped at the number of distinct training windows."]}
     (a.out / "metrics.json").write_text(json.dumps(result, indent=2, allow_nan=False) + "\n")

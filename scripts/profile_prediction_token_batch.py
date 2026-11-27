@@ -23,6 +23,7 @@ def main():
     p.add_argument("--data", type=Path, required=True)
     p.add_argument("--initial", type=Path, required=True)
     p.add_argument("--batch-size", type=int, required=True)
+    p.add_argument("--depth", type=int, choices=(4, 8, 12), default=4)
     p.add_argument("--updates", type=int, default=3)
     p.add_argument("--activation-checkpointing", action="store_true")
     p.add_argument("--out", type=Path, required=True)
@@ -31,7 +32,7 @@ def main():
         raise RuntimeError("This trial requires exactly one visible GPU")
     torch.set_num_threads(8)
     props = torch.cuda.get_device_properties(0)
-    report = {"batch_size": a.batch_size, "updates_requested": a.updates,
+    report = {"batch_size": a.batch_size, "updates_requested": a.updates, "depth": a.depth,
               "device_name": props.name, "device_total_bytes": props.total_memory,
               "precision": "BF16 autocast, FP32 parameters/AdamW states",
               "activation_checkpointing": a.activation_checkpointing, "attention_batch_chunk": 8192,
@@ -43,7 +44,7 @@ def main():
         y = torch.as_tensor(data["y"], device="cuda")
         if a.batch_size > len(x):
             raise ValueError("Do not duplicate observations to inflate a training batch")
-        model = PredictionTokenTransformer(activation_checkpointing=a.activation_checkpointing,
+        model = PredictionTokenTransformer(depth=a.depth, activation_checkpointing=a.activation_checkpointing,
                                             attention_batch_chunk=8192).cuda().train()
         model.load_state_dict(torch.load(a.initial, map_location="cpu", weights_only=True))
         opt = torch.optim.AdamW(model.parameters(), lr=3e-4, weight_decay=.01, fused=True)

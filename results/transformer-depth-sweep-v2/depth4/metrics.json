@@ -1,0 +1,221 @@
+{
+  "id": "shared-token-transformer-v1",
+  "architecture": "none+Transformer128x4~none~none",
+  "status": "completed",
+  "train_cohort": "SPX-PX6-GRID5-v1",
+  "score_cohort": "SPX-PX6-GRID5-v1 val",
+  "audit": {
+    "price_sha256": "6a873b1d72d27f9188c6bf12acb756775916be8ed9ff42d9e9dd98028f68de2a",
+    "stride_minutes": 5,
+    "raw_price_rows": 331256,
+    "regular_session_bars": 322783,
+    "input_bars": 35,
+    "horizons_minutes": [
+      5,
+      10,
+      15,
+      20,
+      25,
+      30
+    ],
+    "processing_lag_minutes": 5,
+    "train_upper_bar_end_inclusive": "2019-05-22 14:05:00",
+    "validation_upper_bar_end_inclusive": "2021-08-24 11:05:00",
+    "cross_split_shared_bars": 0,
+    "test_loaded": false,
+    "inherited_price_cleaning": "09:30 through 16:00 bar-start filter, as in the original loader; actual calendar constrains targets",
+    "splits": {
+      "train": {
+        "rows": 204694,
+        "dates": 2865,
+        "first_anchor": "2008-01-02T12:25:00.000000000",
+        "last_anchor": "2019-05-22T13:30:00.000000000",
+        "first_used_bar": "2008-01-02T09:30:00.000000000",
+        "last_used_bar": "2019-05-22T14:00:00.000000000"
+      },
+      "val": {
+        "rows": 40548,
+        "dates": 569,
+        "first_anchor": "2019-05-23T10:25:00.000000000",
+        "last_anchor": "2021-08-24T10:30:00.000000000",
+        "first_used_bar": "2019-05-22T14:05:00.000000000",
+        "last_used_bar": "2021-08-24T11:00:00.000000000"
+      }
+    },
+    "train_cohort": "SPX-PX6-GRID5-v1",
+    "score_cohort": "SPX-PX6-GRID5-v1 val",
+    "time_embedding": "sinusoidal UTC elapsed minutes / five, measured from forecast origin"
+  },
+  "horizons_minutes": [
+    5,
+    10,
+    15,
+    20,
+    25,
+    30
+  ],
+  "test_scored": false,
+  "configuration": {
+    "d_model": 128,
+    "depth": 4,
+    "nhead": 4,
+    "ffn": 512,
+    "dropout": 0.1,
+    "shared_query_parameters": 128,
+    "linear_readout": "128 -> 1 per future position",
+    "maximum_batch_size": 204694,
+    "max_updates": 1000,
+    "activation_checkpointing": true,
+    "attention_batch_chunk": 8192,
+    "precision": "BF16 autocast; FP32 parameters/AdamW states",
+    "gradient_accumulation": false
+  },
+  "parameters": 794241,
+  "completed_updates": 1000,
+  "examples_seen": 204694000,
+  "selected_update": 50,
+  "stop_reason": "max_updates",
+  "runtime_seconds": 1613.5145800479804,
+  "memory": {
+    "allocated_bytes": 24165826048,
+    "reserved_bytes": 34726739968
+  },
+  "validation": {
+    "smooth_l1": 0.33819913639629334,
+    "mean_mae_bp": 11.689790080104657,
+    "by_horizon": {
+      "5": {
+        "mae_bp": 6.556317979646952,
+        "direction_accuracy": 0.5206989446627617
+      },
+      "10": {
+        "mae_bp": 9.240522809814093,
+        "direction_accuracy": 0.5209249468847275
+      },
+      "15": {
+        "mae_bp": 11.198857629310202,
+        "direction_accuracy": 0.5254450727178449
+      },
+      "20": {
+        "mae_bp": 12.88922772853902,
+        "direction_accuracy": 0.5252395534920478
+      },
+      "25": {
+        "mae_bp": 14.41471673663223,
+        "direction_accuracy": 0.5285040614275486
+      },
+      "30": {
+        "mae_bp": 15.839097596685445,
+        "direction_accuracy": 0.5256090637573124
+      }
+    }
+  },
+  "persistence": {
+    "mean_mae_bp": 11.706526115163483,
+    "by_horizon": {
+      "5": {
+        "mae_bp": 6.5617034286422875,
+        "direction_accuracy": 0.0
+      },
+      "10": {
+        "mae_bp": 9.24889582596134,
+        "direction_accuracy": 0.0
+      },
+      "15": {
+        "mae_bp": 11.214600089292661,
+        "direction_accuracy": 0.0
+      },
+      "20": {
+        "mae_bp": 12.907565336743385,
+        "direction_accuracy": 0.0
+      },
+      "25": {
+        "mae_bp": 14.441712779794706,
+        "direction_accuracy": 0.0
+      },
+      "30": {
+        "mae_bp": 15.864679230546502,
+        "direction_accuracy": 0.0
+      }
+    }
+  },
+  "paired_gain_bp": [
+    0.005385448995248253,
+    0.00837301614726669,
+    0.015742459982528052,
+    0.018337608204429517,
+    0.026996043162641942,
+    0.02558163386117355
+  ],
+  "paired_ci95_by_date_block": {
+    "5": [
+      [
+        0.0029470223513294075,
+        0.00778079542003244
+      ],
+      [
+        0.003390010896532733,
+        0.013275827122351435
+      ],
+      [
+        0.008639927709239145,
+        0.022864570213823886
+      ],
+      [
+        0.008762248846075326,
+        0.027838358635526486
+      ],
+      [
+        0.0146609901457816,
+        0.03927860147487064
+      ],
+      [
+        0.011483173867216501,
+        0.03923279563083804
+      ]
+    ],
+    "10": [
+      [
+        0.0028180828963815857,
+        0.007851251760160783
+      ],
+      [
+        0.003442772033558891,
+        0.013600879424204824
+      ],
+      [
+        0.00840002496629016,
+        0.022970152032720008
+      ],
+      [
+        0.008796456524631832,
+        0.02768584507543118
+      ],
+      [
+        0.014266418978445524,
+        0.03949241791326912
+      ],
+      [
+        0.011196162344998878,
+        0.04014012911053886
+      ]
+    ]
+  },
+  "code_commit": "e1c5375359b0faf05e240f95fa175d8604df6d4e",
+  "model_sha256": "4ca79cfc25c7f09564906fae230b9cd39a182676eef16082aebb918eee95c032",
+  "runner_sha256": "0e294a0d73422e683ac901da2a38e2bc622d0e02ccc1155900ef57c94bed760d",
+  "checkpoint_sha256": "93c1455ab761cbd061a66d3fad83bf0554969c54c896e4c32ebf4ea637f64540",
+  "environment": {
+    "torch": "2.8.0+cu128",
+    "numpy": "2.5.5",
+    "python": "3.12.9",
+    "gpu": "NVIDIA H200",
+    "total_memory_bytes": 150111977472
+  },
+  "limitations": [
+    "Validation selected the checkpoint; paired intervals do not adjust selection.",
+    "Six-target supervision, architecture, batch and optimizer settings change together.",
+    "Overlapping windows are correlated; no test was scored.",
+    "Largest confirmed batch is capped at the number of distinct training windows."
+  ]
+}
