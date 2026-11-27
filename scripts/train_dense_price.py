@@ -6,6 +6,7 @@ validation grid and the original 35-bar / 20,30-minute label clock. No test
 labels or text are loaded. Full per-step histories stay in private run storage.
 """
 import argparse
+import csv
 import hashlib
 import json
 import os
@@ -115,9 +116,12 @@ def main():
         else:
             ix = torch.as_tensor(np.flatnonzero(train15_mask), device=device)
             x, y, truth = xtrain5[ix], ytrain5[ix], train5.returns[train15_mask]
-        best, step, step_rows, epoch_rows = float("inf"), 0, [], []
+        best, step, epoch_rows = float("inf"), 0, []
         directory = a.out / f"grid{stride}"
         directory.mkdir()
+        steps_stream = (directory / "optimizer-steps.csv").open("w", newline="")
+        step_writer = csv.writer(steps_stream)
+        step_writer.writerow(["step", "epoch", "minibatch_loss", "gradient_norm"])
         for epoch in range(a.epochs + 1):
             epoch_start = time.perf_counter()
             if epoch:
@@ -130,7 +134,9 @@ def main():
                     norm = torch.nn.utils.clip_grad_norm_(arm.parameters(), 1., error_if_nonfinite=True)
                     optimizer.step()
                     step += 1
-                    step_rows.append({"step": step, "epoch": epoch, "minibatch_loss": loss.item(), "gradient_norm": float(norm)})
+                    step_writer.writerow([step, epoch, loss.item(), float(norm)])
+                    if step % 100 == 0:
+                        steps_stream.flush()
             _, tm = evaluate(arm, x, truth, target_scale)
             vp, vm = evaluate(arm, xval, val5.returns, target_scale)
             row = {"stride_minutes": stride, "epoch": epoch, "updates": step,
@@ -143,7 +149,15 @@ def main():
             if row["val_mae20_bp"] < best:
                 best, chosen_epoch = row["val_mae20_bp"], epoch
                 checkpoint = {k: v.detach().cpu().clone() for k, v in arm.state_dict().items()}
+                torch.save({"state_dict": checkpoint, "input_scale": input_scale,
+                            "target_scale": target_scale.tolist(), "selected_epoch": chosen_epoch},
+                           directory / "best-progress.pt")
             pd.DataFrame(epoch_rows).to_csv(directory / "learning-curves.csv", index=False)
+            torch.save({"state_dict": arm.state_dict(), "optimizer_state_dict": optimizer.state_dict(),
+                        "order_generator_state": generator.get_state(), "torch_rng_state": torch.get_rng_state(),
+                        "epoch": epoch, "updates": step, "input_scale": input_scale,
+                        "target_scale": target_scale.tolist()}, directory / "resume-last.pt")
+        steps_stream.close()
         arm.load_state_dict(checkpoint)
         forecast, fm = evaluate(arm, fx, fed["val"].returns, target_scale, fed["val"].weights)
         grid_forecast, grid_vm = evaluate(arm, xval, val5.returns, target_scale)
@@ -163,7 +177,6 @@ def main():
                     "target_scale": target_scale.tolist(), "selected_epoch": chosen_epoch,
                     "train_cohort": record["train_cohort"]}, checkpoint_path)
         record["checkpoint_sha256"] = sha(checkpoint_path)
-        pd.DataFrame(step_rows).to_csv(directory / "optimizer-steps.csv", index=False)
         np.savez_compressed(directory / "fed-validation.npz", predictions=forecast, targets=fed["val"].returns,
                             event_ids=fed["val"].rows.event_id.to_numpy(str))
         np.savez_compressed(directory / "grid-validation.npz", predictions=grid_forecast, targets=val5.returns,
