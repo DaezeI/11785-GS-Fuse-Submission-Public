@@ -1,6 +1,6 @@
-## November 27 Transformer depth comparison — concurrent replacement
+## November 27 Transformer depth comparison — concurrent training running
 
-The user requested concurrent depth8/12 starts on one H200. The sequential attempt was canceled after depth8 entered formal training; its partial outputs remain private and are excluded. [Concurrent v2](experiments/transformer-depth-sweep-v2/README.md) reuses completed depth4 and retains all scientific settings. The remote controller starts two children on one GPU and automatically compares them after both finish. No depth8/12 result yet.
+`transformer-depth-sweep-v2` runs `none+Transformer128x8~none~none` and `none+Transformer128x12~none~none` concurrently as two processes sharing one H200. Both entered formal training with finite loss and nonzero gradients. Completed depth4 is the reference. All scientific settings remain fixed, including batch 204,694 and 1,000 updates per depth. The remote controller generates the paired comparison automatically; local monitoring stops after startup verification. The canceled sequential v1 attempt is excluded. [Concurrent protocol](experiments/transformer-depth-sweep-v2/README.md). No depth8/12 validation conclusion yet.
 
 ## November 27 shared-query Transformer — completed
 

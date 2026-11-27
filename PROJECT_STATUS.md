@@ -1,3 +1,7 @@
+# November 27 Transformer depth comparison — concurrent fits started
+
+`none+Transformer128x8~none~none` and `none+Transformer128x12~none~none` both entered formal training on the same single H200. They retain the completed depth4 recipe and full batch 204,694 / 1,000 updates. Comparison is pending; the remote controller writes tables and curves automatically. Repeated local monitoring stops at the user’s request after both startup checks. [Protocol](experiments/transformer-depth-sweep-v2/README.md).
+
 # November 27 shared-query Transformer — completed
 
 `none+Transformer128x4~none~none @ train:SPX-PX6-GRID5-v1 → score:SPX-PX6-GRID5-v1 val` completed 1,000 full-batch updates on one H200, exit 0. The selected update 50 mean six-horizon MAE is 11.689790 bp versus Persistence 11.706526 bp, a 0.143% validation gain. Training loss kept declining, while late validation error increased. Date-block intervals condition on checkpoint selection; reused validation is exploratory. No reserved test was scored. [Full result and curves](results/shared-token-transformer-v1/summary.md).
