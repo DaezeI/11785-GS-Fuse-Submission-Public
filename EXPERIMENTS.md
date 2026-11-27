@@ -38,6 +38,8 @@ Nicole completed a [CPU training diagnostic](results/fed-training-diagnostics-v1
 
 At the user's request, a separate [rolling-price training comparison](experiments/dense-price-grid-v1/config.json) replaces event-only training with 204,694 five-minute-grid windows or 68,219 fifteen-minute-grid windows. Both use the same `none+CNN~none~none`, common rolling validation, original target clock and detailed training-loss logging. Real-input separation audit and four focused boundary tests passed. Both fits completed on one H200 in 6m43s allocated time. Selected forecasts have small ordinary rolling-validation gains, but no improvement on the 149 matched Fed validation releases. Continued fitting worsened late validation. [Completed result](results/dense-price-grid-v1/summary.md). No test scoring was performed.
 
+The requested [shared nonlinear decoder](docs/updates/2026-11-26-joint-decoder.md) is implemented and functionally checked, with one or two hidden layers over concatenated price/text representations. This is engineering work, not a completed new text experiment or an early-fusion result. A separately trained price-only readout must be included before assigning any future gain to text.
+
 ## Nicole's Fed text pilot (November 24)
 
 [Exact 8B pilot](experiments/fed-spx-text-llama31-8b-v1/README.md), owner Nicole, #55: **training and validation completed November 26**. The 171/149 text arm essentially ties CNN at 20 minutes and is slightly worse at 30; all ALL-cohort matching comparisons are inconclusive. Frozen-price checks passed; one H200, exit 0, 7m46s. [Result pack](results/fed-spx-text-llama31-8b-v1/summary.md). Test remains reserved pending the team freeze.

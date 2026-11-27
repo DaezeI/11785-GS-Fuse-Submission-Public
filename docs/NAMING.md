@@ -102,3 +102,20 @@ the training population differ from the earlier Fed-event-only experiment;
 report this as a training-population package comparison. Validation selection
 uses the common rolling-price grid; `FED-PX-REL5-v1 val` and
 `FED-PXTX-ALL-REL5-v2 val` are scored after checkpoint selection.
+
+## November 26 shared nonlinear decoder implementation
+
+- `Llama-3.1-8B(frozen)+CNN(frozen)~Pool~MLP1-Residual`: pooled text is
+  projected to 32 dimensions, concatenated with the 64-dimensional frozen
+  price context, and passed through a joint MLP with one 32-unit GELU hidden
+  layer and a two-output correction. The correction is added to the frozen
+  price forecast. Implemented, not benchmarked.
+- `Llama-3.1-8B(frozen)+CNN(frozen)~Pool~MLP2-Residual`: the same design with
+  two 32-unit GELU hidden layers in the joint decoder. Implemented, not benchmarked.
+
+Both are opt-in `CompactReturn(fusion="joint_mlp")` variants. The text head
+receives price context before its nonlinear layers, allowing price-dependent
+text corrections. This is encoded-feature fusion; no token-level early-fusion
+result is claimed. The existing `~Pool~Add` design remains the default and is
+the architecture of the completed exact 8B result. See the
+[implementation and comparison requirements](updates/2026-11-26-joint-decoder.md).

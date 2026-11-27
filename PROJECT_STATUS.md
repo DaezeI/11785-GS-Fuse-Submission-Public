@@ -2,6 +2,8 @@
 
 Nicole completed both `none+CNN~none~none` fits on the full permitted rolling-price training population: 204,694 GRID5 windows / 95,970 updates and 68,219 GRID15 windows / 31,980 updates. Common rolling validation has 40,548 windows. Selected GRID15 MAE20/30 was 12.8773/15.8309 bp versus Persistence 12.9076/15.8647, with conditional date-block intervals excluding zero. These are small validation gains and the intervals do not adjust checkpoint selection. On the 149 matched Fed validation releases, neither selected fit improved over Persistence. Training loss kept falling while late validation worsened. One H200, exit 0, 6m43s. No text training or test scoring. [Result and provenance](results/dense-price-grid-v1/summary.md).
 
+**Shared decoder implementation:** `~Pool~MLP1-Residual` and `~Pool~MLP2-Residual` are available as opt-in joint price/text MLPs. Eleven focused tests and real rolling-price checkpoint loading/parity checks passed. No new joint-decoder training or forecasting improvement has been measured. [Design, interfaces and required controls](docs/updates/2026-11-26-joint-decoder.md).
+
 The separate [CPU training diagnostic](results/fed-training-diagnostics-v1/summary.md) also completed: ten extra text-head updates reduced full-training loss 10.33% while validation error increased. The saved curve is an explicitly labeled CPU replay, not an original W&B history.
 
 # Exact frozen 8B validation completed — November 26
