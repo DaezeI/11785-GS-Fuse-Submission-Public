@@ -36,11 +36,15 @@
     {
       "label": "Verified provenance",
       "url": "https://github.com/DaezeI/11785-GS-Fuse-Submission-Public/blob/main/results/dense-price-grid-v1/provenance.json"
+    },
+    {
+      "label": "Verified aggregate Drive backup",
+      "url": "https://drive.google.com/file/d/1oicRd6YPws6966Ejl7-_pIiwmRlL_LvP/view?usp=drivesdk"
     }
   ],
   "related": [
     "fed-training-diagnostics-v1",
     "fed-spx-endpoints-price-v1"
   ],
-  "updated_at": "2026-11-27T04:04:29.031185+00:00"
+  "updated_at": "2026-11-27T04:09:55.789925+00:00"
 }

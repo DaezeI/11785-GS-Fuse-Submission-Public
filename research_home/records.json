@@ -1,8 +1,8 @@
 {
   "title": "GS-Fuse Research Home",
   "stage": "Controlled experiments and final writing",
-  "overview": "The last-price rule beat our trained price models. In Adaeze’s completed R3 return run, correct and shuffled articles gave nearly identical results, and predicting zero return had slightly lower error.",
-  "updated_at": "2026-11-27T04:04:29+00:00",
+  "overview": "Rolling-price CNN training produced small ordinary-market validation gains, while matched Fed validation did not improve over Persistence. Earlier controlled text comparisons found little reliable benefit from the matched report. These findings remain scoped to their protocols; the Fed test is reserved.",
+  "updated_at": "2026-11-27T04:09:55+00:00",
   "source_url": "https://github.com/DaezeI/11785-GS-Fuse-Submission-Public/blob/main/research_home/records.json",
   "links": [
     {
@@ -79,13 +79,17 @@
         {
           "label": "Verified provenance",
           "url": "https://github.com/DaezeI/11785-GS-Fuse-Submission-Public/blob/main/results/dense-price-grid-v1/provenance.json"
+        },
+        {
+          "label": "Verified aggregate Drive backup",
+          "url": "https://drive.google.com/file/d/1oicRd6YPws6966Ejl7-_pIiwmRlL_LvP/view?usp=drivesdk"
         }
       ],
       "related": [
         "fed-training-diagnostics-v1",
         "fed-spx-endpoints-price-v1"
       ],
-      "updated_at": "2026-11-27T04:04:29.031185+00:00"
+      "updated_at": "2026-11-27T04:09:55.789925+00:00"
     },
     {
       "id": "fed-training-diagnostics-v1",
@@ -113,13 +117,17 @@
         {
           "label": "Reproducible diagnostic runner",
           "url": "https://github.com/DaezeI/11785-GS-Fuse-Submission-Public/blob/main/scripts/diagnose_fed_training.py"
+        },
+        {
+          "label": "Verified aggregate Drive backup",
+          "url": "https://drive.google.com/file/d/1oicRd6YPws6966Ejl7-_pIiwmRlL_LvP/view?usp=drivesdk"
         }
       ],
       "related": [
         "fed-spx-text-llama31-8b-v1",
         "fed-spx-endpoints-price-v1"
       ],
-      "updated_at": "2026-11-27T03:49:46.039957+00:00"
+      "updated_at": "2026-11-27T04:09:55.790722+00:00"
     },
     {
       "id": "fed-spx-text-llama31-8b-v1",
