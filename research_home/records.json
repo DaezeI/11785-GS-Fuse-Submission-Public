@@ -2,7 +2,7 @@
   "title": "GS-Fuse Research Home",
   "stage": "Controlled experiments and final writing",
   "overview": "Rolling-price CNN training produced small ordinary-market validation gains, while matched Fed validation did not improve over Persistence. Earlier controlled text comparisons found little reliable benefit from the matched report. These findings remain scoped to their protocols; the Fed test is reserved.",
-  "updated_at": "2026-11-27T04:09:55+00:00",
+  "updated_at": "2026-11-27T06:15:36+00:00",
   "source_url": "https://github.com/DaezeI/11785-GS-Fuse-Submission-Public/blob/main/research_home/records.json",
   "links": [
     {
@@ -41,6 +41,28 @@
     }
   ],
   "experiments": [
+    {
+      "id": "shared-token-transformer-v1",
+      "title": "Six-position shared-query Transformer: implementation and training",
+      "owner": "Nicole",
+      "kind": "Experiment",
+      "status": "planned",
+      "question": "How does a width-128, depth-four shared-query Transformer train and predict on all five-minute SPX windows?",
+      "configuration": "none+Transformer128x4~none~none; SPX-PX6-GRID5-v1: 204,694 train / 40,548 val; six outputs through 30 minutes; one H200, calibrated maximum unique batch; 1,000 optimizer updates capped at 90 minutes.",
+      "finding": "Implementation and 13 focused CPU tests passed; real-input audit has zero cross-split shared price bars. GPU training and batch calibration pending.",
+      "limitations": "Exploratory reused validation, six-target objective and optimization changed together. No reserved test or text experiment.",
+      "figure": null,
+      "evidence": [
+        {
+          "label": "Bounded protocol and configuration",
+          "url": "https://github.com/DaezeI/11785-GS-Fuse-Submission-Public/blob/main/experiments/shared-token-transformer-v1/README.md"
+        }
+      ],
+      "related": [
+        "dense-price-grid-v1"
+      ],
+      "updated_at": "2026-11-27T06:15:35.951864+00:00"
+    },
     {
       "id": "dense-price-grid-v1",
       "title": "Rolling-price training completed; small general-price validation gain",

@@ -119,3 +119,15 @@ text corrections. This is encoded-feature fusion; no token-level early-fusion
 result is claimed. The existing `~Pool~Add` design remains the default and is
 the architecture of the completed exact 8B result. See the
 [implementation and comparison requirements](updates/2026-11-26-joint-decoder.md).
+
+## November 27 shared-query price Transformer
+
+- `SPX-PX6-GRID5-v1`: the same 204,694 train / 40,548 validation rolling
+  windows as `SPX-PX-GRID5-v1`, with six supervised cumulative returns at
+  +5/+10/+15/+20/+25/+30 minutes. A new ID distinguishes the changed target
+  task. There is no constituent-stock panel and no test cohort is constructed.
+- `none+Transformer128x4~none~none`: linear OHLC embedding, four pre-LN
+  Transformer layers (width 128, four heads, FFN 512), one shared learnable
+  prediction vector expanded over six temporally encoded future positions,
+  and one shared linear output projection. The run is
+  `shared-token-transformer-v1`; [protocol](../experiments/shared-token-transformer-v1/README.md).

@@ -54,3 +54,23 @@ def test_missing_intraday_bar_excludes_affected_windows():
     j = anchor_indices(t, op, cl, t[0], np.datetime64("2020-01-02T16:00"), 5)
     for i in j:
         np.testing.assert_array_equal(np.diff(t[i - 35:i + 7]), np.full(41, np.timedelta64(5, "m")))
+
+
+def test_six_supervised_horizons_preserve_existing_endpoints():
+    t, op, cl = session()
+    j = anchor_indices(t, op, cl, t[0], np.datetime64("2020-01-02T16:00"), 5)
+    prices = np.exp(np.arange(len(t))[:, None] * .001) * np.ones((len(t), 4))
+    old = make_cohort(prices, t, j)
+    new = make_cohort(prices, t, j, target_steps=range(1, 7), include_time_offsets=True)
+    np.testing.assert_allclose(new.returns, np.tile(np.arange(1, 7) * 10, (len(j), 1)), atol=1e-8)
+    np.testing.assert_array_equal(old.returns, new.returns[:, [3, 5]])
+    np.testing.assert_array_equal(new.past_minutes[0], np.arange(-175, 0, 5))
+
+
+def test_overnight_time_offsets_account_for_dst():
+    friday = pd.date_range("2020-03-06 09:30", "2020-03-06 16:00", freq="5min").to_numpy()
+    monday = pd.date_range("2020-03-09 09:30", "2020-03-09 16:00", freq="5min").to_numpy()
+    t = np.concatenate((friday, monday))
+    c = make_cohort(np.ones((len(t), 4)), t, np.array([len(friday)]),
+                    target_steps=range(1, 7), include_time_offsets=True)
+    assert c.past_minutes[0, -1] == -3870
