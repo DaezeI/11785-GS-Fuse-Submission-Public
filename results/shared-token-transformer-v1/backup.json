@@ -1,0 +1,12 @@
+{
+  "source_commit": "87893181c90bd1bd0da84bd5099376feaf621be5",
+  "bytes": 267223,
+  "sha256": "5b36399a2f828fe88f261d6209916f51a890cddd1606230cef9b11634829166d",
+  "contains": "Aggregate metrics, curves, provenance and protocol; no raw prices, predictions or model weights.",
+  "drive_id": "1g6CyDG2MWLew-gjmCj4ZWSgFxFs6FP58",
+  "url": "https://drive.google.com/file/d/1g6CyDG2MWLew-gjmCj4ZWSgFxFs6FP58/view?usp=drivesdk",
+  "verified_parent": "1qpVCQDpEJmke26zNhrnBpYH3Vkd2dYmy",
+  "destination_bytes": 267223,
+  "destination_mime_type": "application/zip",
+  "verification": "Destination filename, size, MIME type and parent verified by metadata readback. Destination checksum was not exposed. Local ZIP CRC and SHA256 verified."
+}

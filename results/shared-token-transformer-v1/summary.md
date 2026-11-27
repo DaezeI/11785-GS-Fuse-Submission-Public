@@ -103,3 +103,7 @@ verification. All six Transformer and Persistence MAEs, paired date-block
 intervals, checkpoint hashes and source hashes were independently checked from
 saved forecasts/artifacts. [Provenance](provenance.json). Main/Research Home delivery
 is pending the code review and dependency merge; the focused PR is stacked on #72.
+
+## Aggregate evidence backup
+
+[Verified Drive ZIP](https://drive.google.com/file/d/1g6CyDG2MWLew-gjmCj4ZWSgFxFs6FP58/view?usp=drivesdk) contains the aggregate result and protocol from commit `87893181c90bd1bd0da84bd5099376feaf621be5` (267,223 bytes). Filename, MIME type, size and Results/Evidence parent were read back. Destination checksum was not exposed; [receipt](backup.json). Private prediction/checkpoint backups are separate.

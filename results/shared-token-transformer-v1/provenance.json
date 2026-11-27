@@ -12,7 +12,8 @@
   "test_scored": false,
   "independent_verification": "Recomputed all six validation and persistence MAEs from private per-window forecasts; verified checkpoint and source hashes; verified 1000 contiguous optimizer updates.",
   "private_artifacts": "Selected and continuation weights, optimizer state, initial state and per-window forecasts retained in Nicole private run storage and verified local backup. Normalized training tensors remain on compute storage.",
-  "aggregate_backup": "Pending versioned Drive upload after publication.",
+  "aggregate_backup": "https://drive.google.com/file/d/1g6CyDG2MWLew-gjmCj4ZWSgFxFs6FP58/view?usp=drivesdk",
   "allocated_walltime": "00:31:32",
-  "runtime_seconds": 1613.5145800479804
+  "runtime_seconds": 1613.5145800479804,
+  "aggregate_backup_source_commit": "87893181c90bd1bd0da84bd5099376feaf621be5"
 }

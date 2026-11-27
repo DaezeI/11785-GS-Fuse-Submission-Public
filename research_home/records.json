@@ -2,7 +2,7 @@
   "title": "GS-Fuse Research Home",
   "stage": "Controlled experiments and final writing",
   "overview": "Rolling-price CNN training produced small ordinary-market validation gains, while matched Fed validation did not improve over Persistence. Earlier controlled text comparisons found little reliable benefit from the matched report. These findings remain scoped to their protocols; the Fed test is reserved.",
-  "updated_at": "2026-11-27T07:31:06+00:00",
+  "updated_at": "2026-11-27T07:33:01+00:00",
   "source_url": "https://github.com/DaezeI/11785-GS-Fuse-Submission-Public/blob/main/research_home/records.json",
   "links": [
     {
@@ -71,12 +71,16 @@
         {
           "label": "Fixed training protocol",
           "url": "https://github.com/DaezeI/11785-GS-Fuse-Submission-Public/blob/main/experiments/shared-token-transformer-v1/README.md"
+        },
+        {
+          "label": "Verified aggregate Drive backup",
+          "url": "https://drive.google.com/file/d/1g6CyDG2MWLew-gjmCj4ZWSgFxFs6FP58/view?usp=drivesdk"
         }
       ],
       "related": [
         "dense-price-grid-v1"
       ],
-      "updated_at": "2026-11-27T07:30:28.100967+00:00"
+      "updated_at": "2026-11-27T07:33:01.540529+00:00"
     },
     {
       "id": "dense-price-grid-v1",

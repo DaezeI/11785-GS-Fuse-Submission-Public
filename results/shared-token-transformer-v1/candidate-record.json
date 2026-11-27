@@ -28,10 +28,14 @@
     {
       "label": "Fixed training protocol",
       "url": "https://github.com/DaezeI/11785-GS-Fuse-Submission-Public/blob/main/experiments/shared-token-transformer-v1/README.md"
+    },
+    {
+      "label": "Verified aggregate Drive backup",
+      "url": "https://drive.google.com/file/d/1g6CyDG2MWLew-gjmCj4ZWSgFxFs6FP58/view?usp=drivesdk"
     }
   ],
   "related": [
     "dense-price-grid-v1"
   ],
-  "updated_at": "2026-11-27T07:30:28.100967+00:00"
+  "updated_at": "2026-11-27T07:33:01.540529+00:00"
 }
