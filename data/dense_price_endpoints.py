@@ -27,6 +27,7 @@ class DenseCohort:
     anchors: np.ndarray
     times: np.ndarray
     used_bar_mask: np.ndarray
+    past_minutes: np.ndarray | None = None
 
 
 def anchor_indices(times, session_open, session_close, lower, upper, stride_minutes):
@@ -55,20 +56,28 @@ def anchor_indices(times, session_open, session_close, lower, upper, stride_minu
     return j[valid]
 
 
-def make_cohort(values, times, anchors):
+def make_cohort(values, times, anchors, target_steps=(4, 6), include_time_offsets=False):
     values = np.asarray(values, dtype=np.float64)
     if values.shape != (len(times), 4) or not np.isfinite(values).all() or np.any(values <= 0):
         raise ValueError("Expected positive finite OHLC bars")
     observed = values[anchors[:, None] + np.arange(-35, 0)]
     history = (10_000 * np.log(observed / observed[:, -1:, 3:4])).transpose(0, 2, 1).astype(np.float32)
-    returns = 10_000 * np.log(values[anchors[:, None] + np.array([4, 6]), 3] / values[anchors, 3, None])
+    steps = np.asarray(target_steps, dtype=int)
+    if steps.ndim != 1 or len(steps) == 0 or np.any(steps < 1) or np.any(steps > 6):
+        raise ValueError("Target steps must be within the existing six-bar audited support")
+    returns = 10_000 * np.log(values[anchors[:, None] + steps, 3] / values[anchors, 3, None])
     used = np.zeros(len(times), dtype=bool)
     for offset in range(-35, 7):
         used[anchors + offset] = True
-    return DenseCohort(history, returns, anchors, times[anchors], used)
+    offsets = None
+    if include_time_offsets:
+        utc = pd.DatetimeIndex(times).tz_localize("America/New_York").tz_convert("UTC").tz_localize(None).to_numpy()
+        offsets = ((utc[anchors[:, None] + np.arange(-35, 0)] - utc[anchors, None])
+                   / np.timedelta64(1, "m")).astype(np.float32)
+    return DenseCohort(history, returns, anchors, times[anchors], used, offsets)
 
 
-def load_dense_cohorts(price_csv, stride_minutes):
+def load_dense_cohorts(price_csv, stride_minutes, target_steps=(4, 6), include_time_offsets=False):
     if sha256_file(price_csv) != PRICE_SHA256:
         raise ValueError("Frozen price hash mismatch")
     bars, report = load_prices(price_csv)
@@ -83,13 +92,13 @@ def load_dense_cohorts(price_csv, stride_minutes):
     train_j = anchor_indices(times, opens, closes, times[0], TRAIN_END, stride_minutes)
     val_j = anchor_indices(times, opens, closes, TRAIN_END, VALIDATION_END, stride_minutes)
     values = bars[CHANNELS].to_numpy(np.float64)
-    train, val = (make_cohort(values, times, j) for j in (train_j, val_j))
+    train, val = (make_cohort(values, times, j, target_steps, include_time_offsets) for j in (train_j, val_j))
     shared = int(np.count_nonzero(train.used_bar_mask & val.used_bar_mask))
     if shared:
         raise ValueError("Rolling train and validation share price bars")
     audit = {"price_sha256": PRICE_SHA256, "stride_minutes": stride_minutes,
              "raw_price_rows": report["rows_in"], "regular_session_bars": len(bars),
-             "input_bars": 35, "horizons_minutes": [20, 30], "processing_lag_minutes": 5,
+             "input_bars": 35, "horizons_minutes": [int(s) * 5 for s in target_steps], "processing_lag_minutes": 5,
              "train_upper_bar_end_inclusive": str(TRAIN_END),
              "validation_upper_bar_end_inclusive": str(VALIDATION_END),
              "cross_split_shared_bars": shared, "test_loaded": False,

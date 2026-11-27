@@ -1,3 +1,7 @@
+## November 27 shared-query Transformer — completed
+
+Nicole completed `none+Transformer128x4~none~none` on `SPX-PX6-GRID5-v1`: 204,694 training / 40,548 validation windows, six supervised positions through 30 minutes, batch 204,694, 1,000 optimizer updates, one H200, exit 0 in 31m32s including calibration. Selected update 50 mean MAE is 11.689790 bp versus Persistence 11.706526 bp; training continued fitting while late validation deteriorated. This is a small exploratory validation gain. [Result and provenance](results/shared-token-transformer-v1/summary.md).
+
 # Experiment register and reporting rule
 
 This is the protocol and citation index for team experiments. Use the

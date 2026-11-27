@@ -1,3 +1,7 @@
+# November 27 shared-query Transformer — completed
+
+`none+Transformer128x4~none~none @ train:SPX-PX6-GRID5-v1 → score:SPX-PX6-GRID5-v1 val` completed 1,000 full-batch updates on one H200, exit 0. The selected update 50 mean six-horizon MAE is 11.689790 bp versus Persistence 11.706526 bp, a 0.143% validation gain. Training loss kept declining, while late validation error increased. Date-block intervals condition on checkpoint selection; reused validation is exploratory. No reserved test was scored. [Full result and curves](results/shared-token-transformer-v1/summary.md).
+
 # November 26 rolling-price CNN experiment — completed
 
 Nicole completed both `none+CNN~none~none` fits on the full permitted rolling-price training population: 204,694 GRID5 windows / 95,970 updates and 68,219 GRID15 windows / 31,980 updates. Common rolling validation has 40,548 windows. Selected GRID15 MAE20/30 was 12.8773/15.8309 bp versus Persistence 12.9076/15.8647, with conditional date-block intervals excluding zero. These are small validation gains and the intervals do not adjust checkpoint selection. On the 149 matched Fed validation releases, neither selected fit improved over Persistence. Training loss kept falling while late validation worsened. One H200, exit 0, 6m43s. No text training or test scoring. [Result and provenance](results/dense-price-grid-v1/summary.md).
