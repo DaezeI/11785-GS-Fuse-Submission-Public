@@ -19,5 +19,6 @@
   "runtime_note": "Depth4 ran alone earlier; depths8/12 shared one GPU. Per-fit elapsed runtime and per-process memory are not directly comparable as isolated hardware efficiency.",
   "private_artifacts": "Raw forecasts, selected/initial weights and optimizer continuation states remain in private compute storage and verified local backup.",
   "test_scored": false,
-  "aggregate_backup": "Pending versioned Drive upload after publication."
+  "aggregate_backup": "https://drive.google.com/file/d/1uXg61Ow-S4vAgRZmREi5EdI57Ws4FL7H/view?usp=drivesdk",
+  "aggregate_backup_source_commit": "93909f7cb7ca39209aa700da6aba01af4c8e190d"
 }

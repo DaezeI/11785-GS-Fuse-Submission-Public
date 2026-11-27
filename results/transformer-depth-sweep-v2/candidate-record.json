@@ -28,11 +28,15 @@
     {
       "label": "Fixed comparison protocol",
       "url": "https://github.com/DaezeI/11785-GS-Fuse-Submission-Public/blob/main/experiments/transformer-depth-sweep-v2/README.md"
+    },
+    {
+      "label": "Verified aggregate Drive backup",
+      "url": "https://drive.google.com/file/d/1uXg61Ow-S4vAgRZmREi5EdI57Ws4FL7H/view?usp=drivesdk"
     }
   ],
   "related": [
     "shared-token-transformer-v1",
     "transformer-depth-sweep-v1"
   ],
-  "updated_at": "2026-11-27T21:40:52.365995+00:00"
+  "updated_at": "2026-11-27T21:52:31.032605+00:00"
 }
