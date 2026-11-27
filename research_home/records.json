@@ -2,7 +2,7 @@
   "title": "GS-Fuse Research Home",
   "stage": "Controlled experiments and final writing",
   "overview": "Rolling-price CNN training produced small ordinary-market validation gains, while matched Fed validation did not improve over Persistence. Earlier controlled text comparisons found little reliable benefit from the matched report. These findings remain scoped to their protocols; the Fed test is reserved.",
-  "updated_at": "2026-11-27T07:52:01+00:00",
+  "updated_at": "2026-11-27T21:40:52+00:00",
   "source_url": "https://github.com/DaezeI/11785-GS-Fuse-Submission-Public/blob/main/research_home/records.json",
   "links": [
     {
@@ -43,30 +43,41 @@
   "experiments": [
     {
       "id": "transformer-depth-sweep-v2",
-      "title": "Compare depths8 and12 concurrently with the depth4 reference",
+      "title": "Greater depth fit training better but gave no clear validation gain",
       "owner": "Nicole",
       "kind": "Experiment",
-      "status": "running",
-      "question": "Does increasing depth from4 to8 or12 reduce validation MAE with the existing fixed training recipe?",
-      "configuration": "SPX-PX6-GRID5-v1: 204,694 training /40,548 validation; width128, four heads, FFN512, six supervised outputs. Reuse completed depth4; concurrent depth8/12 on one H200, each batch204,694 and1,000 updates. Exact optimizer/schedule, checkpointing and selection retained.",
-      "finding": "Depth8 and12 both entered formal training concurrently on the same single H200. Their first five full-batch updates have finite loss, finite nonzero gradients and saved checkpoints. Startup checks observed19/9 updates respectively, then monitoring stopped as requested. Final validation comparison remains pending.",
-      "limitations": "One fit per depth with one fixed optimization recipe. Reused validation selects checkpoints/depth; intervals do not adjust selection. Equal updates are not equal compute. No reserved test.",
-      "figure": null,
+      "status": "completed",
+      "question": "Does increasing Transformer depth from 4 to 8 or 12 reduce validation MAE under the existing fixed training recipe?",
+      "configuration": "SPX-PX6-GRID5-v1: 204,694 train / 40,548 validation windows, width128, heads4, FFN512, six outputs; 1,000 full-batch updates at batch204,694 per depth. Reuse completed depth4; depths8/12 concurrently shared one H200. Optimizer/schedule, preprocessing, precision and selection retained.",
+      "finding": "All fits completed. Selected mean six-horizon MAE: depth4 11.689790 bp, depth8 11.692259, depth12 11.687593. Depth12 improves only 0.002198 bp (0.0188%) over depth4; paired ten-date-block 95% interval [-0.006810,0.013092] bp spans zero. Deeper fits lower training loss but worsen late validation more; final MAEs are 11.717759/11.944967/12.212058. No clear validation benefit of extra depth under this recipe.",
+      "limitations": "One fit per depth with one fixed optimization recipe. Reused validation selects checkpoints/depth; conditional intervals do not adjust selection. Equal updates are not equal FLOPs, and new depths shared one GPU. No reserved test or text experiment.",
+      "figure": {
+        "url": "https://raw.githubusercontent.com/DaezeI/11785-GS-Fuse-Submission-Public/main/results/transformer-depth-sweep-v2/learning-curves.png",
+        "alt": "Deeper Transformers have lower full training losses, nearly tied selected validation MAEs, and larger late validation deterioration."
+      },
       "evidence": [
         {
-          "label": "Concurrent comparison protocol",
-          "url": "https://github.com/DaezeI/11785-GS-Fuse-Submission-Public/blob/main/experiments/transformer-depth-sweep-v2/README.md"
+          "label": "Completed comparison and interpretation",
+          "url": "https://github.com/DaezeI/11785-GS-Fuse-Submission-Public/blob/main/results/transformer-depth-sweep-v2/summary.md"
         },
         {
-          "label": "Verified concurrent formal training startup",
-          "url": "https://github.com/DaezeI/11785-GS-Fuse-Submission-Public/blob/main/experiments/transformer-depth-sweep-v2/startup-verification.json"
+          "label": "Metrics and paired intervals",
+          "url": "https://github.com/DaezeI/11785-GS-Fuse-Submission-Public/blob/main/results/transformer-depth-sweep-v2/metrics.json"
+        },
+        {
+          "label": "Numeric depth comparison",
+          "url": "https://github.com/DaezeI/11785-GS-Fuse-Submission-Public/blob/main/results/transformer-depth-sweep-v2/depth-comparison.csv"
+        },
+        {
+          "label": "Fixed comparison protocol",
+          "url": "https://github.com/DaezeI/11785-GS-Fuse-Submission-Public/blob/main/experiments/transformer-depth-sweep-v2/README.md"
         }
       ],
       "related": [
         "shared-token-transformer-v1",
         "transformer-depth-sweep-v1"
       ],
-      "updated_at": "2026-11-27T07:52:01.544232+00:00"
+      "updated_at": "2026-11-27T21:40:52.365995+00:00"
     },
     {
       "id": "transformer-depth-sweep-v1",

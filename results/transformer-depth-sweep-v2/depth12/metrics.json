@@ -1,0 +1,221 @@
+{
+  "id": "shared-token-transformer-depth12-v2",
+  "architecture": "none+Transformer128x12~none~none",
+  "status": "completed",
+  "train_cohort": "SPX-PX6-GRID5-v1",
+  "score_cohort": "SPX-PX6-GRID5-v1 val",
+  "audit": {
+    "price_sha256": "6a873b1d72d27f9188c6bf12acb756775916be8ed9ff42d9e9dd98028f68de2a",
+    "stride_minutes": 5,
+    "raw_price_rows": 331256,
+    "regular_session_bars": 322783,
+    "input_bars": 35,
+    "horizons_minutes": [
+      5,
+      10,
+      15,
+      20,
+      25,
+      30
+    ],
+    "processing_lag_minutes": 5,
+    "train_upper_bar_end_inclusive": "2019-05-22 14:05:00",
+    "validation_upper_bar_end_inclusive": "2021-08-24 11:05:00",
+    "cross_split_shared_bars": 0,
+    "test_loaded": false,
+    "inherited_price_cleaning": "09:30 through 16:00 bar-start filter, as in the original loader; actual calendar constrains targets",
+    "splits": {
+      "train": {
+        "rows": 204694,
+        "dates": 2865,
+        "first_anchor": "2008-01-02T12:25:00.000000000",
+        "last_anchor": "2019-05-22T13:30:00.000000000",
+        "first_used_bar": "2008-01-02T09:30:00.000000000",
+        "last_used_bar": "2019-05-22T14:00:00.000000000"
+      },
+      "val": {
+        "rows": 40548,
+        "dates": 569,
+        "first_anchor": "2019-05-23T10:25:00.000000000",
+        "last_anchor": "2021-08-24T10:30:00.000000000",
+        "first_used_bar": "2019-05-22T14:05:00.000000000",
+        "last_used_bar": "2021-08-24T11:00:00.000000000"
+      }
+    },
+    "train_cohort": "SPX-PX6-GRID5-v1",
+    "score_cohort": "SPX-PX6-GRID5-v1 val",
+    "time_embedding": "sinusoidal UTC elapsed minutes / five, measured from forecast origin"
+  },
+  "horizons_minutes": [
+    5,
+    10,
+    15,
+    20,
+    25,
+    30
+  ],
+  "test_scored": false,
+  "configuration": {
+    "d_model": 128,
+    "depth": 12,
+    "nhead": 4,
+    "ffn": 512,
+    "dropout": 0.1,
+    "shared_query_parameters": 128,
+    "linear_readout": "128 -> 1 per future position",
+    "maximum_batch_size": 204694,
+    "max_updates": 1000,
+    "activation_checkpointing": true,
+    "attention_batch_chunk": 8192,
+    "precision": "BF16 autocast; FP32 parameters/AdamW states",
+    "gradient_accumulation": false
+  },
+  "parameters": 2380417,
+  "completed_updates": 1000,
+  "examples_seen": 204694000,
+  "selected_update": 225,
+  "stop_reason": "max_updates",
+  "runtime_seconds": 8394.618530273903,
+  "memory": {
+    "allocated_bytes": 41375825408,
+    "reserved_bytes": 51950649344
+  },
+  "validation": {
+    "smooth_l1": 0.3379410502051898,
+    "mean_mae_bp": 11.687592577487107,
+    "by_horizon": {
+      "5": {
+        "mae_bp": 6.55643736963708,
+        "direction_accuracy": 0.5031758977781073
+      },
+      "10": {
+        "mae_bp": 9.236560907497966,
+        "direction_accuracy": 0.5056573941400266
+      },
+      "15": {
+        "mae_bp": 11.194363398692932,
+        "direction_accuracy": 0.5156423615397911
+      },
+      "20": {
+        "mae_bp": 12.885086040224767,
+        "direction_accuracy": 0.5141509433962265
+      },
+      "25": {
+        "mae_bp": 14.415535261578697,
+        "direction_accuracy": 0.5171468780090364
+      },
+      "30": {
+        "mae_bp": 15.837572487291194,
+        "direction_accuracy": 0.5169945449608767
+      }
+    }
+  },
+  "persistence": {
+    "mean_mae_bp": 11.706526115163483,
+    "by_horizon": {
+      "5": {
+        "mae_bp": 6.5617034286422875,
+        "direction_accuracy": 0.0
+      },
+      "10": {
+        "mae_bp": 9.24889582596134,
+        "direction_accuracy": 0.0
+      },
+      "15": {
+        "mae_bp": 11.214600089292661,
+        "direction_accuracy": 0.0
+      },
+      "20": {
+        "mae_bp": 12.907565336743385,
+        "direction_accuracy": 0.0
+      },
+      "25": {
+        "mae_bp": 14.441712779794706,
+        "direction_accuracy": 0.0
+      },
+      "30": {
+        "mae_bp": 15.864679230546502,
+        "direction_accuracy": 0.0
+      }
+    }
+  },
+  "paired_gain_bp": [
+    0.005266059005183856,
+    0.012334918463452383,
+    0.020236690599814484,
+    0.02247929651863476,
+    0.026177518216129035,
+    0.027106743255284105
+  ],
+  "paired_ci95_by_date_block": {
+    "5": [
+      [
+        0.00032086502379746913,
+        0.010005832502714881
+      ],
+      [
+        0.0042469780041178426,
+        0.02087599502668854
+      ],
+      [
+        0.008782683141856493,
+        0.03221590569632199
+      ],
+      [
+        0.008811729802902997,
+        0.038240697921837354
+      ],
+      [
+        0.011013819555761369,
+        0.04320746483866008
+      ],
+      [
+        0.007023034983835557,
+        0.0494909121779671
+      ]
+    ],
+    "10": [
+      [
+        0.0008131774560724477,
+        0.009582195303229946
+      ],
+      [
+        0.004937318517294939,
+        0.02140367029524275
+      ],
+      [
+        0.009762748400723838,
+        0.0332857842210689
+      ],
+      [
+        0.009132506191049432,
+        0.039311793159781394
+      ],
+      [
+        0.011853029414814743,
+        0.043731545149222666
+      ],
+      [
+        0.007858651086208512,
+        0.05067639285968039
+      ]
+    ]
+  },
+  "code_commit": "de22e4575f31c6f87c6b004d0208cf6b38a2bb62",
+  "model_sha256": "4ca79cfc25c7f09564906fae230b9cd39a182676eef16082aebb918eee95c032",
+  "runner_sha256": "65a3e9ce78a214b1a28287b4933f736b37bf686f0038bb3528d88621bfe502c9",
+  "checkpoint_sha256": "5ab71e76d6387a9569b94450abaf1eb7980caab03a11c0b43a7fcae4637b9890",
+  "environment": {
+    "torch": "2.8.0+cu128",
+    "numpy": "2.5.5",
+    "python": "3.12.9",
+    "gpu": "NVIDIA H200",
+    "total_memory_bytes": 150111977472
+  },
+  "limitations": [
+    "Validation selected the checkpoint; paired intervals do not adjust selection.",
+    "Relative to the earlier CNN, supervision, architecture, batch and optimizer settings change together.",
+    "Overlapping windows are correlated; no test was scored.",
+    "Largest confirmed batch is capped at the number of distinct training windows."
+  ]
+}

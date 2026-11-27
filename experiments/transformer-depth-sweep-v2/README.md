@@ -37,3 +37,7 @@ continues without a local monitor. Each depth has one fit under this fixed
 recipe; validation selects checkpoints and depth, and intervals do not adjust
 selection. Equal update/sample budgets do not imply equal compute or elapsed
 runtime, especially with GPU contention. This is exploratory validation.
+
+## Completed comparison
+
+All three depths completed 1,000 updates. Greater depth gave no clear validation gain under this recipe. [Verified results, curves and conditional intervals](../../results/transformer-depth-sweep-v2/summary.md). Local polling remains disabled.

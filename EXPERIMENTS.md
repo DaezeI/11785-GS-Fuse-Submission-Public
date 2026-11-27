@@ -1,6 +1,6 @@
-## November 27 Transformer depth comparison — concurrent training running
+## November 27 controlled Transformer depth comparison — completed
 
-`transformer-depth-sweep-v2` runs `none+Transformer128x8~none~none` and `none+Transformer128x12~none~none` concurrently as two processes sharing one H200. Both entered formal training with finite loss and nonzero gradients. Completed depth4 is the reference. All scientific settings remain fixed, including batch 204,694 and 1,000 updates per depth. The remote controller generates the paired comparison automatically; local monitoring stops after startup verification. The canceled sequential v1 attempt is excluded. [Concurrent protocol](experiments/transformer-depth-sweep-v2/README.md). No depth8/12 validation conclusion yet.
+Nicole completed depths4/8/12 with identical width, data, six-target loss, full batch204,694, 1,000 updates and optimizer recipe. Depths8/12 shared one H200; the canceled sequential attempt is excluded. Selected validation MAE11.689790/11.692259/11.687593 bp gives no clear depth benefit: all paired primary mean-MAE intervals span zero. Deeper fits lower training loss but worsen late validation. [Result and provenance](results/transformer-depth-sweep-v2/summary.md).
 
 ## November 27 shared-query Transformer — completed
 

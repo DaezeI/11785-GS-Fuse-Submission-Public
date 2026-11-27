@@ -1,6 +1,6 @@
-# November 27 Transformer depth comparison — concurrent fits started
+# November 27 Transformer depth comparison — completed
 
-`none+Transformer128x8~none~none` and `none+Transformer128x12~none~none` both entered formal training on the same single H200. They retain the completed depth4 recipe and full batch 204,694 / 1,000 updates. Comparison is pending; the remote controller writes tables and curves automatically. Repeated local monitoring stops at the user’s request after both startup checks. [Protocol](experiments/transformer-depth-sweep-v2/README.md).
+All three `none+Transformer128x4~none~none`, `none+Transformer128x8~none~none`, and `none+Transformer128x12~none~none` fits completed 1,000 full-batch updates on `SPX-PX6-GRID5-v1`. Selected mean validation MAE is 11.689790 / 11.692259 / 11.687593 bp. Depth12 gains only 0.0188% over depth4, with the paired mean-MAE interval spanning zero. Deeper fits lower training loss but show larger late validation deterioration. The concurrent one-H200 job exited 0 in 2h22m10s. No test scored. [Verified result](results/transformer-depth-sweep-v2/summary.md).
 
 # November 27 shared-query Transformer — completed
 

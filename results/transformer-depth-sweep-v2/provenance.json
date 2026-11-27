@@ -1,0 +1,23 @@
+{
+  "run_id": "transformer-depth-sweep-v2",
+  "owner": "Nicole",
+  "status": "completed",
+  "hardware": "one H200; depths8/12 concurrent on the same device",
+  "runtime_code_commit": "de22e4575f31c6f87c6b004d0208cf6b38a2bb62",
+  "reference_depth4_code_commit": "e1c5375359b0faf05e240f95fa175d8604df6d4e",
+  "source_tar_sha256": "4dc475c5b82d6d223626d1336ea4c604033edbd29d5eb5e8b0f8206246faac0d",
+  "runtime_file_sha256": {
+    "model/prediction_token_transformer.py": "4ca79cfc25c7f09564906fae230b9cd39a182676eef16082aebb918eee95c032",
+    "scripts/train_prediction_token_transformer.py": "65a3e9ce78a214b1a28287b4933f736b37bf686f0038bb3528d88621bfe502c9",
+    "scripts/compare_prediction_token_depths.py": "7aed4c61f794f2669eeb76e4c877a3f26af239f108aabe3a747e3c43eb3466c6",
+    "scripts/run_prediction_token_depth_sweep.py": "50517948aec381f7d62560830c6d21ec8f0e3184b449d7805198848e2ab5270d"
+  },
+  "scheduler_exit_status": 0,
+  "allocated_walltime": "02:22:10",
+  "verified_artifact_files": 29,
+  "verification": "All remote-to-local file hashes verified. Re-ran full paired comparison locally: identical timestamps/targets/scales/fixed settings, all MAEs and bootstrap intervals agree within 1e-12 numerical tolerance; largest observed floating-point difference 1.78e-15. Selected weights and immutable source hashes checked; new fits each have 1000 logged full-batch updates.",
+  "runtime_note": "Depth4 ran alone earlier; depths8/12 shared one GPU. Per-fit elapsed runtime and per-process memory are not directly comparable as isolated hardware efficiency.",
+  "private_artifacts": "Raw forecasts, selected/initial weights and optimizer continuation states remain in private compute storage and verified local backup.",
+  "test_scored": false,
+  "aggregate_backup": "Pending versioned Drive upload after publication."
+}
