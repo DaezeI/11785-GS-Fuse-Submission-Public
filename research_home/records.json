@@ -2,7 +2,7 @@
   "title": "GS-Fuse Research Home",
   "stage": "Controlled experiments and final writing",
   "overview": "Rolling-price CNN training produced small ordinary-market validation gains, while matched Fed validation did not improve over Persistence. Earlier controlled text comparisons found little reliable benefit from the matched report. These findings remain scoped to their protocols; the Fed test is reserved.",
-  "updated_at": "2026-11-27T07:33:01+00:00",
+  "updated_at": "2026-11-27T07:37:56+00:00",
   "source_url": "https://github.com/DaezeI/11785-GS-Fuse-Submission-Public/blob/main/research_home/records.json",
   "links": [
     {
@@ -41,6 +41,32 @@
     }
   ],
   "experiments": [
+    {
+      "id": "transformer-depth-sweep-v1",
+      "title": "Does depth 8 or 12 improve the shared-query Transformer?",
+      "owner": "Nicole",
+      "kind": "Experiment",
+      "status": "planned",
+      "question": "Does increasing depth from4 to8 or12 reduce validation MAE with the existing fixed training recipe?",
+      "configuration": "SPX-PX6-GRID5-v1: 204,694 training /40,548 validation; width128, four heads, FFN512, six supervised outputs. Reuse completed depth4; sequential depth8/12 on one H200, each batch204,694 and1,000 updates. Exact optimizer/schedule, checkpointing and selection retained.",
+      "finding": "Depth4 completed with selected mean validation MAE11.689790bp. Depth8/12 are prepared; no depth comparison result yet.",
+      "limitations": "One fit per depth with one fixed optimization recipe. Reused validation selects checkpoints/depth; intervals do not adjust selection. Equal updates are not equal compute. No reserved test.",
+      "figure": null,
+      "evidence": [
+        {
+          "label": "Fixed depth-comparison protocol",
+          "url": "https://github.com/DaezeI/11785-GS-Fuse-Submission-Public/blob/main/experiments/transformer-depth-sweep-v1/README.md"
+        },
+        {
+          "label": "Completed depth4 reference",
+          "url": "https://github.com/DaezeI/11785-GS-Fuse-Submission-Public/blob/main/results/shared-token-transformer-v1/summary.md"
+        }
+      ],
+      "related": [
+        "shared-token-transformer-v1"
+      ],
+      "updated_at": "2026-11-27T07:37:56.886254+00:00"
+    },
     {
       "id": "shared-token-transformer-v1",
       "title": "Full-batch Transformer completed; validation gain over Persistence remains small",

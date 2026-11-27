@@ -131,3 +131,9 @@ the architecture of the completed exact 8B result. See the
   prediction vector expanded over six temporally encoded future positions,
   and one shared linear output projection. The run is
   `shared-token-transformer-v1`; [protocol](../experiments/shared-token-transformer-v1/README.md).
+
+The depth comparison adds `none+Transformer128x8~none~none` and
+`none+Transformer128x12~none~none`, with the same width, query/readout, cohort,
+six targets, full batch and update budget. `transformer-depth-sweep-v1` reuses
+the completed depth-4 fit and runs depths 8/12 sequentially on one H200.
+[Fixed comparison](../experiments/transformer-depth-sweep-v1/README.md).

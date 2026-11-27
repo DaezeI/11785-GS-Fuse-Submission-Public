@@ -1,3 +1,7 @@
+## November 27 controlled Transformer depth comparison — planned
+
+Nicole will reuse completed `none+Transformer128x4~none~none` and train `none+Transformer128x8~none~none` / `none+Transformer128x12~none~none` sequentially on one H200. Width, six-target task, cohort, batch 204,694, 1,000 updates, optimizer and selection stay fixed. [Protocol](experiments/transformer-depth-sweep-v1/README.md). The remote pipeline generates a paired comparison table and curves after both fits complete; no ongoing local polling. No depth-8/12 result yet.
+
 ## November 27 shared-query Transformer — completed
 
 Nicole completed `none+Transformer128x4~none~none` on `SPX-PX6-GRID5-v1`: 204,694 training / 40,548 validation windows, six supervised positions through 30 minutes, batch 204,694, 1,000 optimizer updates, one H200, exit 0 in 31m32s including calibration. Selected update 50 mean MAE is 11.689790 bp versus Persistence 11.706526 bp; training continued fitting while late validation deteriorated. This is a small exploratory validation gain. [Result and provenance](results/shared-token-transformer-v1/summary.md).
