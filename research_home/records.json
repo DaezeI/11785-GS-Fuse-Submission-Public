@@ -49,7 +49,7 @@
       "status": "running",
       "question": "How does a width-128, depth-four shared-query Transformer train and predict on all five-minute SPX windows?",
       "configuration": "none+Transformer128x4~none~none; SPX-PX6-GRID5-v1: 204,694 train / 40,548 val; six outputs through 30 minutes; one H200, calibrated maximum unique batch; 1,000 optimizer updates capped at 90 minutes.",
-      "finding": "One H200 confirmed a full batch of 204,694 distinct windows for ten complete BF16 forward/backward/AdamW updates with activation checkpointing. Peak allocated/reserved memory was 22.482/30.712 GiB. Formal 1,000-update training was running at the last check; repeated polling stopped at the user’s request. Final results are pending.",
+      "finding": "One H200 confirmed a full batch of 204,694 distinct windows for ten complete BF16 forward/backward/AdamW updates with activation checkpointing. Peak allocated/reserved memory was 22.482/30.711 GiB. Formal 1,000-update training was running at the last check; repeated polling stopped at the user’s request. Final results are pending.",
       "limitations": "Exploratory reused validation, six-target objective and optimization changed together. No reserved test or text experiment.",
       "figure": null,
       "evidence": [
